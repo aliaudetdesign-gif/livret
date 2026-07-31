@@ -8,15 +8,18 @@ import {
   type AssetActionState,
 } from "@/app/agence/projets/[id]/actions";
 
+// Trois teintes de la charte plutôt que violet/emerald/orange, chacune
+// vérifiée au-dessus de 4,5:1 sur son propre fond teinté :
+// clay-700/clay-100 = 4,99 · ok-600/ok-100 = 5,91 · warn-600/warn-100 = 4,93.
 const categoryConfig: Record<TypographyCategory, { label: string; badgeClass: string }> = {
-  titrage: { label: "Titrage", badgeClass: "bg-violet-100 text-violet-700" },
-  corps_de_texte: { label: "Corps de texte", badgeClass: "bg-emerald-100 text-emerald-700" },
-  accent: { label: "Accent / Labels", badgeClass: "bg-orange-100 text-orange-700" },
+  titrage: { label: "Titrage", badgeClass: "bg-clay-100 text-clay-700" },
+  corps_de_texte: { label: "Corps de texte", badgeClass: "bg-ok-100 text-ok-600" },
+  accent: { label: "Accent / Labels", badgeClass: "bg-warn-100 text-warn-600" },
 };
 
 const inputClass =
-  "w-full px-2 py-1.5 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1";
+  "w-full px-2.5 py-1.5 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1";
 
 // Construit une URL Google Fonts CSS2 à partir du nom de la police. Best-effort :
 // si la police n'existe pas sur Google Fonts, le lien renvoie une erreur silencieuse
@@ -83,9 +86,9 @@ export function TypographyCard({
   // du formulaire (metadata absente) : affichage minimal plutôt qu'un plantage.
   if (!metadata || !categoryConfig[category]) {
     return (
-      <div className="bg-white border border-zinc-100 rounded-lg p-5">
-        <div className="font-medium text-sm">{asset.label}</div>
-        <div className="text-xs text-zinc-500">{asset.value}</div>
+      <div className="glass rounded-card p-5">
+        <div className="font-semibold text-[13.5px]">{asset.label}</div>
+        <div className="text-xs text-ink-500">{asset.value}</div>
       </div>
     );
   }
@@ -100,7 +103,7 @@ export function TypographyCard({
     : `"${fontName}", sans-serif`;
 
   return (
-    <div className="group relative bg-white border border-zinc-100 rounded-lg p-5">
+    <div className="glass group relative rounded-card p-5">
       {metadata.fileUrl && (
         <style
           dangerouslySetInnerHTML={{
@@ -128,7 +131,7 @@ export function TypographyCard({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-[var(--color-terracotta)]"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-clay-600 transition-colors"
               title="Modifier"
             >
               ✎
@@ -137,7 +140,7 @@ export function TypographyCard({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
               title="Supprimer"
             >
               ✕
@@ -186,20 +189,20 @@ export function TypographyCard({
             />
           </div>
 
-          {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+          {state.error && <p className="text-xs text-err-600">{state.error}</p>}
 
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={pending}
-              className="text-xs font-medium bg-gradient-terracotta text-white rounded-md px-3 py-1.5 disabled:opacity-60"
+              className="btn-clay text-xs font-semibold px-3.5 py-1.5 disabled:opacity-60"
             >
               {pending ? "..." : "Enregistrer"}
             </button>
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="text-xs font-medium text-zinc-500 px-3 py-1.5"
+              className="text-xs font-medium text-ink-500 hover:text-ink-900 transition-colors px-3 py-1.5"
             >
               Annuler
             </button>
@@ -213,33 +216,35 @@ export function TypographyCard({
             }`}
           >
             <div className="flex items-center gap-2 text-xs">
-              <span className={`px-2 py-0.5 rounded-full font-medium ${badgeClass}`}>{label}</span>
-              {metadata.source && <span className="text-zinc-400">{metadata.source}</span>}
+              <span className={`px-2.5 py-[3.5px] rounded-full text-[11px] font-semibold ${badgeClass}`}>
+                {label}
+              </span>
+              {metadata.source && <span className="text-ink-400">{metadata.source}</span>}
             </div>
             {metadata.fileUrl && (
               <a
                 href={metadata.fileUrl}
                 download
-                className="text-xs font-medium text-[var(--color-terracotta)] hover:text-[var(--color-terracotta-deep)] whitespace-nowrap"
+                className="text-xs font-semibold text-clay-600 hover:text-clay-700 transition-colors whitespace-nowrap"
               >
                 ↓ Télécharger
               </a>
             )}
           </div>
 
-          <p className="text-lg font-semibold mb-3">{fontName}</p>
+          <p className="text-lg font-semibold tracking-[-0.02em] mb-3">{fontName}</p>
 
-          <div className="border-t border-zinc-100 py-4">
+          <div className="border-t border-white/55 py-4">
             {category === "titrage" && (
               <div style={{ fontFamily }}>
                 <p className="text-3xl font-bold leading-tight">{metadata.previewText}</p>
                 {metadata.previewSubtext && (
-                  <p className="italic text-lg text-zinc-500 mt-1">{metadata.previewSubtext}</p>
+                  <p className="italic text-lg text-ink-500 mt-1">{metadata.previewSubtext}</p>
                 )}
               </div>
             )}
             {category === "corps_de_texte" && (
-              <p style={{ fontFamily }} className="text-base text-zinc-700 leading-relaxed">
+              <p style={{ fontFamily }} className="text-base text-ink-700 leading-relaxed">
                 {metadata.previewText}
               </p>
             )}
@@ -247,7 +252,7 @@ export function TypographyCard({
               <div style={{ fontFamily }}>
                 <p className="text-sm font-medium uppercase tracking-[0.15em]">{metadata.previewText}</p>
                 {metadata.previewSubtext && (
-                  <p className="text-xs text-zinc-500 mt-1 tracking-normal normal-case">
+                  <p className="text-xs text-ink-500 mt-1 tracking-normal normal-case">
                     {metadata.previewSubtext}
                   </p>
                 )}
@@ -256,11 +261,11 @@ export function TypographyCard({
           </div>
 
           {metadata.weights.length > 0 && (
-            <div className="flex flex-wrap gap-2 border-t border-zinc-100 pt-4">
+            <div className="flex flex-wrap gap-2 border-t border-white/55 pt-4">
               {metadata.weights.map((w) => (
                 <span
                   key={w}
-                  className="text-xs px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600"
+                  className="text-xs px-2.5 py-1 rounded-full bg-white/65 border border-white/60 text-ink-700"
                 >
                   {w}
                 </span>
@@ -268,7 +273,7 @@ export function TypographyCard({
             </div>
           )}
 
-          {deleteError && <p className="text-xs text-red-600 mt-2">{deleteError}</p>}
+          {deleteError && <p className="text-xs text-err-600 mt-2">{deleteError}</p>}
         </>
       )}
     </div>

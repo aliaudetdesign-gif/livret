@@ -12,8 +12,8 @@ import { InfoPopover } from "@/components/InfoPopover";
 const initialState: AssetActionState = { error: null };
 
 const inputClass =
-  "w-full px-2 py-1.5 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1";
+  "w-full px-2.5 py-1.5 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1";
 
 const colorCategories: { value: ColorCategory; label: string }[] = [
   { value: "primaire", label: "Couleur primaire" },
@@ -88,7 +88,7 @@ export function ColorCard({
   }
 
   return (
-    <div className="group relative bg-white border border-zinc-100 rounded-lg overflow-hidden hover:border-[var(--color-terracotta)] hover:shadow-md transition-all duration-300">
+    <div className="glass hover-lift group relative rounded-card overflow-hidden">
       {selectionMode ? (
         <label className="absolute top-3 left-3 z-10">
           <input
@@ -105,7 +105,7 @@ export function ColorCard({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white/90 border border-zinc-200 text-zinc-500 hover:text-[var(--color-terracotta)]"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-clay-600 transition-colors"
               title="Modifier"
             >
               ✎
@@ -114,7 +114,7 @@ export function ColorCard({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white/90 border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
               title="Supprimer"
             >
               ✕
@@ -127,7 +127,7 @@ export function ColorCard({
         <button
           type="button"
           onClick={handleCopy}
-          className="h-20 w-full block"
+          className="h-[86px] w-full block border-b border-white/40"
           style={{ backgroundColor: asset.value }}
           title="Cliquer pour copier le code hexadécimal"
         />
@@ -260,20 +260,20 @@ export function ColorCard({
               </div>
             )}
 
-            {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+            {state.error && <p className="text-xs text-err-600">{state.error}</p>}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={pending}
-                className="text-xs font-medium bg-gradient-terracotta text-white rounded-md px-3 py-1.5 disabled:opacity-60"
+                className="btn-clay text-xs font-semibold px-3.5 py-1.5 disabled:opacity-60"
               >
                 {pending ? "..." : "Enregistrer"}
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="text-xs font-medium text-zinc-500 px-3 py-1.5"
+                className="text-xs font-medium text-ink-500 hover:text-ink-900 transition-colors px-3 py-1.5"
               >
                 Annuler
               </button>
@@ -281,13 +281,13 @@ export function ColorCard({
           </form>
         ) : (
           <>
-            <div className="font-medium text-sm">{asset.label}</div>
-            <div className="text-xs text-zinc-500 mt-1 flex items-center">
+            <div className="font-semibold text-[13.5px]">{asset.label}</div>
+            <div className="text-xs text-ink-500 mt-1 flex items-center">
               {copied ? "Copié !" : asset.value}
               {!copied && <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.hex} />}
             </div>
             {metadata && (
-              <div className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+              <div className="text-[11px] text-ink-400 mt-1 leading-relaxed">
                 <div className="flex items-center">
                   RGB {metadata.rgb.r}, {metadata.rgb.g}, {metadata.rgb.b}
                   <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.rgb} />
@@ -301,7 +301,7 @@ export function ColorCard({
           </>
         )}
 
-        {deleteError && <p className="text-xs text-red-600 mt-2">{deleteError}</p>}
+        {deleteError && <p className="text-xs text-err-600 mt-2">{deleteError}</p>}
       </div>
     </div>
   );

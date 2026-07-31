@@ -37,43 +37,43 @@ export function DashboardCalendar() {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-zinc-100 p-4 h-full flex flex-col">
+    <div className="glass rounded-card p-[19px] h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <div className="font-medium text-sm">{capitalizedLabel}</div>
-        <div className="flex gap-1">
+        <div className="font-semibold text-[13px]">{capitalizedLabel}</div>
+        <div className="flex gap-[5px]">
           <button
             type="button"
             onClick={() => setCursor(new Date(year, month - 1, 1))}
-            className="p-1 rounded hover:bg-zinc-100 text-zinc-500"
+            className="w-[25px] h-[25px] rounded-full bg-white/60 border border-white/60 text-ink-500 flex items-center justify-center transition-colors hover:bg-white/85"
             aria-label="Mois précédent"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             onClick={() => setCursor(new Date(year, month + 1, 1))}
-            className="p-1 rounded hover:bg-zinc-100 text-zinc-500"
+            className="w-[25px] h-[25px] rounded-full bg-white/60 border border-white/60 text-ink-500 flex items-center justify-center transition-colors hover:bg-white/85"
             aria-label="Mois suivant"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-wide text-zinc-400 mb-2">
+      <div className="grid grid-cols-7 gap-[3px] text-center text-[9.5px] font-semibold uppercase tracking-[0.09em] text-ink-400 mb-1.5">
         {WEEKDAYS.map((day) => (
           <div key={day}>{day}</div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-[3px]">
         {cells.map((day, i) => (
           <div
             key={i}
-            className={`aspect-square flex items-center justify-center text-xs rounded-md ${
+            className={`aspect-square flex items-center justify-center text-xs rounded-chip transition-colors ${
               isToday(day)
-                ? "bg-gradient-terracotta text-white font-semibold"
-                : "text-zinc-600"
+                ? "bg-gradient-terracotta text-white font-semibold shadow-[0_4px_12px_-4px_var(--clay-glow)]"
+                : "text-ink-700 hover:bg-white/60"
             }`}
           >
             {day ?? ""}
@@ -81,7 +81,7 @@ export function DashboardCalendar() {
         ))}
       </div>
 
-      <p className="text-[11px] text-zinc-400 mt-4">
+      <p className="text-[11px] text-ink-400 mt-4">
         Aucun événement pour l&apos;instant. Les rendez-vous et échéances viendront
         s&apos;afficher ici.
       </p>

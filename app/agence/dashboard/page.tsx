@@ -100,14 +100,14 @@ export default async function AgenceDashboardPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-zinc-500 text-sm">
+      <div className="mb-[22px] px-1">
+        <h1 className="text-[27px] font-semibold tracking-[-0.028em]">Dashboard</h1>
+        <p className="text-ink-500 text-[13.5px] mt-0.5">
           Gérez, visualisez et personnalisez votre aperçu global
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-3.5 mb-3.5">
         <StatTrendCard
           label="Projets actifs"
           value={activeProjects.length}
@@ -134,39 +134,39 @@ export default async function AgenceDashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-4 gap-3.5 mb-[26px]">
         <div className="col-span-2">
           <DashboardCalendar />
         </div>
 
-        <div className="bg-white rounded-lg border border-zinc-100 p-4 h-full">
-          <h2 className="text-sm font-medium mb-4">Dernières activités</h2>
+        <div className="glass rounded-card p-[19px] h-full">
+          <h2 className="text-[12.5px] font-semibold mb-4">Dernières activités</h2>
           {activities.length === 0 ? (
-            <p className="text-xs text-zinc-400">Aucune activité pour l&apos;instant.</p>
+            <p className="text-xs text-ink-400">Aucune activité pour l&apos;instant.</p>
           ) : (
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col gap-3.5">
               {activities.map((activity) => (
                 <li key={activity.id} className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-[var(--color-lin)] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-[29px] h-[29px] rounded-chip bg-white/65 border border-white/60 text-ink-500 flex items-center justify-center shrink-0 mt-0.5">
                     {activity.type === "asset" ? (
-                      <FileText className="w-3.5 h-3.5 text-zinc-500" />
+                      <FileText className="w-[13px] h-[13px]" strokeWidth={1.8} />
                     ) : (
-                      <MessageCircle className="w-3.5 h-3.5 text-zinc-500" />
+                      <MessageCircle className="w-[13px] h-[13px]" strokeWidth={1.8} />
                     )}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs text-zinc-700 leading-snug">
+                    <div className="text-xs text-ink-700 leading-[1.4]">
                       {activity.title}
                     </div>
                     {activity.type === "asset" && activity.projectId && (
                       <Link
                         href={`/agence/projets/${activity.projectId}`}
-                        className="text-[11px] text-zinc-400 hover:text-[var(--color-terracotta-deep)]"
+                        className="text-[11px] text-ink-400 hover:text-clay-600"
                       >
                         chez {activity.projectName}
                       </Link>
                     )}
-                    <div className="text-[10px] text-zinc-300 mt-0.5">
+                    <div className="text-[10px] text-ink-400/80 mt-0.5">
                       {formatRelativeDate(activity.createdAt)}
                     </div>
                   </div>
@@ -176,20 +176,20 @@ export default async function AgenceDashboardPage() {
           )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="bg-white rounded-lg border border-zinc-100 p-4">
-            <h2 className="text-sm font-medium mb-3">Échéances proches</h2>
+        <div className="flex flex-col gap-3.5">
+          <div className="glass rounded-card p-[19px]">
+            <h2 className="text-[12.5px] font-semibold mb-3">Échéances proches</h2>
             {upcomingDeadlines.length === 0 ? (
-              <p className="text-xs text-zinc-400">Aucune échéance à venir.</p>
+              <p className="text-xs text-ink-400">Aucune échéance à venir.</p>
             ) : (
               <div className="flex flex-col gap-3">
                 {upcomingDeadlines.map((project) => (
                   <div key={project.id}>
                     <div className="text-sm font-semibold">{project.name}</div>
-                    <div className="text-xs text-zinc-500 mb-2">Fin de projet</div>
+                    <div className="text-xs text-ink-500 mb-2">Fin de projet</div>
                     <Link
                       href={`/agence/projets/${project.id}`}
-                      className="block bg-gradient-terracotta text-white text-xs font-medium rounded-md px-3 py-2 text-center hover-lift"
+                      className="btn-clay block text-xs font-semibold px-3 py-2 text-center"
                     >
                       {formatWeekdayDate(project.end_date)}
                     </Link>
@@ -199,18 +199,18 @@ export default async function AgenceDashboardPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-lg border border-zinc-100 p-4 flex-1">
+          <div className="glass rounded-card p-[19px] flex-1">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-medium">Messagerie</h2>
+              <h2 className="text-[12.5px] font-semibold">Messagerie</h2>
               <Link
                 href="/agence/messagerie"
-                className="text-xs font-medium text-[var(--color-terracotta-deep)] hover:underline"
+                className="text-xs font-medium text-clay-600 hover:underline"
               >
                 + Nouveau
               </Link>
             </div>
             {messagePreview.length === 0 ? (
-              <p className="text-xs text-zinc-400">Aucun message pour l&apos;instant.</p>
+              <p className="text-xs text-ink-400">Aucun message pour l&apos;instant.</p>
             ) : (
               <ul className="flex flex-col gap-3">
                 {messagePreview.map((message) => {
@@ -235,7 +235,7 @@ export default async function AgenceDashboardPage() {
                           <div className="text-xs font-medium truncate">
                             {message.projects?.name ?? "Client"}
                           </div>
-                          <div className="text-[11px] text-zinc-400 truncate">
+                          <div className="text-[11px] text-ink-400 truncate">
                             {message.content}
                           </div>
                         </div>
@@ -250,16 +250,16 @@ export default async function AgenceDashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-xs uppercase tracking-wide text-zinc-500 font-medium mb-3">
+        <h2 className="text-[10px] uppercase tracking-[0.13em] text-ink-400 font-medium mb-3 px-1">
           Projets actifs
         </h2>
         {activeProjects.length === 0 ? (
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-ink-400">
             Aucun projet pour l&apos;instant. Crée ton premier projet client pour
             voir cette section se remplir.
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3.5">
             {activeProjects.slice(0, 3).map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
@@ -282,20 +282,21 @@ function StatTrendCard({
   href: string;
 }) {
   return (
-    <Link
-      href={href}
-      className="bg-white rounded-lg p-4 border border-zinc-100 hover-lift block"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-sm font-medium text-zinc-700">{label}</div>
-        <div className="w-7 h-7 rounded-full bg-[var(--color-noir-doux)] text-white flex items-center justify-center shrink-0">
-          <ArrowUpRight className="w-3.5 h-3.5" />
+    <Link href={href} className="glass hover-lift rounded-card p-[19px] block">
+      <div className="flex items-start justify-between mb-[22px]">
+        <div className="text-[12.5px] font-medium text-ink-700 max-w-[110px] leading-[1.35]">
+          {label}
+        </div>
+        <div className="w-7 h-7 rounded-full bg-ink-900/90 text-white flex items-center justify-center shrink-0">
+          <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={2} />
         </div>
       </div>
-      <div className="text-3xl font-semibold mb-2">{value}</div>
+      <div className="text-[34px] font-semibold tracking-[-0.04em] leading-none mb-[11px]">
+        {value}
+      </div>
       {trend > 0 && (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">
-          <ArrowUp className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-ok-600 bg-ok-100 rounded-full px-2.5 py-[3.5px]">
+          <ArrowUp className="w-[11px] h-[11px]" strokeWidth={2.4} />
           {trend}
         </span>
       )}

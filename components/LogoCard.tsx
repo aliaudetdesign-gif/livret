@@ -40,9 +40,9 @@ function guessFilename(label: string, url: string): string {
 }
 
 const backgroundStyles: Record<LogoBackground, string> = {
-  dark: "bg-[var(--color-noir-doux)] text-white",
-  light: "bg-[var(--color-creme)] text-[var(--color-noir-doux)]",
-  color: "bg-[var(--color-terracotta)] text-white",
+  dark: "bg-ink-900 text-white",
+  light: "bg-paper text-ink-900",
+  color: "bg-gradient-terracotta text-white",
 };
 
 const backgroundOptions: { value: LogoBackground; label: string }[] = [
@@ -52,8 +52,8 @@ const backgroundOptions: { value: LogoBackground; label: string }[] = [
 ];
 
 const inputClass =
-  "w-full px-2 py-1.5 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1";
+  "w-full px-2.5 py-1.5 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1";
 
 const initialState: AssetActionState = { error: null };
 
@@ -172,12 +172,12 @@ export function LogoCard({
   // du modèle logo (metadata absente).
   if (!metadata) {
     return (
-      <div className="bg-white border border-zinc-100 rounded-lg p-4">
-        <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-zinc-50">
+      <div className="glass rounded-card p-4">
+        <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/60">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={asset.value} alt={asset.label} className="w-full h-full object-contain" />
         </div>
-        <div className="font-medium text-sm">{asset.label}</div>
+        <div className="font-semibold text-[13.5px]">{asset.label}</div>
       </div>
     );
   }
@@ -194,10 +194,10 @@ export function LogoCard({
   const isGeneratedFallback = !metadata.formats.svg && !metadata.formats.png && !!previewUrl;
 
   return (
-    <div className="group relative bg-white border border-zinc-100 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="glass hover-lift group relative rounded-card overflow-hidden">
       {recentlyAdded && (
         <span
-          className="absolute top-3 right-3 z-20 w-2.5 h-2.5 rounded-full bg-[var(--color-terracotta)]"
+          className="absolute top-3 right-3 z-20 w-2.5 h-2.5 rounded-full bg-clay-500 shadow-[0_0_0_3px_rgba(255,255,255,0.6)]"
           title="Récemment ajouté"
         />
       )}
@@ -218,7 +218,7 @@ export function LogoCard({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white/90 border border-zinc-200 text-zinc-500 hover:text-[var(--color-terracotta)]"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-clay-600 transition-colors"
               title="Modifier"
             >
               ✎
@@ -227,7 +227,7 @@ export function LogoCard({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white/90 border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
               title="Supprimer"
             >
               ✕
@@ -237,8 +237,8 @@ export function LogoCard({
       )}
 
       <div
-        className={`relative aspect-[4/3] w-full flex items-center justify-center border border-zinc-200 ${
-          isGeneratedFallback ? "bg-zinc-50" : backgroundStyles[metadata.background]
+        className={`relative aspect-[4/3] w-full flex items-center justify-center border-b border-white/45 ${
+          isGeneratedFallback ? "bg-white/60" : backgroundStyles[metadata.background]
         }`}
       >
         {previewUrl ? (
@@ -273,12 +273,12 @@ export function LogoCard({
         )}
 
         {!isEditing && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-0 flex items-center justify-center bg-ink-900/25 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               type="button"
               onClick={handleDownload}
               disabled={isDownloading}
-              className="bg-white text-[var(--color-noir-doux)] text-xs font-medium rounded-full px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-wait"
+              className="bg-white/95 text-ink-900 text-xs font-semibold rounded-full px-4 py-2 shadow-[0_8px_20px_-8px_rgba(23,22,26,0.5)] disabled:opacity-60 disabled:cursor-wait"
             >
               {isDownloading ? "Téléchargement..." : "↓ Télécharger"}
             </button>
@@ -323,20 +323,20 @@ export function LogoCard({
 
             <ExtraFormatFields />
 
-            {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+            {state.error && <p className="text-xs text-err-600">{state.error}</p>}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={pending}
-                className="text-xs font-medium bg-gradient-terracotta text-white rounded-md px-3 py-1.5 disabled:opacity-60"
+                className="btn-clay text-xs font-semibold px-3.5 py-1.5 disabled:opacity-60"
               >
                 {pending ? "..." : "Enregistrer"}
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="text-xs font-medium text-zinc-500 px-3 py-1.5"
+                className="text-xs font-medium text-ink-500 hover:text-ink-900 transition-colors px-3 py-1.5"
               >
                 Annuler
               </button>
@@ -344,9 +344,9 @@ export function LogoCard({
           </form>
         ) : (
           <>
-            <div className="font-medium text-sm">{asset.label}</div>
+            <div className="font-semibold text-[13.5px]">{asset.label}</div>
             {metadata.subtitle && (
-              <div className="text-xs text-zinc-500 mt-0.5">{metadata.subtitle}</div>
+              <div className="text-xs text-ink-500 mt-0.5">{metadata.subtitle}</div>
             )}
 
             {badgeItems.length > 0 && (
@@ -358,10 +358,10 @@ export function LogoCard({
                       <button
                         type="button"
                         onClick={() => toggleFormat(item.key)}
-                        className={`text-[11px] font-medium px-2 py-1 rounded-full border transition-colors ${
+                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
                           isSelected
-                            ? "bg-[var(--color-noir-doux)] text-white border-[var(--color-noir-doux)]"
-                            : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
+                            ? "bg-ink-900 text-white border-ink-900"
+                            : "bg-white/70 text-ink-500 border-white/60 hover:bg-white/90 hover:text-ink-900"
                         }`}
                       >
                         {item.label}
@@ -378,7 +378,7 @@ export function LogoCard({
                     );
                   })}
                 </div>
-                <p className="text-[11px] text-zinc-400 mt-1.5">
+                <p className="text-[11px] text-ink-400 mt-1.5">
                   {selectedFormats.size === 0
                     ? "Sélectionne le format souhaité"
                     : `${selectedFormats.size} format${selectedFormats.size > 1 ? "s" : ""} sélectionné${selectedFormats.size > 1 ? "s" : ""}`}
@@ -386,7 +386,7 @@ export function LogoCard({
               </>
             )}
 
-            {deleteError && <p className="text-xs text-red-600 mt-2">{deleteError}</p>}
+            {deleteError && <p className="text-xs text-err-600 mt-2">{deleteError}</p>}
           </>
         )}
       </div>

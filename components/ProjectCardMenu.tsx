@@ -87,7 +87,7 @@ export function ProjectCardMenu({ project }: { project: Project }) {
           setStatusOpen(false);
         }}
         disabled={isPending}
-        className="w-7 h-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors disabled:opacity-50"
+        className="w-7 h-7 rounded-chip flex items-center justify-center text-ink-400 hover:text-ink-900 hover:bg-white/70 transition-colors disabled:opacity-50"
         aria-label="Options du projet"
       >
         <MoreVertical className="w-4 h-4" />
@@ -95,39 +95,39 @@ export function ProjectCardMenu({ project }: { project: Project }) {
 
       {open && (
         <div
-          className="absolute z-20 top-full right-0 mt-1 w-52 bg-white border border-zinc-200 rounded-lg shadow-lg overflow-hidden text-sm"
+          className="glass absolute z-20 top-full right-0 mt-2 w-52 rounded-field overflow-hidden text-[13px]"
           onClick={stop}
         >
           <button
             type="button"
             onClick={handleArchive}
-            className="w-full text-left px-3 py-2 hover:bg-zinc-50 transition-colors"
+            className="w-full text-left px-3.5 py-2.5 hover:bg-white/60 transition-colors"
           >
             {project.archived ? "Désarchiver" : "Archiver"}
           </button>
 
-          <div className="border-t border-zinc-100">
+          <div className="border-t border-white/50">
             <button
               type="button"
               onClick={(e) => {
                 stop(e);
                 setStatusOpen((v) => !v);
               }}
-              className="w-full text-left px-3 py-2 hover:bg-zinc-50 transition-colors"
+              className="w-full text-left px-3.5 py-2.5 hover:bg-white/60 transition-colors"
             >
               Changer le statut
             </button>
             {statusOpen && (
-              <div className="border-t border-zinc-100 bg-zinc-50/50">
+              <div className="border-t border-white/50 bg-white/30">
                 {STATUS_OPTIONS.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={(e) => handleStatus(e, option.value)}
-                    className={`w-full text-left px-5 py-2 text-xs hover:bg-zinc-100 transition-colors ${
+                    className={`w-full text-left px-5 py-2 text-xs hover:bg-white/60 transition-colors ${
                       option.value === project.status
-                        ? "font-medium text-[var(--color-terracotta-deep)]"
-                        : "text-zinc-600"
+                        ? "font-semibold text-clay-600"
+                        : "text-ink-700"
                     }`}
                   >
                     {option.label}
@@ -140,7 +140,7 @@ export function ProjectCardMenu({ project }: { project: Project }) {
           <button
             type="button"
             onClick={handleDelete}
-            className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 transition-colors border-t border-zinc-100"
+            className="w-full text-left px-3.5 py-2.5 text-err-600 hover:bg-err-100/70 transition-colors border-t border-white/50"
           >
             Supprimer
           </button>
@@ -148,7 +148,7 @@ export function ProjectCardMenu({ project }: { project: Project }) {
       )}
 
       {error && (
-        <p className="absolute z-20 top-full right-0 mt-1 w-52 text-[11px] text-red-600 bg-red-50 rounded-md px-2 py-1">
+        <p className="absolute z-20 top-full right-0 mt-2 w-52 text-[11px] text-err-600 bg-err-100 rounded-chip px-2.5 py-1.5">
           {error}
         </p>
       )}

@@ -30,6 +30,9 @@
   --ink-400: #6e6975;
 
   /* --- Terre cuite (accent) ---------------------------------------------- */
+  /* clay-700 existe uniquement pour le texte posé sur clay-100 :
+     clay-600 y tombe à 4,49:1, sous le seuil AA. */
+  --clay-700: #9c4529;
   --clay-600: #a64b2e;
   --clay-500: #ba5636;
   --clay-400: #da8664;
@@ -110,6 +113,7 @@
   --color-ink-500: var(--ink-500);
   --color-ink-400: var(--ink-400);
 
+  --color-clay-700: var(--clay-700);
   --color-clay-600: var(--clay-600);
   --color-clay-500: var(--clay-500);
   --color-clay-400: var(--clay-400);
