@@ -1,0 +1,532 @@
+"use client";
+
+import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent } from "react";
+import { addBrandAsset, type AssetActionState } from "@/app/agence/projets/[id]/actions";
+import { ExtraFormatFields } from "@/components/ExtraFormatFields";
+import { InfoPopover } from "@/components/InfoPopover";
+import {
+  COLOR_FORMAT_DESCRIPTIONS,
+  LOGO_FORMAT_DESCRIPTIONS,
+  type AssetType,
+  type ColorCategory,
+  type ColorInputFormat,
+  type LogoBackground,
+  type TypographyCategory,
+} from "@/lib/types";
+
+const initialState: AssetActionState = { error: null };
+
+const inputClass =
+  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
+const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+
+const FILE_TYPES: AssetType[] = ["logo", "moodboard"];
+
+const labels: Record<AssetType, { title: string; namePlaceholder: string }> = {
+  logo: { title: "Ajouter un logo", namePlaceholder: "ex: Logo principal" },
+  moodboard: { title: "Ajouter une image", namePlaceholder: "ex: Ambiance été" },
+  typographie: { title: "Ajouter une typographie", namePlaceholder: "ex: Cormorant Infant" },
+  couleur: { title: "Ajouter une couleur", namePlaceholder: "ex: Terracotta" },
+};
+
+const typographyCategories: { value: TypographyCategory; label: string }[] = [
+  { value: "titrage", label: "Titrage" },
+  { value: "corps_de_texte", label: "Corps de texte" },
+  { value: "accent", label: "Accent / Labels" },
+];
+
+const logoBackgrounds: { value: LogoBackground; label: string }[] = [
+  { value: "dark", label: "Fond sombre" },
+  { value: "light", label: "Fond clair" },
+  { value: "color", label: "Fond couleur" },
+];
+
+const colorCategories: { value: ColorCategory; label: string }[] = [
+  { value: "primaire", label: "Couleur primaire" },
+  { value: "secondaire", label: "Couleur secondaire" },
+];
+
+const colorFormats: { value: ColorInputFormat; label: string }[] = [
+  { value: "hex", label: "HEX" },
+  { value: "rgb", label: "RGB" },
+  { value: "cmyk", label: "CMJN" },
+];
+
+// Génère un aperçu PNG de la première page d'un PDF, entièrement côté
+// navigateur (canvas), pour les logos déposés uniquement en PDF. Best effort :
+// une erreur ici ne doit jamais empêcher l'ajout du logo.
+async function generatePdfPreview(file: File): Promise<Blob | null> {
+  try {
+    const pdfjsLib = await import("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 2 });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext("2d");
+    if (!context) return null;
+
+    await page.render({ canvasContext: context, viewport }).promise;
+
+    return await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/png");
+    });
+  } catch {
+    return null;
+  }
+}
+
+export function AssetUploadForm({
+  projectId,
+  type,
+  onSuccess,
+}: {
+  projectId: string;
+  type: AssetType;
+  onSuccess?: () => void;
+}) {
+  const [state, formAction, pending] = useActionState(addBrandAsset, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
+  const wasPending = useRef(false);
+  const [colorFormat, setColorFormat] = useState<ColorInputFormat>("hex");
+
+  useEffect(() => {
+    if (wasPending.current && !pending && !state.error) {
+      formRef.current?.reset();
+      setColorFormat("hex");
+      onSuccess?.();
+    }
+    wasPending.current = pending;
+  }, [pending, state, onSuccess]);
+
+  const isFile = FILE_TYPES.includes(type);
+  const isTypography = type === "typographie";
+  const { title, namePlaceholder } = labels[type];
+
+  // Cas logo déposé uniquement en PDF (pas de SVG/PNG) : on intercepte la
+  // soumission pour générer un aperçu côté navigateur avant d'envoyer le
+  // formulaire, afin que la carte logo puisse afficher une image plutôt
+  // qu'une icône PDF générique.
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    if (type !== "logo") return;
+
+    const form = e.currentTarget;
+    const svgFile = (form.elements.namedItem("svg_file") as HTMLInputElement | null)?.files?.[0];
+    const pngFile = (form.elements.namedItem("png_file") as HTMLInputElement | null)?.files?.[0];
+    const pdfFile = (form.elements.namedItem("pdf_file") as HTMLInputElement | null)?.files?.[0];
+
+    if (svgFile || pngFile || !pdfFile) return;
+
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    const previewBlob = await generatePdfPreview(pdfFile);
+    if (previewBlob) {
+      formData.append("pdf_preview_file", previewBlob, "preview.png");
+    }
+
+    startTransition(() => {
+      formAction(formData);
+    });
+  }
+
+  return (
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={handleSubmit}
+      className="bg-white rounded-lg border border-zinc-100 p-4 max-w-md flex flex-col gap-3 mb-6"
+    >
+      <p className="text-sm font-medium">{title}</p>
+
+      <input type="hidden" name="project_id" value={projectId} />
+      <input type="hidden" name="type" value={type} />
+
+      <div>
+        <label htmlFor={`${type}-label`} className={labelClass}>
+          {isTypography ? "Nom de la police *" : "Nom *"}
+        </label>
+        <input
+          id={`${type}-label`}
+          name="label"
+          required
+          className={inputClass}
+          placeholder={namePlaceholder}
+        />
+      </div>
+
+      {isTypography ? (
+        <>
+          <div>
+            <label htmlFor="typographie-category" className={labelClass}>
+              Catégorie *
+            </label>
+            <select
+              id="typographie-category"
+              name="category"
+              required
+              defaultValue=""
+              className={inputClass}
+            >
+              <option value="" disabled>
+                Choisir...
+              </option>
+              {typographyCategories.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="typographie-source" className={labelClass}>
+              Source
+            </label>
+            <input
+              id="typographie-source"
+              name="source"
+              className={inputClass}
+              placeholder="ex: Google Fonts - Libre, Système..."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="typographie-preview-text" className={labelClass}>
+              Texte d&apos;aperçu *
+            </label>
+            <input
+              id="typographie-preview-text"
+              name="preview_text"
+              required
+              className={inputClass}
+              placeholder="ex: L'art de vivre à la française"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="typographie-preview-subtext" className={labelClass}>
+              Texte d&apos;aperçu secondaire
+            </label>
+            <input
+              id="typographie-preview-subtext"
+              name="preview_subtext"
+              className={inputClass}
+              placeholder="ex: Élégance & authenticité"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="typographie-weights" className={labelClass}>
+              Graisses disponibles
+            </label>
+            <input
+              id="typographie-weights"
+              name="weights"
+              className={inputClass}
+              placeholder="ex: Regular, SemiBold, Bold, Italic"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="typographie-file" className={labelClass}>
+              Fichier de police (optionnel)
+            </label>
+            <input
+              id="typographie-file"
+              name="file"
+              type="file"
+              accept=".woff,.woff2,.ttf,.otf"
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+            />
+          </div>
+        </>
+      ) : type === "logo" ? (
+        <>
+          <div>
+            <label htmlFor="logo-background" className={labelClass}>
+              Fond *
+            </label>
+            <select
+              id="logo-background"
+              name="background"
+              required
+              defaultValue=""
+              className={inputClass}
+            >
+              <option value="" disabled>
+                Choisir...
+              </option>
+              {logoBackgrounds.map((b) => (
+                <option key={b.value} value={b.value}>
+                  {b.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="logo-subtitle" className={labelClass}>
+              Sous-titre
+            </label>
+            <input
+              id="logo-subtitle"
+              name="subtitle"
+              className={inputClass}
+              placeholder="ex: Version couleur"
+            />
+          </div>
+
+          <p className="text-xs text-zinc-500 -mb-1">
+            Dépose au moins un format (SVG, PNG ou PDF).
+          </p>
+
+          <div>
+            <label htmlFor="logo-svg-file" className={labelClass}>
+              <InfoPopover text={LOGO_FORMAT_DESCRIPTIONS.svg}>Fichier SVG</InfoPopover>
+            </label>
+            <input
+              id="logo-svg-file"
+              name="svg_file"
+              type="file"
+              accept=".svg,image/svg+xml"
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="logo-png-file" className={labelClass}>
+              <InfoPopover text={LOGO_FORMAT_DESCRIPTIONS.png}>Fichier PNG</InfoPopover>
+            </label>
+            <input
+              id="logo-png-file"
+              name="png_file"
+              type="file"
+              accept="image/png"
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="logo-pdf-file" className={labelClass}>
+              <InfoPopover text={LOGO_FORMAT_DESCRIPTIONS.pdf}>Fichier PDF</InfoPopover>
+            </label>
+            <input
+              id="logo-pdf-file"
+              name="pdf_file"
+              type="file"
+              accept="application/pdf"
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+            />
+          </div>
+
+          <ExtraFormatFields />
+        </>
+      ) : type === "couleur" ? (
+        <>
+          <div>
+            <label htmlFor="color-category" className={labelClass}>
+              Catégorie *
+            </label>
+            <select
+              id="color-category"
+              name="color_category"
+              required
+              defaultValue=""
+              className={inputClass}
+            >
+              <option value="" disabled>
+                Choisir...
+              </option>
+              {colorCategories.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="color-format" className={labelClass}>
+              <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS[colorFormat]}>Format de saisie *</InfoPopover>
+            </label>
+            <select
+              id="color-format"
+              name="color_format"
+              required
+              value={colorFormat}
+              onChange={(e) => setColorFormat(e.target.value as ColorInputFormat)}
+              className={inputClass}
+            >
+              {colorFormats.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-[11px] text-zinc-400 mt-1">
+              Les autres codes seront calculés automatiquement à partir de celui-ci.
+            </p>
+          </div>
+
+          {colorFormat === "hex" ? (
+            <div>
+              <label htmlFor="color-hex" className={labelClass}>
+                Code HEX *
+              </label>
+              <input
+                id="color-hex"
+                name="hex_value"
+                required
+                className={inputClass}
+                placeholder="ex: #C97C5D"
+              />
+            </div>
+          ) : colorFormat === "rgb" ? (
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label htmlFor="color-rgb-r" className={labelClass}>
+                  R
+                </label>
+                <input
+                  id="color-rgb-r"
+                  name="rgb_r"
+                  type="number"
+                  min={0}
+                  max={255}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="color-rgb-g" className={labelClass}>
+                  G
+                </label>
+                <input
+                  id="color-rgb-g"
+                  name="rgb_g"
+                  type="number"
+                  min={0}
+                  max={255}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="color-rgb-b" className={labelClass}>
+                  B
+                </label>
+                <input
+                  id="color-rgb-b"
+                  name="rgb_b"
+                  type="number"
+                  min={0}
+                  max={255}
+                  required
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              <div>
+                <label htmlFor="color-cmyk-c" className={labelClass}>
+                  C
+                </label>
+                <input
+                  id="color-cmyk-c"
+                  name="cmyk_c"
+                  type="number"
+                  min={0}
+                  max={100}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="color-cmyk-m" className={labelClass}>
+                  M
+                </label>
+                <input
+                  id="color-cmyk-m"
+                  name="cmyk_m"
+                  type="number"
+                  min={0}
+                  max={100}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="color-cmyk-y" className={labelClass}>
+                  J
+                </label>
+                <input
+                  id="color-cmyk-y"
+                  name="cmyk_y"
+                  type="number"
+                  min={0}
+                  max={100}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="color-cmyk-k" className={labelClass}>
+                  N
+                </label>
+                <input
+                  id="color-cmyk-k"
+                  name="cmyk_k"
+                  type="number"
+                  min={0}
+                  max={100}
+                  required
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          )}
+        </>
+      ) : isFile ? (
+        <div>
+          <label htmlFor={`${type}-file`} className={labelClass}>
+            Fichier image *
+          </label>
+          <input
+            id={`${type}-file`}
+            name="file"
+            type="file"
+            accept="image/*"
+            required
+            className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+          />
+        </div>
+      ) : (
+        <div>
+          <label htmlFor={`${type}-value`} className={labelClass}>
+            Valeur *
+          </label>
+          <input id={`${type}-value`} name="value" required className={inputClass} />
+        </div>
+      )}
+
+      {state.error && (
+        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+      )}
+
+      <button
+        type="submit"
+        disabled={pending}
+        className="self-start bg-gradient-terracotta text-white text-sm font-medium rounded-md px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {pending ? "Ajout..." : "Ajouter"}
+      </button>
+    </form>
+  );
+}

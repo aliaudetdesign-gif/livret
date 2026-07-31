@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>livret. — Proposition B · Éditorial espacé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PROPOSITION B — ÉDITORIAL ESPACÉ
+   Même charte terracotta modernisée que la proposition A.
+   Tout le travail porte sur l'espace et la typographie :
+   zéro ombre, filets d'un pixel, blanc dominant, accent rationné.
+   ============================================================ */
+
+:root{
+  --paper:    #FBFAF8;
+  --white:    #FFFFFF;
+  --line:     #E8E4DD;
+  --line-soft:#F0EDE8;
+
+  --ink-900:  #17161A;
+  --ink-700:  #45424B;
+  --ink-500:  #625E69;
+  --ink-400:  #6E6975;
+
+  --clay-600: #A64B2E;
+  --clay-500: #BA5636;
+  --clay-100: #F7DFD4;
+
+  --sage:     #5F6E52;
+  --sand:     #D9B08C;
+  --bark:     #8A6247;
+
+  /* échelle d'espacement : un seul pas de 8, mais on va loin dedans */
+  --s3:24px; --s4:32px; --s6:48px; --s8:64px; --s10:80px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--paper);color:var(--ink-900);
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.55;
+}
+
+/* ============================ CHROME ============================ */
+.viewbar{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  display:flex;justify-content:center;gap:2px;padding:12px;
+  background:rgba(251,250,248,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+}
+.viewbar button{
+  font:450 12px/1 'Geist',sans-serif;color:var(--ink-500);letter-spacing:.005em;
+  padding:8px 15px;border:0;border-radius:8px;background:transparent;cursor:pointer;transition:.18s;
+}
+.viewbar button:hover{color:var(--ink-900);background:#F2EFEA}
+.viewbar button.on{background:var(--ink-900);color:#fff}
+
+.app{display:flex;padding-top:45px;min-height:100vh}
+.screen{display:none;width:100%}
+.screen.on{display:flex}
+
+/* ============================ SIDEBAR ============================ */
+.side{
+  width:252px;flex-shrink:0;border-right:1px solid var(--line);
+  padding:var(--s4) var(--s3);position:sticky;top:45px;height:calc(100vh - 45px);
+  display:flex;flex-direction:column;background:var(--paper);
+}
+.logo{font-size:20px;font-weight:500;letter-spacing:-.025em;padding:0 8px;margin-bottom:var(--s6)}
+.logo i{font-style:normal;color:var(--clay-500)}
+.navgroup{margin-bottom:var(--s4)}
+.navgroup h6{
+  font:500 9.5px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.17em;
+  color:var(--ink-400);padding:0 8px;margin-bottom:14px;
+}
+.nav a{
+  display:block;padding:7px 8px;font-size:13.5px;font-weight:400;color:var(--ink-500);
+  text-decoration:none;transition:.16s;position:relative;letter-spacing:-.002em;
+}
+.nav a:hover{color:var(--ink-900)}
+.nav a.on{color:var(--ink-900);font-weight:500}
+.nav a.on::before{
+  content:'';position:absolute;left:-24px;top:50%;transform:translateY(-50%);
+  width:3px;height:15px;border-radius:0 2px 2px 0;background:var(--clay-500);
+}
+.sub{padding-left:8px;margin-top:6px;border-left:1px solid var(--line)}
+.sub a{padding-left:16px;font-size:13px}
+.sub a.on::before{display:none}
+.sub a.on{color:var(--clay-600)}
+.acct{margin-top:auto;padding-top:var(--s3);border-top:1px solid var(--line);display:flex;align-items:center;gap:11px}
+.ava{width:34px;height:34px;border-radius:50%;background:var(--clay-100);color:#9C4529;
+  display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex-shrink:0}
+.acct b{display:block;font-size:13px;font-weight:500}
+.acct span{font-size:11.5px;color:var(--ink-400)}
+
+/* ============================ MAIN ============================ */
+main{flex:1;min-width:0;padding:var(--s8) var(--s8) var(--s10);max-width:1240px}
+
+.phead{margin-bottom:var(--s8);display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s4)}
+.phead h1{font-size:38px;font-weight:400;letter-spacing:-.035em;line-height:1.1}
+.phead p{font-size:15px;color:var(--ink-500);margin-top:12px;font-weight:300;max-width:420px}
+.hact{display:flex;gap:10px;align-items:center;flex-shrink:0}
+.ghost{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 17px;border:1px solid var(--line);
+  border-radius:10px;background:var(--white);font:450 13px 'Geist',sans-serif;color:var(--ink-500);
+  cursor:pointer;transition:.18s;
+}
+.ghost:hover{border-color:var(--ink-400);color:var(--ink-900)}
+.ghost svg{width:14px;height:14px;stroke-width:1.7}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 19px;border:0;border-radius:10px;
+  background:var(--clay-500);color:#fff;font:500 13px 'Geist',sans-serif;cursor:pointer;transition:.18s;
+}
+.btn:hover{background:var(--clay-600)}
+.btn svg{width:14px;height:14px;stroke-width:2.2}
+
+/* --- statistiques : pas de cartes, une frise de chiffres --- */
+.figs{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--ink-900);margin-bottom:var(--s10);
+}
+.fig{padding:var(--s3) var(--s3) var(--s3) 0;border-right:1px solid var(--line);cursor:pointer;transition:.2s}
+.fig:last-child{border-right:0}
+.fig:not(:first-child){padding-left:var(--s3)}
+.fig:hover .n{color:var(--clay-500)}
+.fig .k{
+  font:500 9.5px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.17em;
+  color:var(--ink-400);margin-bottom:var(--s3);
+}
+.fig .n{font-size:52px;font-weight:300;letter-spacing:-.045em;line-height:1;transition:.2s}
+.fig .d{font-size:12px;color:var(--ink-400);margin-top:11px;font-weight:400}
+.fig .d b{color:var(--sage);font-weight:500}
+
+/* --- titres de section --- */
+.sechead{
+  display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);
+  padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:var(--s4);
+}
+.sechead h2{font:500 9.5px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.17em;color:var(--ink-400)}
+.lnk{font-size:12.5px;font-weight:450;color:var(--clay-600);text-decoration:none}
+.lnk:hover{text-decoration:underline}
+
+/* --- grille médiane --- */
+.mid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:var(--s6);margin-bottom:var(--s10)}
+.col h3{
+  font:500 9.5px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.17em;
+  color:var(--ink-400);padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:var(--s3);
+}
+
+/* calendrier */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.calhead b{font-size:15px;font-weight:450;letter-spacing:-.01em}
+.calnav{display:flex;gap:14px;color:var(--ink-400);font-size:13px}
+.calnav i{cursor:pointer;font-style:normal}
+.calnav i:hover{color:var(--ink-900)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal .dow{font:500 9px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--ink-400);text-align:center;padding-bottom:12px}
+.cal .d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:300;color:var(--ink-700);border-radius:9px;position:relative;transition:.14s}
+.cal .d:not(.void):hover{background:#F2EFEA}
+.cal .void{opacity:0}
+.cal .dot{color:var(--clay-600);font-weight:500}
+.cal .dot::after{content:'';position:absolute;bottom:6px;width:3px;height:3px;border-radius:50%;background:var(--clay-500)}
+.cal .now{background:var(--ink-900);color:#fff;font-weight:400}
+
+/* listes aérées */
+.list{display:flex;flex-direction:column}
+.li{padding:18px 0;border-bottom:1px solid var(--line-soft)}
+.li:first-child{padding-top:4px}
+.li:last-child{border-bottom:0}
+.li .t{font-size:13.5px;color:var(--ink-900);font-weight:400;line-height:1.45}
+.li .t b{font-weight:500}
+.li .s{font-size:12px;color:var(--ink-400);margin-top:5px}
+.li .s a{color:var(--clay-600);text-decoration:none}
+.li .s a:hover{text-decoration:underline}
+
+.msgli{display:flex;gap:13px;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line-soft);text-decoration:none;color:inherit}
+.msgli:first-child{padding-top:4px}
+.msgli:last-child{border-bottom:0}
+.msgli .ini{font-family:'Geist Mono',monospace;font-size:10.5px;color:var(--ink-400);flex-shrink:0;width:26px}
+.msgli b{display:block;font-size:13px;font-weight:500}
+.msgli p{font-size:12.5px;color:var(--ink-500);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* échéance */
+.dl{padding:4px 0 20px;border-bottom:1px solid var(--line-soft);margin-bottom:20px}
+.dl .date{font-size:26px;font-weight:300;letter-spacing:-.035em;color:var(--clay-600);line-height:1.1}
+.dl b{display:block;font-size:13.5px;font-weight:500;margin-top:10px}
+.dl span{font-size:12px;color:var(--ink-400)}
+
+/* --- projets --- */
+.projs{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+.proj{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:var(--s3);
+  cursor:pointer;transition:.22s;display:flex;flex-direction:column;gap:var(--s3)}
+.proj:hover{border-color:var(--ink-400)}
+.proj .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dotc{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.st{font:500 9.5px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.13em;color:var(--ink-400)}
+.proj h4{font-size:19px;font-weight:400;letter-spacing:-.025em;line-height:1.2}
+.proj .cli{font-size:12.5px;color:var(--ink-400);margin-top:6px;font-weight:300}
+.bar{height:2px;background:var(--line);position:relative}
+.bar i{display:block;height:100%;background:var(--clay-500)}
+.pmeta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-400);
+  font-family:'Geist Mono',monospace;letter-spacing:.01em}
+
+/* ============================ PALETTE ============================ */
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);margin-bottom:var(--s10)}
+.sw{cursor:pointer}
+.sw .fill{height:186px;border-radius:14px;border:1px solid rgba(23,22,26,.07);transition:.24s}
+.sw:hover .fill{transform:translateY(-4px)}
+.sw .meta{padding-top:18px}
+.sw h4{font-size:16px;font-weight:450;letter-spacing:-.02em}
+.sw .hex{font-family:'Geist Mono',monospace;font-size:13px;color:var(--clay-600);margin-top:7px}
+.sw .codes{font-family:'Geist Mono',monospace;font-size:11px;color:var(--ink-400);line-height:1.85;margin-top:10px}
+.sw .tag{font:500 9px/1 'Geist',sans-serif;text-transform:uppercase;letter-spacing:.17em;
+  color:var(--ink-400);display:block;margin-bottom:9px}
+
+/* ============================ CHARTE ============================ */
+.tokens{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:var(--s3);margin-bottom:var(--s4)}
+.tok .c{height:76px;border-radius:11px;border:1px solid rgba(23,22,26,.07)}
+.tok .n{padding-top:12px;font-family:'Geist Mono',monospace;font-size:10.5px;color:var(--ink-400);line-height:1.7}
+.tok .n b{display:block;font-family:'Geist',sans-serif;font-size:12.5px;font-weight:500;color:var(--ink-900);margin-bottom:3px}
+.tscale>div{display:flex;align-items:baseline;gap:var(--s4);padding:20px 0;border-bottom:1px solid var(--line-soft)}
+.tscale>div:last-child{border:0}
+.tscale code{font-family:'Geist Mono',monospace;font-size:10.5px;color:var(--ink-400);min-width:150px;flex-shrink:0}
+.note{font-size:14px;color:var(--ink-500);line-height:1.8;max-width:660px;font-weight:300}
+.note strong{color:var(--ink-900);font-weight:500}
+.note code{font-family:'Geist Mono',monospace;font-size:12px;color:var(--clay-600)}
+.block{margin-bottom:var(--s10)}
+</style>
+</head>
+<body>
+
+<div class="viewbar">
+  <button class="on" data-go="s1">Dashboard agence</button>
+  <button data-go="s2">Palette client</button>
+  <button data-go="s3">Charte</button>
+</div>
+
+<div class="app">
+
+<!-- ══════════════════════ ÉCRAN 1 — DASHBOARD AGENCE ══════════════════════ -->
+<section class="screen on" id="s1">
+  <aside class="side">
+    <div class="logo">livret<i>.</i></div>
+    <div class="navgroup">
+      <h6>Menu</h6>
+      <nav class="nav">
+        <a href="#" class="on">Dashboard</a>
+        <a href="#">Projets clients</a>
+        <a href="#">Messagerie</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <h6>Général</h6>
+      <nav class="nav">
+        <a href="#">Corbeille</a>
+        <a href="#">Réglages</a>
+        <a href="#">Aide</a>
+      </nav>
+    </div>
+    <div class="acct">
+      <div class="ava">AB</div>
+      <div><b>AB.Design</b><span>Mon profil</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="phead">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Gérez, visualisez et personnalisez votre aperçu global.</p>
+      </div>
+      <div class="hact">
+        <button class="ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          Rechercher
+        </button>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>Nouveau projet</button>
+      </div>
+    </div>
+
+    <div class="figs">
+      <div class="fig"><div class="k">Projets actifs</div><div class="n">6</div><div class="d"><b>+2</b> cette semaine</div></div>
+      <div class="fig"><div class="k">Clients totaux</div><div class="n">14</div><div class="d"><b>+1</b> cette semaine</div></div>
+      <div class="fig"><div class="k">Projets totaux</div><div class="n">23</div><div class="d"><b>+3</b> cette semaine</div></div>
+      <div class="fig"><div class="k">Nouveaux clients · 30 j</div><div class="n">3</div><div class="d">stable</div></div>
+    </div>
+
+    <div class="mid">
+      <div class="col">
+        <h3>Calendrier</h3>
+        <div class="calhead">
+          <b>Juillet 2026</b>
+          <div class="calnav"><i>←</i><i>→</i></div>
+        </div>
+        <div class="cal">
+          <div class="dow">L</div><div class="dow">M</div><div class="dow">M</div><div class="dow">J</div><div class="dow">V</div><div class="dow">S</div><div class="dow">D</div>
+          <div class="d void">0</div><div class="d void">0</div>
+          <div class="d">1</div><div class="d">2</div><div class="d">3</div><div class="d">4</div><div class="d">5</div>
+          <div class="d">6</div><div class="d">7</div><div class="d dot">8</div><div class="d">9</div><div class="d">10</div><div class="d">11</div><div class="d">12</div>
+          <div class="d">13</div><div class="d">14</div><div class="d">15</div><div class="d">16</div><div class="d dot">17</div><div class="d">18</div><div class="d">19</div>
+          <div class="d">20</div><div class="d">21</div><div class="d">22</div><div class="d">23</div><div class="d dot">24</div><div class="d">25</div><div class="d">26</div>
+          <div class="d">27</div><div class="d">28</div><div class="d">29</div><div class="d">30</div><div class="d now">31</div>
+        </div>
+      </div>
+
+      <div class="col">
+        <h3>Dernières activités</h3>
+        <div class="list">
+          <div class="li"><div class="t">Téléchargement de <b>Logo principal</b></div><div class="s">chez <a href="#">Atelier Vasse</a> · il y a 2 h</div></div>
+          <div class="li"><div class="t">Nouveau message de <b>Maison Laurent</b></div><div class="s">il y a 5 h</div></div>
+          <div class="li"><div class="t">Téléchargement de <b>Palette secondaire</b></div><div class="s">chez <a href="#">Studio Vélo</a> · hier</div></div>
+          <div class="li"><div class="t">Nouveau message de <b>Café Nord</b></div><div class="s">hier</div></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <h3>Échéance la plus proche</h3>
+        <div class="dl">
+          <div class="date">vendredi<br>7 août</div>
+          <b>Atelier Vasse</b>
+          <span>Fin de projet · dans 7 jours</span>
+        </div>
+        <div class="sechead" style="margin-bottom:var(--s3)">
+          <h2>Messagerie</h2><a href="#" class="lnk">Nouveau</a>
+        </div>
+        <div class="list">
+          <a href="#" class="msgli"><span class="ini">ML</span><span style="min-width:0"><b>Maison Laurent</b><p>Parfait, on valide la piste 2 !</p></span></a>
+          <a href="#" class="msgli"><span class="ini">SV</span><span style="min-width:0"><b>Studio Vélo</b><p>Est-ce qu'on peut voir la typo en gras ?</p></span></a>
+          <a href="#" class="msgli"><span class="ini">CN</span><span style="min-width:0"><b>Café Nord</b><p>Merci pour l'envoi du devis.</p></span></a>
+          <a href="#" class="msgli"><span class="ini">AV</span><span style="min-width:0"><b>Atelier Vasse</b><p>Le moodboard est superbe.</p></span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sechead">
+      <h2>Projets actifs</h2><a href="#" class="lnk">Voir les 6 projets</a>
+    </div>
+    <div class="projs">
+      <div class="proj">
+        <div class="top"><span class="dotc" style="background:#BA5636"></span><span class="st">En cours</span></div>
+        <div><h4>Atelier Vasse</h4><div class="cli">Céramique · Granville</div></div>
+        <div class="bar"><i style="width:60%"></i></div>
+        <div class="pmeta"><span>03 / 05</span><span>07.08.26</span></div>
+      </div>
+      <div class="proj">
+        <div class="top"><span class="dotc" style="background:#5F6E52"></span><span class="st">Attente de validation</span></div>
+        <div><h4>Studio Vélo</h4><div class="cli">Mobilité · Paris 11</div></div>
+        <div class="bar"><i style="width:80%"></i></div>
+        <div class="pmeta"><span>04 / 05</span><span>21.08.26</span></div>
+      </div>
+      <div class="proj">
+        <div class="top"><span class="dotc" style="background:#D9B08C"></span><span class="st">Livré</span></div>
+        <div><h4>Maison Laurent</h4><div class="cli">Architecture · Saint-Germain</div></div>
+        <div class="bar"><i style="width:100%"></i></div>
+        <div class="pmeta"><span>05 / 05</span><span>Terminé</span></div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ══════════════════════ ÉCRAN 2 — PALETTE CLIENT ══════════════════════ -->
+<section class="screen" id="s2">
+  <aside class="side">
+    <div class="logo">livret<i>.</i></div>
+    <div class="navgroup">
+      <h6>Ma marque</h6>
+      <nav class="nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Administratif</a>
+        <a href="#" class="on">Design</a>
+        <div class="sub">
+          <a href="#">Logos</a>
+          <a href="#" class="on">Couleurs</a>
+          <a href="#">Typographies</a>
+          <a href="#">Moodboard</a>
+        </div>
+        <a href="#" style="margin-top:14px">Messagerie</a>
+      </nav>
+    </div>
+    <div class="acct">
+      <div class="ava" style="background:#E1E7DA;color:#46543A">AV</div>
+      <div><b>Atelier Vasse</b><span>Mon profil</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="phead">
+      <div>
+        <h1>Palette de couleurs</h1>
+        <p>Cliquez sur une couleur pour copier le code hexadécimal.</p>
+      </div>
+      <div class="hact">
+        <button class="ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v13M7 11l5 5 5-5M5 21h14"/></svg>
+          Exporter la palette
+        </button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="sechead"><h2>Couleurs primaires</h2><span class="st">04</span></div>
+      <div class="swatches">
+        <div class="sw">
+          <div class="fill" style="background:#BA5636"></div>
+          <div class="meta"><span class="tag">Primaire</span><h4>Terre cuite</h4><div class="hex">#BA5636</div>
+            <div class="codes">RGB 186 · 86 · 54<br>CMJN 0 · 54 · 71 · 27</div></div>
+        </div>
+        <div class="sw">
+          <div class="fill" style="background:#17161A"></div>
+          <div class="meta"><span class="tag">Primaire</span><h4>Encre douce</h4><div class="hex">#17161A</div>
+            <div class="codes">RGB 23 · 22 · 26<br>CMJN 12 · 15 · 0 · 90</div></div>
+        </div>
+        <div class="sw">
+          <div class="fill" style="background:#F4F0EA"></div>
+          <div class="meta"><span class="tag">Primaire</span><h4>Coquille</h4><div class="hex">#F4F0EA</div>
+            <div class="codes">RGB 244 · 240 · 234<br>CMJN 0 · 2 · 4 · 4</div></div>
+        </div>
+        <div class="sw">
+          <div class="fill" style="background:#5F6E52"></div>
+          <div class="meta"><span class="tag">Primaire</span><h4>Sauge</h4><div class="hex">#5F6E52</div>
+            <div class="codes">RGB 95 · 110 · 82<br>CMJN 14 · 0 · 25 · 57</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="sechead"><h2>Couleurs secondaires</h2><span class="st">04</span></div>
+      <div class="swatches">
+        <div class="sw">
+          <div class="fill" style="background:#D9B08C"></div>
+          <div class="meta"><span class="tag">Secondaire</span><h4>Sable</h4><div class="hex">#D9B08C</div>
+            <div class="codes">RGB 217 · 176 · 140<br>CMJN 0 · 19 · 35 · 15</div></div>
+        </div>
+        <div class="sw">
+          <div class="fill" style="background:#8A6247"></div>
+          <div class="meta"><span class="tag">Secondaire</span><h4>Écorce</h4><div class="hex">#8A6247</div>
+            <div class="codes">RGB 138 · 98 · 71<br>CMJN 0 · 29 · 49 · 46</div></div>
+        </div>
+        <div class="sw">
+          <div class="fill" style="background:#F7DFD4"></div>
+          <div class="meta"><span class="tag">Secondaire</span><h4>Argile claire</h4><div class="hex">#F7DFD4</div>
+            <div class="codes">RGB 247 · 223 · 212<br>CMJN 0 · 10 · 14 · 3</div></div>
+        </div>
+        <div class="sw">
+          <div class="fill" style="background:#E8E4DD"></div>
+          <div class="meta"><span class="tag">Secondaire</span><h4>Lin</h4><div class="hex">#E8E4DD</div>
+            <div class="codes">RGB 232 · 228 · 221<br>CMJN 0 · 2 · 5 · 9</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ══════════════════════ ÉCRAN 3 — CHARTE ══════════════════════ -->
+<section class="screen" id="s3">
+  <main style="max-width:940px;margin:0 auto">
+    <div class="phead" style="display:block">
+      <h1>Charte — Proposition B</h1>
+      <p>Même palette que la proposition A. Tout se joue sur l'espace et la graisse.</p>
+    </div>
+
+    <div class="block">
+      <div class="sechead"><h2>Accent</h2></div>
+      <div class="tokens">
+        <div class="tok"><div class="c" style="background:#F7DFD4"></div><div class="n"><b>clay-100</b>#F7DFD4</div></div>
+        <div class="tok"><div class="c" style="background:#BA5636"></div><div class="n"><b>clay-500</b>#BA5636</div></div>
+        <div class="tok"><div class="c" style="background:#A64B2E"></div><div class="n"><b>clay-600</b>#A64B2E</div></div>
+      </div>
+      <p class="note">Trois valeurs suffisent, contre quatre dans la proposition A. L'accent n'apparaît qu'à cinq endroits sur tout le dashboard : le point du logo, le filet de navigation active, le bouton principal, les barres de progression, la date d'échéance. <strong>Partout ailleurs, du noir et du gris.</strong> C'est cette rareté qui fait que l'accent se voit.</p>
+    </div>
+
+    <div class="block">
+      <div class="sechead"><h2>Neutres</h2></div>
+      <div class="tokens">
+        <div class="tok"><div class="c" style="background:#FFFFFF"></div><div class="n"><b>white</b>#FFFFFF</div></div>
+        <div class="tok"><div class="c" style="background:#FBFAF8"></div><div class="n"><b>paper</b>#FBFAF8</div></div>
+        <div class="tok"><div class="c" style="background:#F0EDE8"></div><div class="n"><b>line-soft</b>#F0EDE8</div></div>
+        <div class="tok"><div class="c" style="background:#E8E4DD"></div><div class="n"><b>line</b>#E8E4DD</div></div>
+        <div class="tok"><div class="c" style="background:#6E6975"></div><div class="n"><b>ink-400</b>#6E6975</div></div>
+        <div class="tok"><div class="c" style="background:#625E69"></div><div class="n"><b>ink-500</b>#625E69</div></div>
+        <div class="tok"><div class="c" style="background:#45424B"></div><div class="n"><b>ink-700</b>#45424B</div></div>
+        <div class="tok"><div class="c" style="background:#17161A"></div><div class="n"><b>ink-900</b>#17161A</div></div>
+      </div>
+      <p class="note">Le fond passe du crème saturé <code>#f7f3ec</code> à <code>#FBFAF8</code>, presque blanc mais encore chaud. Deux valeurs de filet au lieu d'une : <code>line</code> pour séparer des blocs, <code>line-soft</code> pour séparer des lignes à l'intérieur d'un bloc. Sans cette distinction, les listes aérées deviennent des tableaux.</p>
+    </div>
+
+    <div class="block">
+      <div class="sechead"><h2>Typographie — Geist</h2></div>
+      <div class="tscale">
+        <div><code>38 / 400 / -.035em</code><span style="font-size:38px;font-weight:400;letter-spacing:-.035em">Titre de page</span></div>
+        <div><code>52 / 300 / -.045em</code><span style="font-size:52px;font-weight:300;letter-spacing:-.045em">142</span></div>
+        <div><code>19 / 400 / -.025em</code><span style="font-size:19px;font-weight:400;letter-spacing:-.025em">Titre de carte</span></div>
+        <div><code>15 / 300</code><span style="font-size:15px;font-weight:300;color:var(--ink-500)">Sous-titre et texte d'introduction</span></div>
+        <div><code>13.5 / 400</code><span style="font-size:13.5px">Texte courant</span></div>
+        <div><code>9.5 / 500 / .17em</code><span style="font-size:9.5px;font-weight:500;text-transform:uppercase;letter-spacing:.17em;color:var(--ink-400)">Étiquette de section</span></div>
+        <div><code>Geist Mono 11.5</code><span style="font-family:'Geist Mono',monospace;font-size:11.5px">03 / 05 · 07.08.26</span></div>
+      </div>
+      <p class="note">L'inversion est le point clé : <strong>les grands caractères s'allègent</strong> (300 à 400) et les petits s'épaississent (500). C'est l'inverse de la version actuelle, où tout est en 600. Le mono ne sert plus qu'aux données brutes, dates et codes, ce qui les rend immédiatement lisibles comme des données.</p>
+    </div>
+
+    <div class="block">
+      <div class="sechead"><h2>Espace</h2></div>
+      <div class="tscale">
+        <div><code>--s3 · 24 px</code><span class="note" style="max-width:none">Intérieur de carte, écart entre éléments proches</span></div>
+        <div><code>--s4 · 32 px</code><span class="note" style="max-width:none">Écart entre cartes d'une même grille</span></div>
+        <div><code>--s6 · 48 px</code><span class="note" style="max-width:none">Écart entre colonnes de la grille médiane</span></div>
+        <div><code>--s8 · 64 px</code><span class="note" style="max-width:none">Marge de page, écart sous l'en-tête</span></div>
+        <div><code>--s10 · 80 px</code><span class="note" style="max-width:none">Écart entre deux sections majeures</span></div>
+      </div>
+      <p class="note">Un seul pas de 8 px, mais poussé beaucoup plus loin que la version actuelle qui plafonne à 32 px. <strong>C'est le vide qui fait le haut de gamme</strong>, pas l'effet.</p>
+    </div>
+
+    <div class="block" style="margin-bottom:0">
+      <div class="sechead"><h2>Matière</h2></div>
+      <p class="note" style="max-width:none">
+        <strong>Zéro ombre.</strong> Aucune, nulle part. La hiérarchie vient du filet, du fond blanc contre le fond papier, et de l'espace.<br><br>
+        <strong>Rayons :</strong> 14 px sur les cartes et les aplats de couleur, 10 px sur les boutons, 9 px sur les cellules de calendrier. Jamais de pilule, jamais de 999 px : le rayon complet appartient à la proposition A.<br><br>
+        <strong>Survol :</strong> la bordure fonce, ou l'élément monte de 4 px. Jamais les deux, jamais d'ombre qui apparaît.<br><br>
+        <strong>Filet de 1 px, pas 2.</strong> Sur un écran à densité classique, un filet clair de 1 px est la limite basse du visible, et c'est exactement là qu'il doit être : présent, jamais bruyant.
+      </p>
+    </div>
+  </main>
+</section>
+
+</div>
+
+<script>
+document.querySelectorAll('.viewbar button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.viewbar button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')});
+    document.getElementById(b.dataset.go).classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+document.querySelectorAll('.sw').forEach(function(s){
+  s.addEventListener('click',function(){
+    var h=s.querySelector('.hex'),o=h.textContent;
+    h.textContent='Copié !';setTimeout(function(){h.textContent=o},1100);
+  });
+});
+</script>
+</body>
+</html>

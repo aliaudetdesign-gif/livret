@@ -1,0 +1,308 @@
+"use client";
+
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import {
+  updateBrandAsset,
+  deleteBrandAsset,
+  type AssetActionState,
+} from "@/app/agence/projets/[id]/actions";
+import { COLOR_FORMAT_DESCRIPTIONS, type BrandAsset, type ColorCategory, type ColorInputFormat, type ColorMetadata } from "@/lib/types";
+import { InfoPopover } from "@/components/InfoPopover";
+
+const initialState: AssetActionState = { error: null };
+
+const inputClass =
+  "w-full px-2 py-1.5 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
+const labelClass = "block text-xs font-medium text-zinc-500 mb-1";
+
+const colorCategories: { value: ColorCategory; label: string }[] = [
+  { value: "primaire", label: "Couleur primaire" },
+  { value: "secondaire", label: "Couleur secondaire" },
+];
+
+const colorFormats: { value: ColorInputFormat; label: string }[] = [
+  { value: "hex", label: "HEX" },
+  { value: "rgb", label: "RGB" },
+  { value: "cmyk", label: "CMJN" },
+];
+
+// Carte d'une couleur de la palette : swatch plein, nom, codes HEX/RGB/CMJN
+// (copie du hex au clic sur le swatch). En mode agence (projectId fourni) :
+// édition en direct (catégorie + nouvelle saisie de référence dans le format
+// de son choix) et suppression. Filet de sécurité pour les couleurs créées
+// avant l'ajout des métadonnées RGB/CMJN (metadata absente).
+export function ColorCard({
+  asset,
+  projectId,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
+}: {
+  asset: BrandAsset;
+  projectId?: string;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
+}) {
+  const metadata = asset.metadata as unknown as ColorMetadata | null;
+  const editable = !!projectId;
+
+  const [copied, setCopied] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [colorFormat, setColorFormat] = useState<ColorInputFormat>("hex");
+  const [state, formAction, pending] = useActionState(updateBrandAsset, initialState);
+  const wasPending = useRef(false);
+
+  const [isDeleting, startTransition] = useTransition();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (wasPending.current && !pending && !state.error) {
+      setIsEditing(false);
+    }
+    wasPending.current = pending;
+  }, [pending, state]);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(asset.value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  }
+
+  function handleDelete() {
+    if (!projectId) return;
+    const confirmed = window.confirm(
+      `Supprimer "${asset.label}" ? Cette action est irréversible.`
+    );
+    if (!confirmed) return;
+
+    setDeleteError(null);
+    startTransition(async () => {
+      try {
+        const result = await deleteBrandAsset(asset.id, projectId);
+        if (result.error) setDeleteError(result.error);
+      } catch {
+        setDeleteError("Une erreur est survenue, réessaie.");
+      }
+    });
+  }
+
+  return (
+    <div className="group relative bg-white border border-zinc-100 rounded-lg overflow-hidden hover:border-[var(--color-terracotta)] hover:shadow-md transition-all duration-300">
+      {selectionMode ? (
+        <label className="absolute top-3 left-3 z-10">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onToggleSelect}
+            className="w-4 h-4 accent-[var(--color-terracotta)]"
+          />
+        </label>
+      ) : (
+        editable &&
+        !isEditing && (
+          <div className="absolute top-3 right-3 z-10 hidden group-hover:flex gap-1">
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="w-7 h-7 flex items-center justify-center rounded-md bg-white/90 border border-zinc-200 text-zinc-500 hover:text-[var(--color-terracotta)]"
+              title="Modifier"
+            >
+              ✎
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="w-7 h-7 flex items-center justify-center rounded-md bg-white/90 border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+              title="Supprimer"
+            >
+              ✕
+            </button>
+          </div>
+        )
+      )}
+
+      {!isEditing && (
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="h-20 w-full block"
+          style={{ backgroundColor: asset.value }}
+          title="Cliquer pour copier le code hexadécimal"
+        />
+      )}
+
+      <div className="p-3">
+        {isEditing ? (
+          <form action={formAction} className="flex flex-col gap-2">
+            <input type="hidden" name="asset_id" value={asset.id} />
+            <input type="hidden" name="project_id" value={projectId} />
+            <input type="hidden" name="type" value="couleur" />
+
+            <div>
+              <label className={labelClass}>Nom</label>
+              <input name="label" defaultValue={asset.label} required className={inputClass} />
+            </div>
+
+            <div>
+              <label className={labelClass}>Catégorie</label>
+              <select
+                name="color_category"
+                defaultValue={metadata?.category ?? "primaire"}
+                required
+                className={inputClass}
+              >
+                {colorCategories.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>Format de saisie</label>
+              <select
+                name="color_format"
+                value={colorFormat}
+                onChange={(e) => setColorFormat(e.target.value as ColorInputFormat)}
+                className={inputClass}
+              >
+                {colorFormats.map((f) => (
+                  <option key={f.value} value={f.value}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {colorFormat === "hex" ? (
+              <div>
+                <label className={labelClass}>Code HEX</label>
+                <input name="hex_value" defaultValue={asset.value} required className={inputClass} />
+              </div>
+            ) : colorFormat === "rgb" ? (
+              <div className="grid grid-cols-3 gap-2">
+                <input
+                  name="rgb_r"
+                  type="number"
+                  min={0}
+                  max={255}
+                  defaultValue={metadata?.rgb.r}
+                  required
+                  placeholder="R"
+                  className={inputClass}
+                />
+                <input
+                  name="rgb_g"
+                  type="number"
+                  min={0}
+                  max={255}
+                  defaultValue={metadata?.rgb.g}
+                  required
+                  placeholder="G"
+                  className={inputClass}
+                />
+                <input
+                  name="rgb_b"
+                  type="number"
+                  min={0}
+                  max={255}
+                  defaultValue={metadata?.rgb.b}
+                  required
+                  placeholder="B"
+                  className={inputClass}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 gap-2">
+                <input
+                  name="cmyk_c"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={metadata?.cmyk.c}
+                  required
+                  placeholder="C"
+                  className={inputClass}
+                />
+                <input
+                  name="cmyk_m"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={metadata?.cmyk.m}
+                  required
+                  placeholder="M"
+                  className={inputClass}
+                />
+                <input
+                  name="cmyk_y"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={metadata?.cmyk.y}
+                  required
+                  placeholder="J"
+                  className={inputClass}
+                />
+                <input
+                  name="cmyk_k"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={metadata?.cmyk.k}
+                  required
+                  placeholder="N"
+                  className={inputClass}
+                />
+              </div>
+            )}
+
+            {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={pending}
+                className="text-xs font-medium bg-gradient-terracotta text-white rounded-md px-3 py-1.5 disabled:opacity-60"
+              >
+                {pending ? "..." : "Enregistrer"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="text-xs font-medium text-zinc-500 px-3 py-1.5"
+              >
+                Annuler
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div className="font-medium text-sm">{asset.label}</div>
+            <div className="text-xs text-zinc-500 mt-1 flex items-center">
+              {copied ? "Copié !" : asset.value}
+              {!copied && <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.hex} />}
+            </div>
+            {metadata && (
+              <div className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+                <div className="flex items-center">
+                  RGB {metadata.rgb.r}, {metadata.rgb.g}, {metadata.rgb.b}
+                  <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.rgb} />
+                </div>
+                <div className="flex items-center">
+                  CMJN {metadata.cmyk.c}, {metadata.cmyk.m}, {metadata.cmyk.y}, {metadata.cmyk.k}
+                  <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.cmyk} />
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {deleteError && <p className="text-xs text-red-600 mt-2">{deleteError}</p>}
+      </div>
+    </div>
+  );
+}

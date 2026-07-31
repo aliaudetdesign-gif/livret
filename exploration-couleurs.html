@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Livret — exploration couleurs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #0e0e10;
+    color: #fff;
+    padding: 48px 24px 96px;
+  }
+  .intro {
+    max-width: 720px;
+    margin: 0 auto 56px;
+  }
+  .intro h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .intro p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.65);
+  }
+  .concept {
+    max-width: 960px;
+    margin: 0 auto 72px;
+  }
+  .concept-label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .concept-label .tag {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+  .concept-label h2 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .concept-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 24px;
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  /* ---- Mini dashboard shell ---- */
+  .shell {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    min-height: 340px;
+  }
+  .sidebar {
+    padding: 24px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .logo {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .nav-item {
+    font-size: 13px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    color: rgba(255,255,255,0.55);
+    position: relative;
+    z-index: 1;
+    cursor: default;
+    transition: color 0.25s ease;
+  }
+  .nav-item.active {
+    color: #fff;
+    font-weight: 500;
+  }
+  .main {
+    background: #17171a;
+    padding: 28px 32px;
+  }
+  .main h3 {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .main .sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 22px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 14px;
+    align-items: stretch;
+  }
+  .kpi {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .kpi .label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 8px;
+  }
+  .kpi .num {
+    font-size: 26px;
+    font-weight: 600;
+  }
+  .cta {
+    border: none;
+    border-radius: 12px;
+    padding: 0 26px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-width: 160px;
+    isolation: isolate;
+  }
+  .cta span { position: relative; z-index: 1; }
+  .cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .cta:hover::before { opacity: 1; }
+
+  /* === A. Terracotta évolué === */
+  .a .sidebar { background: #1c1a18; }
+  .a .sidebar::before {
+    content: "";
+    position: absolute;
+    inset: -40% -20% auto auto;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(216,90,48,0.35), transparent 70%);
+  }
+  .a .nav-item.active { background: linear-gradient(135deg, #D85A30, #A83E1D); }
+  .a .kpi .num { color: #F0997B; }
+  .a .cta { background: linear-gradient(135deg, #D85A30, #A83E1D); box-shadow: 0 8px 24px -8px rgba(216,90,48,0.55); }
+  .a .cta::before { background: linear-gradient(135deg, #E8703F, #C24A22); }
+  .a .cta:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -6px rgba(216,90,48,0.7); }
+
+  /* === B. Indigo électrique === */
+  .b .sidebar { background: #131220; }
+  .b .sidebar::before {
+    content: "";
+    position: absolute;
+    inset: auto auto -30% -20%;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(127,119,221,0.4), transparent 70%);
+  }
+  .b .nav-item.active { background: linear-gradient(135deg, #7F77DD, #4C42B0); }
+  .b .kpi .num {
+    background: linear-gradient(135deg, #AFA9EC, #7F77DD);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .b .cta { background: linear-gradient(135deg, #7F77DD, #4C42B0); box-shadow: 0 8px 24px -8px rgba(127,119,221,0.55); }
+  .b .cta::before { background: linear-gradient(135deg, #948CF0, #5B4FCB); }
+  .b .cta:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px rgba(127,119,221,0.25), 0 12px 28px -6px rgba(127,119,221,0.7); }
+
+  /* === C. Duotone teal & corail === */
+  .c .sidebar { background: #0B3B34; }
+  .c .sidebar::before {
+    content: "";
+    position: absolute;
+    inset: -20% auto auto -30%;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(29,158,117,0.4), transparent 70%);
+  }
+  .c .nav-item.active { background: linear-gradient(135deg, #1D9E75, #0F6E56); }
+  .c .kpi.accent .num { color: #F0997B; }
+  .c .kpi .num { color: #5DCAA5; }
+  .c .cta { background: linear-gradient(135deg, #1D9E75, #D85A30); box-shadow: 0 8px 24px -8px rgba(29,158,117,0.5); }
+  .c .cta::before { background: linear-gradient(135deg, #24BA8A, #E8703F); }
+  .c .cta:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 28px -6px rgba(216,90,48,0.55); }
+
+  .note {
+    max-width: 960px;
+    margin: 16px auto 0;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.4);
+  }
+</style>
+</head>
+<body>
+
+  <div class="intro">
+    <h1>Trois directions couleur — survole les boutons</h1>
+    <p>Même structure de dashboard, trois traitements différents. L'idée n'est pas de choisir un hex isolé mais de sentir comment la couleur bouge (dégradé, glow, hover) plutôt que de rester plate. Passe la souris sur les boutons "Voir tout" pour sentir l'animation.</p>
+  </div>
+
+  <div class="concept a">
+    <div class="concept-label"><span class="tag">Direction A</span><h2>Terracotta évolué</h2></div>
+    <p class="concept-desc">Garde ton identité actuelle mais la fait vivre : la terracotta devient un dégradé profond (corail → brique), avec un glow doux derrière la sidebar. Le moins risqué, le plus proche de ce que tu as déjà.</p>
+    <div class="shell">
+      <div class="sidebar">
+        <div class="logo">livret.</div>
+        <div class="nav-item active">Dashboard</div>
+        <div class="nav-item">Projets clients</div>
+        <div class="nav-item">Messagerie</div>
+      </div>
+      <div class="main">
+        <h3>Dashboard</h3>
+        <div class="sub">Gérez, visualisez et personnalisez votre aperçu global</div>
+        <div class="row">
+          <div class="kpi"><div class="label">Projets actifs</div><div class="num">5</div></div>
+          <div class="kpi"><div class="label">En discussion</div><div class="num">3</div></div>
+          <button class="cta"><span>Voir tout ↗</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept b">
+    <div class="concept-label"><span class="tag">Direction B</span><h2>Indigo électrique</h2></div>
+    <p class="concept-desc">Rupture plus nette avec la terracotta. Palette froide, dégradé violet-bleu, chiffres en texte dégradé. Registre "SaaS moderne" (proche Linear, Stripe, Vercel) — sérieux mais vivant grâce au glow au hover.</p>
+    <div class="shell">
+      <div class="sidebar">
+        <div class="logo">livret.</div>
+        <div class="nav-item active">Dashboard</div>
+        <div class="nav-item">Projets clients</div>
+        <div class="nav-item">Messagerie</div>
+      </div>
+      <div class="main">
+        <h3>Dashboard</h3>
+        <div class="sub">Gérez, visualisez et personnalisez votre aperçu global</div>
+        <div class="row">
+          <div class="kpi"><div class="label">Projets actifs</div><div class="num">5</div></div>
+          <div class="kpi"><div class="label">En discussion</div><div class="num">3</div></div>
+          <button class="cta"><span>Voir tout ↗</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept c">
+    <div class="concept-label"><span class="tag">Direction C</span><h2>Duotone teal & corail</h2></div>
+    <p class="concept-desc">Deux couleurs de marque au lieu d'une : teal profond en base (sérieux, pro) et corail comme accent ponctuel (urgence, CTA, échéances). Le dégradé du bouton passe littéralement d'une couleur à l'autre au hover.</p>
+    <div class="shell">
+      <div class="sidebar">
+        <div class="logo">livret.</div>
+        <div class="nav-item active">Dashboard</div>
+        <div class="nav-item">Projets clients</div>
+        <div class="nav-item">Messagerie</div>
+      </div>
+      <div class="main">
+        <h3>Dashboard</h3>
+        <div class="sub">Gérez, visualisez et personnalisez votre aperçu global</div>
+        <div class="row">
+          <div class="kpi"><div class="label">Projets actifs</div><div class="num">5</div></div>
+          <div class="kpi accent"><div class="label">Échéance proche</div><div class="num">3j</div></div>
+          <button class="cta"><span>Voir tout ↗</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">Fichier statique, aucune donnée réelle. Sert uniquement à comparer les ambiances de couleur avant de trancher.</p>
+
+</body>
+</html>
