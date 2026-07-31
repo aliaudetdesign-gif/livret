@@ -1,4 +1,11 @@
-@import "tailwindcss";
+/* On restreint la détection des classes au code applicatif. Sans ça, Tailwind
+   scanne aussi CLAUDE.md, propositions-design/*.html et _Archive, et tente de
+   générer des classes à partir d'exemples de documentation comme
+   bg-[var(--color-...)], ce qui casse la compilation CSS. */
+@import "tailwindcss" source(none);
+@source "../app";
+@source "../components";
+@source "../lib";
 
 /* ==========================================================================
    Charte livret. — proposition A (liquid glass)
@@ -119,11 +126,14 @@
   --color-warn-600: var(--warn-600);
   --color-warn-100: var(--warn-100);
 
-  --radius-xs: var(--r-xs);
-  --radius-sm: var(--r-sm);
-  --radius-md: var(--r-md);
-  --radius-lg: var(--r-lg);
-  --radius-xl: var(--r-xl);
+  /* Noms dédiés, volontairement pas rounded-sm/md/lg : redéfinir l'échelle
+     Tailwind ferait sauter d'un coup les 52 rounded-* déjà en place, sans
+     contrôle. On applique ces rayons écran par écran, en phase 3 à 5. */
+  --radius-chip: var(--r-xs);
+  --radius-field: var(--r-sm);
+  --radius-card: var(--r-md);
+  --radius-panel: var(--r-lg);
+  --radius-hero: var(--r-xl);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
