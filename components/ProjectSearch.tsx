@@ -21,13 +21,13 @@ export function ProjectSearch({ defaultValue }: { defaultValue: string }) {
 
   return (
     <div className="relative w-72">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
       <input
         type="text"
         defaultValue={defaultValue}
         onChange={handleChange}
         placeholder="Rechercher un projet..."
-        className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors"
+        className="w-full pl-9 pr-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors"
       />
     </div>
   );

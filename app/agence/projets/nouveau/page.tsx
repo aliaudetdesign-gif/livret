@@ -14,12 +14,12 @@ export default async function NouveauProjetPage() {
     <div>
       <Link
         href="/agence/projets"
-        className="text-sm text-zinc-500 hover:text-[var(--color-terracotta-deep)]"
+        className="text-sm text-ink-500 hover:text-[var(--color-terracotta-deep)]"
       >
         ← Retour aux projets clients
       </Link>
       <h1 className="text-2xl font-semibold mt-2 mb-1">Nouveau projet</h1>
-      <p className="text-sm text-zinc-500 mb-6">Crée un nouvel espace client.</p>
+      <p className="text-sm text-ink-500 mb-6">Crée un nouvel espace client.</p>
 
       <NouveauProjetForm clients={clients ?? []} />
     </div>

@@ -8,12 +8,12 @@ import { formatShortDate } from "@/lib/format";
 const initialState: InviteActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 const statusStyle: Record<AgencyInvite["status"], string> = {
   en_attente: "bg-[var(--color-terracotta-tint)] text-[var(--color-terracotta-deep)]",
-  acceptee: "bg-emerald-100 text-emerald-700",
+  acceptee: "bg-ok-100 text-ok-600",
 };
 
 const statusLabel: Record<AgencyInvite["status"], string> = {
@@ -37,11 +37,11 @@ function InviteRow({ invite }: { invite: AgencyInvite }) {
   }
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-zinc-100 last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-white/55 last:border-0">
       <div className="min-w-0">
         <div className="text-sm font-medium truncate">{invite.full_name}</div>
-        <div className="text-xs text-zinc-500 truncate">{invite.email}</div>
-        {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+        <div className="text-xs text-ink-500 truncate">{invite.email}</div>
+        {error && <p className="text-xs text-err-600 mt-1">{error}</p>}
       </div>
       <div className="flex items-center gap-3 shrink-0">
         <span
@@ -49,12 +49,12 @@ function InviteRow({ invite }: { invite: AgencyInvite }) {
         >
           {statusLabel[invite.status]}
         </span>
-        <span className="text-xs text-zinc-400">{formatShortDate(invite.created_at)}</span>
+        <span className="text-xs text-ink-400">{formatShortDate(invite.created_at)}</span>
         <button
           type="button"
           onClick={handleRemove}
           disabled={isDeleting}
-          className="text-sm text-zinc-400 hover:text-red-600 disabled:opacity-50"
+          className="text-sm text-ink-400 hover:text-err-600 disabled:opacity-50"
           title="Retirer"
         >
           ✕
@@ -73,7 +73,7 @@ export function AgencyAccessSection({ invites }: { invites: AgencyInvite[] }) {
   return (
     <div>
       {invites.length === 0 ? (
-        <p className="text-sm text-zinc-400 mb-4">Aucune invitation pour l&apos;instant.</p>
+        <p className="text-sm text-ink-400 mb-4">Aucune invitation pour l&apos;instant.</p>
       ) : (
         <div className="mb-5">
           {invites.map((invite) => (
@@ -103,7 +103,7 @@ export function AgencyAccessSection({ invites }: { invites: AgencyInvite[] }) {
           {pending ? "..." : "Inviter"}
         </button>
       </form>
-      {state.error && <p className="text-sm text-red-600 mt-2">{state.error}</p>}
+      {state.error && <p className="text-sm text-err-600 mt-2">{state.error}</p>}
     </div>
   );
 }

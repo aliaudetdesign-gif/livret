@@ -144,43 +144,56 @@ export default async function ProjetDetailPage({
 
   return (
     <div>
-      <div className="bg-[var(--color-noir-doux)] rounded-2xl p-8 mb-6">
+      {/* Bloc sombre assumé, en contrepoint du verre clair : c'est le seul
+          endroit de la page où l'on inverse le contraste, donc les couleurs de
+          texte y sont exprimées en blanc translucide et non en tokens d'encre. */}
+      <div className="relative overflow-hidden bg-ink-900 text-white rounded-panel p-9 mb-3.5 shadow-[0_28px_60px_-28px_rgba(23,22,26,0.55)]">
+        <div
+          className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-clay-500 opacity-40 blur-[90px] pointer-events-none"
+          aria-hidden
+        />
         {project ? (
-          <div className="flex items-start justify-between gap-10">
+          <div className="relative flex items-start justify-between gap-10">
             <div className="max-w-xl">
-              <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-terracotta)] mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-clay-400 mb-2.5">
                 Identité de marque
               </p>
-              <h1 className="text-3xl font-semibold text-white mb-3">{project.name}</h1>
+              <h1 className="text-[34px] font-semibold tracking-[-0.035em] leading-none text-white mb-3.5">
+                {project.name}
+              </h1>
               {project.description && (
-                <p className="text-sm text-zinc-300 leading-relaxed">{project.description}</p>
+                <p className="text-sm text-white/75 leading-relaxed">{project.description}</p>
               )}
             </div>
 
             <div className="flex flex-col items-end gap-6 shrink-0">
               <Link
                 href={`/agence/projets/${id}?tab=reglages`}
-                className="text-sm text-[var(--color-terracotta)] underline underline-offset-2 hover:text-white transition-colors"
+                className="text-[13px] font-semibold text-clay-400 hover:text-white transition-colors"
               >
                 Gérer le projet
               </Link>
               <div className="grid grid-cols-2 gap-x-10 gap-y-4 text-right">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">Secteur</p>
+                  <p className="text-[10px] uppercase tracking-[0.09em] font-semibold text-white/45 mb-1">
+                    Secteur
+                  </p>
                   <p className="text-sm text-white">{project.sector || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">Statut</p>
+                  <p className="text-[10px] uppercase tracking-[0.09em] font-semibold text-white/45 mb-1">
+                    Statut
+                  </p>
                   <StatusToggle projectId={project.id} status={project.status} />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">
+                  <p className="text-[10px] uppercase tracking-[0.09em] font-semibold text-white/45 mb-1">
                     Début projet
                   </p>
                   <p className="text-sm text-white">{formatShortDate(project.start_date)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">
+                  <p className="text-[10px] uppercase tracking-[0.09em] font-semibold text-white/45 mb-1">
                     Fin de projet
                   </p>
                   <p className="text-sm text-white">{formatShortDate(project.end_date)}</p>
@@ -189,11 +202,11 @@ export default async function ProjetDetailPage({
             </div>
           </div>
         ) : (
-          <p className="text-sm text-zinc-400">Projet introuvable.</p>
+          <p className="relative text-sm text-white/70">Projet introuvable.</p>
         )}
 
         {project && (
-          <div className="mt-8 pt-6 border-t border-white/10">
+          <div className="relative mt-8 pt-6 border-t border-white/10">
             <ProgressBar
               projectId={project.id}
               progressStep={project.progress_step}
@@ -204,15 +217,15 @@ export default async function ProjetDetailPage({
         )}
       </div>
 
-      <div className="flex gap-6 border-b border-zinc-200 mb-6 text-sm">
+      <div className="flex gap-6 border-b border-white/55 mb-6 text-[13.5px]">
         {tabs.map((t) => (
           <Link
             key={t.key}
             href={`/agence/projets/${id}?tab=${t.key}`}
-            className={`pb-3 -mb-px border-b-2 ${
+            className={`pb-3 -mb-px border-b-2 transition-colors ${
               tab === t.key
-                ? "border-[var(--color-noir-doux)] font-medium"
-                : "border-transparent text-zinc-500"
+                ? "border-clay-500 text-ink-900 font-semibold"
+                : "border-transparent text-ink-500 hover:text-ink-900"
             }`}
           >
             {t.label}
@@ -227,7 +240,7 @@ export default async function ProjetDetailPage({
             brief={(project.brief ?? {}) as Record<string, string>}
           />
         ) : (
-          <p className="text-sm text-zinc-500">Projet introuvable.</p>
+          <p className="text-sm text-ink-500">Projet introuvable.</p>
         )
       ) : tab === "administratif" ? (
         project ? (
@@ -239,22 +252,22 @@ export default async function ProjetDetailPage({
             />
           </div>
         ) : (
-          <p className="text-sm text-zinc-500">Projet introuvable.</p>
+          <p className="text-sm text-ink-500">Projet introuvable.</p>
         )
       ) : tab === "reglages" ? (
         project ? (
           <div className="flex flex-col gap-8">
-            <div className="bg-white border border-zinc-100 rounded-lg p-5">
+            <div className="glass rounded-card p-5">
               <p className="text-sm font-medium mb-4">Paramètres généraux</p>
               <ProjectSettingsForm project={project} />
             </div>
-            <div className="bg-white border border-zinc-100 rounded-lg p-5">
+            <div className="glass rounded-card p-5">
               <p className="text-sm font-medium mb-4">Personnes côté client</p>
               <ProjectClientInvites invites={clientInvites ?? []} projectId={project.id} />
             </div>
           </div>
         ) : (
-          <p className="text-sm text-zinc-500">Projet introuvable.</p>
+          <p className="text-sm text-ink-500">Projet introuvable.</p>
         )
       ) : tab === "design" ? (
         project ? (
@@ -271,7 +284,7 @@ export default async function ProjetDetailPage({
             <div>
               <Link
                 href={`/agence/projets/${id}?tab=design`}
-                className="text-sm text-zinc-500 hover:text-[var(--color-terracotta)] mb-4 inline-block"
+                className="text-sm text-ink-500 hover:text-[var(--color-terracotta)] mb-4 inline-block"
               >
                 ← Design
               </Link>
@@ -295,7 +308,7 @@ export default async function ProjetDetailPage({
               <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/agence/projets/${id}?tab=design`}
-                  className="text-sm text-zinc-500 hover:text-[var(--color-terracotta)] inline-block"
+                  className="text-sm text-ink-500 hover:text-[var(--color-terracotta)] inline-block"
                 >
                   ← Design
                 </Link>
@@ -320,10 +333,10 @@ export default async function ProjetDetailPage({
               />
             </div>
           ) : (
-            <p className="text-sm text-zinc-500">Section introuvable.</p>
+            <p className="text-sm text-ink-500">Section introuvable.</p>
           )
         ) : (
-          <p className="text-sm text-zinc-500">Projet introuvable.</p>
+          <p className="text-sm text-ink-500">Projet introuvable.</p>
         )
       ) : null}
     </div>

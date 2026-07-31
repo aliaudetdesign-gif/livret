@@ -12,7 +12,7 @@ const FILE_TYPES: AssetType[] = ["logo", "moodboard"];
 const initialState: AssetActionState = { error: null };
 
 const inputClass =
-  "w-full px-2 py-1.5 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
+  "w-full px-2.5 py-1.5 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
 
 // Carte d'un élément de marque (logo, couleur, moodboard) côté agence, avec
 // édition en direct, suppression et sélection multiple. Le fichier lui-même
@@ -66,7 +66,7 @@ export function AssetCard({
   }
 
   return (
-    <div className="group relative bg-white border border-zinc-100 rounded-lg p-4">
+    <div className="group relative glass rounded-card p-4">
       {selectionMode ? (
         <label className="absolute top-3 left-3 z-10">
           <input
@@ -82,7 +82,7 @@ export function AssetCard({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-[var(--color-terracotta)]"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-clay-600 transition-colors"
               title="Modifier"
             >
               ✎
@@ -91,7 +91,7 @@ export function AssetCard({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-7 h-7 flex items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
               title="Supprimer"
             >
               ✕
@@ -101,7 +101,7 @@ export function AssetCard({
       )}
 
       {isFile ? (
-        <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-zinc-50">
+        <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={asset.value}
@@ -132,7 +132,7 @@ export function AssetCard({
             />
           )}
 
-          {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+          {state.error && <p className="text-xs text-err-600">{state.error}</p>}
 
           <div className="flex gap-2">
             <button
@@ -145,7 +145,7 @@ export function AssetCard({
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="text-xs font-medium text-zinc-500 px-3 py-1.5"
+              className="text-xs font-medium text-ink-500 px-3 py-1.5"
             >
               Annuler
             </button>
@@ -155,10 +155,10 @@ export function AssetCard({
         <>
           <div className="font-medium text-sm">{asset.label}</div>
           {!isFile && (
-            <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
+            <div className="flex items-center gap-2 text-xs text-ink-500 mt-1">
               {type === "couleur" && (
                 <span
-                  className="w-4 h-4 rounded-full border border-zinc-200 inline-block shrink-0"
+                  className="w-4 h-4 rounded-full border border-white/60 inline-block shrink-0"
                   style={{ backgroundColor: asset.value }}
                 />
               )}
@@ -168,7 +168,7 @@ export function AssetCard({
         </>
       )}
 
-      {deleteError && <p className="text-xs text-red-600 mt-2">{deleteError}</p>}
+      {deleteError && <p className="text-xs text-err-600 mt-2">{deleteError}</p>}
     </div>
   );
 }

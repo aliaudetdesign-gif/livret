@@ -106,7 +106,7 @@ export function SectionAssetGrid({
         <li>{addSlot}</li>
       </ul>
     ) : (
-      <p className="text-sm text-zinc-400">Aucun fichier pour l&apos;instant.</p>
+      <p className="text-sm text-ink-400">Aucun fichier pour l&apos;instant.</p>
     );
   }
 
@@ -117,7 +117,7 @@ export function SectionAssetGrid({
           <button
             type="button"
             onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
-            className="text-sm font-medium text-zinc-500 hover:text-[var(--color-terracotta)]"
+            className="text-sm font-medium text-ink-500 hover:text-[var(--color-terracotta)]"
           >
             {selectionMode ? "Annuler" : "Sélectionner"}
           </button>
@@ -127,7 +127,7 @@ export function SectionAssetGrid({
               type="button"
               onClick={handleBulkDelete}
               disabled={selected.size === 0 || isPending}
-              className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPending ? "Suppression..." : `Supprimer (${selected.size})`}
             </button>
@@ -136,7 +136,7 @@ export function SectionAssetGrid({
       )}
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
       )}
 
       <ul className="grid grid-cols-4 gap-4">
@@ -145,7 +145,7 @@ export function SectionAssetGrid({
           const isImage = asset.file_type.startsWith("image/");
 
           const preview = isImage ? (
-            <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-zinc-50">
+            <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={asset.file_url}
@@ -154,7 +154,7 @@ export function SectionAssetGrid({
               />
             </div>
           ) : (
-            <div className="aspect-square w-full mb-2 rounded-md bg-zinc-50 flex items-center justify-center">
+            <div className="aspect-square w-full mb-2 rounded-md bg-white/55 flex items-center justify-center">
               <PdfIcon />
             </div>
           );
@@ -166,7 +166,7 @@ export function SectionAssetGrid({
                   role="button"
                   tabIndex={0}
                   onClick={() => toggleSelect(asset.id)}
-                  className="relative block bg-white border border-zinc-100 rounded-lg p-4 cursor-pointer"
+                  className="relative block glass rounded-card p-4 cursor-pointer"
                 >
                   <input
                     type="checkbox"
@@ -189,7 +189,7 @@ export function SectionAssetGrid({
                   type="button"
                   onClick={() => handleDelete(asset)}
                   disabled={isPending}
-                  className="absolute top-3 right-3 z-10 hidden group-hover:flex w-7 h-7 items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+                  className="absolute top-3 right-3 z-10 hidden group-hover:flex w-7 h-7 items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
                   title="Supprimer"
                 >
                   ✕
@@ -199,7 +199,7 @@ export function SectionAssetGrid({
                 href={asset.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-white border border-zinc-100 rounded-lg p-4 hover-lift"
+                className="block glass rounded-card p-4 hover-lift"
               >
                 {preview}
                 <div className="text-sm font-medium truncate">{asset.label}</div>

@@ -5,9 +5,9 @@ import type { Subscription } from "@/lib/types";
 import { formatShortDate } from "@/lib/format";
 
 const statusStyle: Record<Subscription["status"], string> = {
-  actif: "bg-emerald-100 text-emerald-700",
+  actif: "bg-ok-100 text-ok-600",
   en_pause: "bg-[var(--color-terracotta-tint)] text-[var(--color-terracotta-deep)]",
-  annule: "bg-zinc-100 text-zinc-500",
+  annule: "bg-white/65 text-ink-500",
 };
 
 const statusLabel: Record<Subscription["status"], string> = {
@@ -38,11 +38,11 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
               {statusLabel[subscription.status]}
             </span>
           </div>
-          <p className="text-sm text-zinc-500 mt-1">{subscription.price_label}</p>
+          <p className="text-sm text-ink-500 mt-1">{subscription.price_label}</p>
         </div>
       </div>
 
-      <p className="text-xs text-zinc-500 mb-4">
+      <p className="text-xs text-ink-500 mb-4">
         Prochain renouvellement le {formatShortDate(subscription.renewal_date)}
       </p>
 
@@ -50,18 +50,18 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
         <button
           type="button"
           onClick={handleComingSoon}
-          className="text-sm font-medium bg-white border border-zinc-200 rounded-md px-4 py-2 hover:border-[var(--color-terracotta)] transition-colors"
+          className="text-sm font-medium glass-soft rounded-field px-4 py-2 hover:border-clay-400 transition-colors"
         >
           Changer de plan
         </button>
         <button
           type="button"
           onClick={handleComingSoon}
-          className="text-sm font-medium bg-white border border-zinc-200 rounded-md px-4 py-2 hover:border-[var(--color-terracotta)] transition-colors"
+          className="text-sm font-medium glass-soft rounded-field px-4 py-2 hover:border-clay-400 transition-colors"
         >
           Gérer le paiement
         </button>
-        {notice && <span className="text-sm text-zinc-400">{notice}</span>}
+        {notice && <span className="text-sm text-ink-400">{notice}</span>}
       </div>
     </div>
   );

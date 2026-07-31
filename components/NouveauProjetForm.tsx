@@ -6,8 +6,8 @@ import { createProject, type ActionState } from "@/app/agence/projets/nouveau/ac
 const initialState: ActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 export function NouveauProjetForm({
   clients,
@@ -20,7 +20,7 @@ export function NouveauProjetForm({
   return (
     <form
       action={formAction}
-      className="bg-white rounded-lg border border-zinc-100 p-6 max-w-xl flex flex-col gap-4"
+      className="glass rounded-card p-6 max-w-xl flex flex-col gap-4"
     >
       <div>
         <label htmlFor="name" className={labelClass}>
@@ -62,12 +62,12 @@ export function NouveauProjetForm({
         </div>
         <div>
           <label className={labelClass}>Client</label>
-          <div className="flex gap-1 mb-2 bg-zinc-100 rounded-md p-1 w-fit">
+          <div className="flex gap-1 mb-2 bg-white/65 rounded-md p-1 w-fit">
             <button
               type="button"
               onClick={() => setClientMode("nouveau")}
               className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
-                clientMode === "nouveau" ? "bg-white shadow-sm text-zinc-900" : "text-zinc-500"
+                clientMode === "nouveau" ? "bg-white shadow-sm text-ink-900" : "text-ink-500"
               }`}
             >
               Nouveau client
@@ -76,7 +76,7 @@ export function NouveauProjetForm({
               type="button"
               onClick={() => setClientMode("existant")}
               className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
-                clientMode === "existant" ? "bg-white shadow-sm text-zinc-900" : "text-zinc-500"
+                clientMode === "existant" ? "bg-white shadow-sm text-ink-900" : "text-ink-500"
               }`}
             >
               Client existant
@@ -92,7 +92,7 @@ export function NouveauProjetForm({
               ))}
             </select>
           ) : (
-            <p className="text-xs text-zinc-400 leading-snug">
+            <p className="text-xs text-ink-400 leading-snug">
               Le compte sera créé après la création du projet.
             </p>
           )}
@@ -139,7 +139,7 @@ export function NouveauProjetForm({
           />
         </div>
       )}
-      <p className="text-xs text-zinc-400 -mt-2">
+      <p className="text-xs text-ink-400 -mt-2">
         Optionnel : possible d&apos;ajouter les coordonnées des clients via &quot;Gérer le projet&quot;.
       </p>
 
@@ -159,7 +159,7 @@ export function NouveauProjetForm({
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <button

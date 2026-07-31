@@ -26,7 +26,7 @@ export function DiscussionRow({
 
   return (
     <div
-      className="relative flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 transition-colors"
+      className="relative flex items-center gap-3 px-4 py-3 hover:bg-white/60 transition-colors"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -50,9 +50,9 @@ export function DiscussionRow({
           <div className={`text-sm truncate ${isUnread ? "font-semibold" : "font-medium"}`}>
             {project.name}
           </div>
-          <div className="text-xs text-zinc-400 truncate">{preview}</div>
+          <div className="text-xs text-ink-400 truncate">{preview}</div>
         </div>
-        <div className="text-xs text-zinc-400 shrink-0">{dateLabel}</div>
+        <div className="text-xs text-ink-400 shrink-0">{dateLabel}</div>
       </Link>
 
       <div
@@ -70,7 +70,7 @@ export function DiscussionRow({
               else await markThreadUnread(project.id);
             })
           }
-          className="w-7 h-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-[var(--color-terracotta-deep)] hover:bg-white transition-colors disabled:opacity-50"
+          className="w-7 h-7 rounded-md flex items-center justify-center text-ink-400 hover:text-[var(--color-terracotta-deep)] hover:bg-white transition-colors disabled:opacity-50"
         >
           {isUnread ? <MailOpen className="w-3.5 h-3.5" /> : <Mail className="w-3.5 h-3.5" />}
         </button>
@@ -83,7 +83,7 @@ export function DiscussionRow({
               await toggleArchiveProject(project.id, !project.archived);
             })
           }
-          className="w-7 h-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-[var(--color-terracotta-deep)] hover:bg-white transition-colors disabled:opacity-50"
+          className="w-7 h-7 rounded-md flex items-center justify-center text-ink-400 hover:text-[var(--color-terracotta-deep)] hover:bg-white transition-colors disabled:opacity-50"
         >
           {project.archived ? (
             <ArchiveRestore className="w-3.5 h-3.5" />

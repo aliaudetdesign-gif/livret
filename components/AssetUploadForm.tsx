@@ -17,8 +17,8 @@ import {
 const initialState: AssetActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 const FILE_TYPES: AssetType[] = ["logo", "moodboard"];
 
@@ -140,7 +140,7 @@ export function AssetUploadForm({
       ref={formRef}
       action={formAction}
       onSubmit={handleSubmit}
-      className="bg-white rounded-lg border border-zinc-100 p-4 max-w-md flex flex-col gap-3 mb-6"
+      className="glass rounded-card p-4 max-w-md flex flex-col gap-3 mb-6"
     >
       <p className="text-sm font-medium">{title}</p>
 
@@ -242,7 +242,7 @@ export function AssetUploadForm({
               name="file"
               type="file"
               accept=".woff,.woff2,.ttf,.otf"
-              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
             />
           </div>
         </>
@@ -282,7 +282,7 @@ export function AssetUploadForm({
             />
           </div>
 
-          <p className="text-xs text-zinc-500 -mb-1">
+          <p className="text-xs text-ink-500 -mb-1">
             Dépose au moins un format (SVG, PNG ou PDF).
           </p>
 
@@ -295,7 +295,7 @@ export function AssetUploadForm({
               name="svg_file"
               type="file"
               accept=".svg,image/svg+xml"
-              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
             />
           </div>
 
@@ -308,7 +308,7 @@ export function AssetUploadForm({
               name="png_file"
               type="file"
               accept="image/png"
-              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
             />
           </div>
 
@@ -321,7 +321,7 @@ export function AssetUploadForm({
               name="pdf_file"
               type="file"
               accept="application/pdf"
-              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
             />
           </div>
 
@@ -369,7 +369,7 @@ export function AssetUploadForm({
                 </option>
               ))}
             </select>
-            <p className="text-[11px] text-zinc-400 mt-1">
+            <p className="text-[11px] text-ink-400 mt-1">
               Les autres codes seront calculés automatiquement à partir de celui-ci.
             </p>
           </div>
@@ -504,7 +504,7 @@ export function AssetUploadForm({
             type="file"
             accept="image/*"
             required
-            className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+            className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
           />
         </div>
       ) : (
@@ -517,7 +517,7 @@ export function AssetUploadForm({
       )}
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <button

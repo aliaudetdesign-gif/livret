@@ -7,9 +7,9 @@ import { briefSections } from "@/lib/briefFields";
 const initialState: BriefActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
 const textareaClass = `${inputClass} resize-y min-h-[72px]`;
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 export function ProjectBriefForm({
   projectId,
@@ -36,7 +36,7 @@ export function ProjectBriefForm({
       <input type="hidden" name="project_id" value={projectId} />
 
       {briefSections.map((section) => (
-        <div key={section.title} className="bg-white border border-zinc-100 rounded-lg p-5">
+        <div key={section.title} className="glass rounded-card p-5">
           <p className="text-sm font-medium mb-4">
             <span className="mr-1.5">{section.icon}</span>
             {section.title}
@@ -72,7 +72,7 @@ export function ProjectBriefForm({
       ))}
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ export function ProjectBriefForm({
         >
           {pending ? "Enregistrement..." : "Enregistrer le brief"}
         </button>
-        {saved && <span className="text-sm text-emerald-600">Brief enregistré.</span>}
+        {saved && <span className="text-sm text-ok-600">Brief enregistré.</span>}
       </div>
     </form>
   );

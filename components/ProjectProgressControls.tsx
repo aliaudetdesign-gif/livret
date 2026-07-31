@@ -15,10 +15,16 @@ const STEP_LABELS: Record<(typeof PROGRESS_STEPS)[number], string> = {
   fin_de_projet: "Fin de projet",
 };
 
+// Mêmes pastilles que sur les ProjectCard (voir badgeStyle dans ProjectCard) :
+// uniquement des couleurs de la charte, chacune au-dessus de 4,5:1 sur son fond.
 const STATUS_OPTIONS: { value: ProjectStatus; label: string; badgeClass: string }[] = [
-  { value: "en_cours", label: "En cours", badgeClass: "bg-amber-100 text-amber-700" },
-  { value: "attente_validation", label: "Attente de validation", badgeClass: "bg-blue-100 text-blue-700" },
-  { value: "livre", label: "Livré", badgeClass: "bg-emerald-100 text-emerald-700" },
+  { value: "en_cours", label: "En cours", badgeClass: "bg-clay-100 text-clay-700" },
+  {
+    value: "attente_validation",
+    label: "Attente de validation",
+    badgeClass: "bg-warn-100 text-warn-600",
+  },
+  { value: "livre", label: "Livré", badgeClass: "bg-ok-100 text-ok-600" },
 ];
 
 // Bascule rapide du statut, utilisée dans le header projet côté agence.
@@ -71,13 +77,13 @@ export function StatusToggle({
         type="button"
         onClick={() => setOpen((v) => !v)}
         disabled={isPending}
-        className={`text-xs rounded-full px-2.5 py-1 transition-colors cursor-pointer disabled:cursor-wait ${currentOption.badgeClass}`}
+        className={`text-[11px] font-semibold rounded-full px-2.5 py-[3.5px] transition-colors cursor-pointer disabled:cursor-wait ${currentOption.badgeClass}`}
       >
         {isPending ? "..." : currentOption.label}
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-1 z-10 bg-[var(--color-noir-doux)] border border-white/10 rounded-lg shadow-lg overflow-hidden min-w-[180px]">
+        <div className="absolute top-full right-0 mt-1.5 z-10 bg-ink-900 border border-white/12 rounded-field shadow-[0_20px_40px_-18px_rgba(23,22,26,0.7)] overflow-hidden min-w-[180px]">
           {STATUS_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -95,7 +101,9 @@ export function StatusToggle({
         </div>
       )}
 
-      {error && <p className="text-[11px] text-red-400">{error}</p>}
+      {/* StatusToggle ne vit que dans le header sombre de la fiche projet :
+          err-600 y serait illisible, on prend la variante claire. */}
+      {error && <p className="text-[11px] text-err-300">{error}</p>}
     </div>
   );
 }
@@ -133,23 +141,24 @@ export function ProgressBar({
   }
 
   const isDark = variant === "dark";
-  const lineBase = isDark ? "bg-white/15" : "bg-zinc-200";
+  const lineBase = isDark ? "bg-white/15" : "bg-white/55";
   const dotBase = isDark
-    ? "border-white/30 bg-[var(--color-noir-doux)] text-white/40"
-    : "border-zinc-300 bg-white text-zinc-400";
-  const dotDone = "border-[var(--color-terracotta)] bg-[var(--color-terracotta)] text-white";
+    ? "border-white/30 bg-ink-900 text-white/45"
+    : "border-white/70 bg-white/80 text-ink-400";
+  const dotDone = "border-clay-500 bg-gradient-terracotta text-white";
   const dotCurrent = isDark
-    ? "border-white bg-white text-[var(--color-noir-doux)]"
-    : "border-[var(--color-terracotta)] bg-white text-[var(--color-terracotta)]";
-  const labelBase = isDark ? "text-white/40" : "text-zinc-400";
-  const labelActive = isDark ? "text-white" : "text-[var(--color-noir-doux)]";
+    ? "border-white bg-white text-ink-900"
+    : "border-clay-500 bg-white text-clay-600";
+  const labelBase = isDark ? "text-white/45" : "text-ink-400";
+  const labelActive = isDark ? "text-white" : "text-ink-900";
+  const errorTone = isDark ? "text-err-300" : "text-err-600";
 
   return (
     <div className="w-full">
       <div className="relative">
         <div className={`absolute top-3 left-3 right-3 h-0.5 ${lineBase}`} />
         <div
-          className="absolute top-3 left-3 h-0.5 bg-[var(--color-terracotta)] transition-all duration-300"
+          className="absolute top-3 left-3 h-0.5 bg-gradient-terracotta transition-all duration-300"
           style={{ width: `calc((100% - 1.5rem) * ${current / 4})` }}
         />
         <div className="relative flex justify-between">
@@ -186,7 +195,7 @@ export function ProgressBar({
           })}
         </div>
       </div>
-      {error && <p className="text-[11px] text-red-400 mt-2">{error}</p>}
+      {error && <p className={`text-[11px] mt-2 ${errorTone}`}>{error}</p>}
     </div>
   );
 }

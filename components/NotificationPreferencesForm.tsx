@@ -50,7 +50,7 @@ export function NotificationPreferencesForm({
       </label>
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <div className="flex items-center gap-3">
@@ -61,7 +61,7 @@ export function NotificationPreferencesForm({
         >
           {pending ? "Enregistrement..." : "Enregistrer"}
         </button>
-        {saved && <span className="text-sm text-emerald-600">Enregistré.</span>}
+        {saved && <span className="text-sm text-ok-600">Enregistré.</span>}
       </div>
     </form>
   );

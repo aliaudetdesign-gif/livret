@@ -46,11 +46,11 @@ export function DeleteSectionButton({
         type="button"
         onClick={handleDelete}
         disabled={isPending}
-        className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {isPending ? "Suppression..." : "Supprimer la section"}
       </button>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-err-600">{error}</p>}
     </div>
   );
 }

@@ -22,8 +22,8 @@ export function MessageForm({ projectId }: { projectId: string }) {
   }, [pending, state]);
 
   return (
-    <div className="border-t border-zinc-100">
-      {state.error && <p className="text-xs text-red-600 bg-red-50 px-4 py-2">{state.error}</p>}
+    <div className="border-t border-white/55">
+      {state.error && <p className="text-xs text-err-600 bg-err-100 px-4 py-2">{state.error}</p>}
       <form ref={formRef} action={formAction} className="flex items-end gap-2 p-4">
         <input type="hidden" name="project_id" value={projectId} />
         <textarea
@@ -31,7 +31,7 @@ export function MessageForm({ projectId }: { projectId: string }) {
           rows={1}
           required
           placeholder="Écris un message..."
-          className="flex-1 resize-none px-3 py-2 text-sm bg-zinc-50 border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors"
+          className="flex-1 resize-none px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors"
         />
         <button
           type="submit"

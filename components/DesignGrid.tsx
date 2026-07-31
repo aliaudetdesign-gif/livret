@@ -12,11 +12,11 @@ function DesignCard({ card, href }: { card: DesignCardData; href: string }) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 bg-white border border-zinc-100 rounded-lg p-4 hover-lift"
+      className="flex items-center gap-3 glass rounded-card p-4 hover-lift"
     >
       <span className="text-2xl leading-none">{card.icon}</span>
       <span>
-        <span className="block text-xs text-zinc-500">{card.label}</span>
+        <span className="block text-xs text-ink-500">{card.label}</span>
         <span className="block text-xl font-semibold">{card.count}</span>
       </span>
     </Link>
@@ -37,7 +37,7 @@ export function DesignGrid({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="text-xs uppercase tracking-wide text-zinc-400 mb-3">Essentiel</p>
+        <p className="text-xs uppercase tracking-wide text-ink-400 mb-3">Essentiel</p>
         <div className="grid grid-cols-4 gap-4">
           {essentiel.map((card) => (
             <DesignCard key={card.key} card={card} href={sectionHref(card.key)} />
@@ -46,7 +46,7 @@ export function DesignGrid({
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-wide text-zinc-400 mb-3">Compléments</p>
+        <p className="text-xs uppercase tracking-wide text-ink-400 mb-3">Compléments</p>
         <div className="grid grid-cols-4 gap-4">
           {complements.map((card) => (
             <DesignCard key={card.key} card={card} href={sectionHref(card.key)} />
@@ -54,7 +54,7 @@ export function DesignGrid({
           {addSectionSlot}
         </div>
         {complements.length === 0 && !addSectionSlot && (
-          <p className="text-sm text-zinc-400 mt-1">Aucune section complémentaire pour l&apos;instant.</p>
+          <p className="text-sm text-ink-400 mt-1">Aucune section complémentaire pour l&apos;instant.</p>
         )}
       </div>
     </div>

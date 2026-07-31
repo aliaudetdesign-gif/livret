@@ -7,8 +7,8 @@ import type { DocumentCategory } from "@/lib/types";
 const initialState: DocumentActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 const categoryLabels: Record<DocumentCategory, string> = {
   devis: "Devis",
@@ -39,7 +39,7 @@ export function DocumentUploadForm({
     <form
       ref={formRef}
       action={formAction}
-      className="bg-white rounded-lg border border-zinc-100 p-4 max-w-md flex flex-col gap-3 mb-6"
+      className="glass rounded-card p-4 max-w-md flex flex-col gap-3 mb-6"
     >
       <p className="text-sm font-medium">Ajouter un document</p>
 
@@ -81,12 +81,12 @@ export function DocumentUploadForm({
           type="file"
           accept="application/pdf"
           required
-          className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+          className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
         />
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <button

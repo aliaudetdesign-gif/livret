@@ -15,7 +15,7 @@ export function AddTile({
   variant?: "square" | "row" | "wide";
 }) {
   const baseClass =
-    "group flex items-center justify-center gap-3 border-2 border-dashed border-zinc-200 rounded-lg text-zinc-500 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors";
+    "group flex items-center justify-center gap-3 border-2 border-dashed border-white/60 rounded-lg text-ink-500 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors";
 
   if (variant === "row") {
     return (
@@ -39,7 +39,7 @@ export function AddTile({
         +
       </span>
       <span className="text-sm font-medium text-center">{title}</span>
-      {subtitle && <span className="text-xs text-zinc-400 text-center">{subtitle}</span>}
+      {subtitle && <span className="text-xs text-ink-400 text-center">{subtitle}</span>}
     </button>
   );
 }

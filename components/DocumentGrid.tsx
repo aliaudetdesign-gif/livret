@@ -141,7 +141,7 @@ export function DocumentGrid({
     return addSlot ? (
       <div className="grid grid-cols-3 gap-4">{addSlot}</div>
     ) : (
-      <p className="text-sm text-zinc-400">
+      <p className="text-sm text-ink-400">
         Aucun document pour l&apos;instant.
       </p>
     );
@@ -154,7 +154,7 @@ export function DocumentGrid({
           <button
             type="button"
             onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
-            className="text-sm font-medium text-zinc-500 hover:text-[var(--color-terracotta)]"
+            className="text-sm font-medium text-ink-500 hover:text-[var(--color-terracotta)]"
           >
             {selectionMode ? "Annuler" : "Sélectionner"}
           </button>
@@ -164,7 +164,7 @@ export function DocumentGrid({
               type="button"
               onClick={handleBulkDelete}
               disabled={selected.size === 0 || isPending}
-              className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPending ? "Suppression..." : `Supprimer (${selected.size})`}
             </button>
@@ -173,7 +173,7 @@ export function DocumentGrid({
       )}
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
       )}
 
       <div className="flex flex-col gap-6">
@@ -194,7 +194,7 @@ export function DocumentGrid({
                         role="button"
                         tabIndex={0}
                         onClick={() => toggleSelect(doc.id)}
-                        className="flex items-center gap-3 bg-white border border-zinc-100 rounded-lg p-4 cursor-pointer"
+                        className="flex items-center gap-3 glass rounded-card p-4 cursor-pointer"
                       >
                         <input
                           type="checkbox"
@@ -214,7 +214,7 @@ export function DocumentGrid({
                           type="button"
                           onClick={() => handleDelete(doc)}
                           disabled={isPending}
-                          className="absolute top-3 right-3 z-10 hidden group-hover:flex w-7 h-7 items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-red-600 disabled:opacity-50"
+                          className="absolute top-3 right-3 z-10 hidden group-hover:flex w-7 h-7 items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
                           title="Supprimer"
                         >
                           ✕
@@ -225,7 +225,7 @@ export function DocumentGrid({
                           href={doc.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 bg-white border border-zinc-100 rounded-lg p-4 hover-lift"
+                          className="flex items-center gap-3 glass rounded-card p-4 hover-lift"
                         >
                           <PdfIcon />
                           <span className="text-sm font-medium truncate">{doc.label}</span>
@@ -235,11 +235,11 @@ export function DocumentGrid({
                           type="button"
                           onClick={() => handleClientDownload(doc)}
                           disabled={downloadingId === doc.id}
-                          className="w-full flex items-center gap-3 bg-white border border-zinc-100 rounded-lg p-4 hover-lift text-left disabled:opacity-60 disabled:cursor-wait"
+                          className="w-full flex items-center gap-3 glass rounded-card p-4 hover-lift text-left disabled:opacity-60 disabled:cursor-wait"
                         >
                           <PdfIcon />
                           <span className="text-sm font-medium truncate">{doc.label}</span>
-                          <span className="ml-auto text-xs text-zinc-400 shrink-0">
+                          <span className="ml-auto text-xs text-ink-400 shrink-0">
                             {downloadingId === doc.id ? "..." : "↓"}
                           </span>
                         </button>

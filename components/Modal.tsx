@@ -42,7 +42,7 @@ export function Modal({
           type="button"
           onClick={onClose}
           aria-label="Fermer"
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-md bg-white border border-zinc-200 text-zinc-500 hover:text-[var(--color-terracotta)]"
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-clay-600 transition-colors"
         >
           ✕
         </button>

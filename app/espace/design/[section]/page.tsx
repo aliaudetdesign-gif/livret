@@ -26,7 +26,7 @@ export default async function DesignSectionPage({
 
   if (!project) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-ink-500">
         Aucun projet rattaché à ton compte pour l&apos;instant.
       </p>
     );
@@ -38,7 +38,7 @@ export default async function DesignSectionPage({
   const backLink = (
     <Link
       href="/espace/design"
-      className="text-sm text-zinc-500 hover:text-[var(--color-terracotta)] mb-4 inline-block"
+      className="text-sm text-ink-500 hover:text-[var(--color-terracotta)] mb-4 inline-block"
     >
       ← Design
     </Link>
@@ -59,7 +59,7 @@ export default async function DesignSectionPage({
         <h1 className="text-2xl font-semibold mb-6">{ESSENTIEL_LABELS[type]}</h1>
 
         {(assets ?? []).length === 0 ? (
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-ink-400">
             Rien à afficher pour l&apos;instant, ton agence n&apos;a pas encore ajouté d&apos;éléments ici.
           </p>
         ) : type === "couleur" ? (
@@ -75,9 +75,9 @@ export default async function DesignSectionPage({
         ) : (
           <div className="grid grid-cols-3 gap-4">
             {(assets ?? []).map((asset) => (
-              <div key={asset.id} className="bg-white border border-zinc-100 rounded-lg p-4">
+              <div key={asset.id} className="glass rounded-card p-4">
                 {FILE_TYPES.includes(type) ? (
-                  <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-zinc-50">
+                  <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={asset.value}
@@ -88,7 +88,7 @@ export default async function DesignSectionPage({
                 ) : null}
                 <div className="font-medium text-sm">{asset.label}</div>
                 {!FILE_TYPES.includes(type) && (
-                  <div className="text-xs text-zinc-500">{asset.value}</div>
+                  <div className="text-xs text-ink-500">{asset.value}</div>
                 )}
               </div>
             ))}
@@ -107,7 +107,7 @@ export default async function DesignSectionPage({
     .single();
 
   if (!projectSection) {
-    return <p className="text-sm text-zinc-500">Section introuvable.</p>;
+    return <p className="text-sm text-ink-500">Section introuvable.</p>;
   }
 
   const { data: sectionAssets } = await supabase

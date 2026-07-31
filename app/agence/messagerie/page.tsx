@@ -62,7 +62,7 @@ export default async function MessagerieAgencePage({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold">Messagerie</h1>
-          <p className="text-sm text-zinc-500">Échanger avec vos clients</p>
+          <p className="text-sm text-ink-500">Échanger avec vos clients</p>
         </div>
         <div className="flex items-center gap-3">
           <MessagerieSearch defaultValue={q} />
@@ -100,16 +100,16 @@ function Section({
     <div className="mb-8">
       <h2
         className={`text-xs uppercase tracking-wide mb-3 ${
-          muted ? "text-zinc-400" : "text-zinc-500 font-medium"
+          muted ? "text-ink-400" : "text-ink-500 font-medium"
         }`}
       >
         {title}
       </h2>
 
       {discussions.length === 0 ? (
-        <p className="text-sm text-zinc-400">{emptyLabel}</p>
+        <p className="text-sm text-ink-400">{emptyLabel}</p>
       ) : (
-        <div className="bg-white rounded-lg border border-zinc-100 divide-y divide-zinc-100">
+        <div className="glass rounded-card divide-y divide-white/55">
           {discussions.map(({ project, lastMessage, unreadCount }) => (
             <DiscussionRow
               key={project.id}

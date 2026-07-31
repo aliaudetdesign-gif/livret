@@ -28,7 +28,7 @@ export function FormatLabelWithHint({
     <span className="inline-flex items-center gap-1.5">
       {label}
       <FormatHint text={description}>
-        <span className="w-3.5 h-3.5 rounded-full border border-zinc-300 text-zinc-400 text-[9px] leading-none flex items-center justify-center cursor-help">
+        <span className="w-3.5 h-3.5 rounded-full border border-white/70 text-ink-400 text-[9px] leading-none flex items-center justify-center cursor-help">
           i
         </span>
       </FormatHint>

@@ -15,7 +15,7 @@ export async function AssetSection({
 
   if (!project) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-ink-500">
         Aucun projet rattaché à ton compte pour l&apos;instant.
       </p>
     );
@@ -32,10 +32,10 @@ export async function AssetSection({
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-1">{title}</h1>
-      <p className="text-sm text-zinc-500 mb-6">{description}</p>
+      <p className="text-sm text-ink-500 mb-6">{description}</p>
 
       {(assets ?? []).length === 0 ? (
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-ink-400">
           Rien à afficher pour l&apos;instant, ton agence n&apos;a pas encore
           ajouté d&apos;éléments ici.
         </p>
@@ -44,10 +44,10 @@ export async function AssetSection({
           {(assets ?? []).map((asset) => (
             <div
               key={asset.id}
-              className="bg-white border border-zinc-100 rounded-lg p-4"
+              className="glass rounded-card p-4"
             >
               {type === "logo" || type === "moodboard" ? (
-                <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-zinc-50">
+                <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={asset.value}
@@ -58,7 +58,7 @@ export async function AssetSection({
               ) : null}
               <div className="font-medium text-sm">{asset.label}</div>
               {type !== "logo" && type !== "moodboard" && (
-                <div className="text-xs text-zinc-500">{asset.value}</div>
+                <div className="text-xs text-ink-500">{asset.value}</div>
               )}
             </div>
           ))}

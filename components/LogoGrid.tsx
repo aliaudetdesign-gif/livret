@@ -40,7 +40,7 @@ export function describeLogoFormats(assets: BrandAsset[]): string {
 export function LogoGrid({ assets }: { assets: BrandAsset[] }) {
   if (assets.length === 0) {
     return (
-      <p className="text-sm text-zinc-400">
+      <p className="text-sm text-ink-400">
         Rien à afficher pour l&apos;instant, ton agence n&apos;a pas encore ajouté
         d&apos;éléments ici.
       </p>

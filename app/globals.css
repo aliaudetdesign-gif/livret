@@ -51,6 +51,9 @@
   /* Erreur : teinte 351°, nettement séparée de la terre cuite (15°) */
   --err-600: #9e1c2f;
   --err-100: #f9e1e3;
+  /* err-300 existe uniquement pour le texte d'erreur posé sur un fond sombre
+     (header projet, hero client) : err-600 y tombe sous 2:1. 9,9:1 sur ink-900. */
+  --err-300: #efb0b7;
   /* Attention */
   --warn-600: #8a5a12;
   --warn-100: #f7e9cf;
@@ -126,6 +129,7 @@
   --color-ok-600: var(--ok-600);
   --color-ok-100: var(--ok-100);
   --color-err-600: var(--err-600);
+  --color-err-300: var(--err-300);
   --color-err-100: var(--err-100);
   --color-warn-600: var(--warn-600);
   --color-warn-100: var(--warn-100);

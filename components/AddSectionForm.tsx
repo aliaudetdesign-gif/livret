@@ -7,7 +7,7 @@ import type { SectionType } from "@/lib/types";
 const initialState: SectionActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
 
 export function AddSectionForm({
   projectId,
@@ -37,7 +37,7 @@ export function AddSectionForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-3 bg-white border border-dashed border-zinc-200 rounded-lg p-4 text-left text-sm text-zinc-500 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors"
+        className="flex items-center gap-3 glass-soft border-dashed rounded-lg p-4 text-left text-sm text-ink-500 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors"
       >
         <span className="text-xl leading-none">+</span>
         Ajouter une section
@@ -49,7 +49,7 @@ export function AddSectionForm({
     <form
       ref={formRef}
       action={formAction}
-      className="col-span-2 bg-white border border-zinc-100 rounded-lg p-4 flex flex-col gap-3"
+      className="col-span-2 glass rounded-card p-4 flex flex-col gap-3"
     >
       <input type="hidden" name="project_id" value={projectId} />
       <input type="hidden" name="mode" value={mode} />
@@ -61,14 +61,14 @@ export function AddSectionForm({
           <button
             type="button"
             onClick={() => setMode("existing")}
-            className={mode === "existing" ? "font-medium" : "text-zinc-400"}
+            className={mode === "existing" ? "font-medium" : "text-ink-400"}
           >
             Depuis la bibliothèque
           </button>
           <button
             type="button"
             onClick={() => setMode("new")}
-            className={mode === "new" ? "font-medium" : "text-zinc-400"}
+            className={mode === "new" ? "font-medium" : "text-ink-400"}
           >
             Nouvelle section
           </button>
@@ -96,7 +96,7 @@ export function AddSectionForm({
       )}
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <div className="flex gap-2">
@@ -110,7 +110,7 @@ export function AddSectionForm({
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-sm text-zinc-500 px-4 py-2"
+          className="text-sm text-ink-500 px-4 py-2"
         >
           Annuler
         </button>

@@ -88,7 +88,7 @@ export default async function CorbeillePage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-1">Corbeille</h1>
-      <p className="text-sm text-zinc-500 mb-8">
+      <p className="text-sm text-ink-500 mb-8">
         Les éléments supprimés restent ici, récupérables jusqu&apos;à suppression définitive.
       </p>
       <TrashList entries={entries} />

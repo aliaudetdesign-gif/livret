@@ -17,11 +17,11 @@ export default async function EspaceProfilPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-1">Mon profil</h1>
-      <p className="text-sm text-zinc-500 mb-8">Photo, nom et coordonnées.</p>
+      <p className="text-sm text-ink-500 mb-8">Photo, nom et coordonnées.</p>
 
       <div className="flex flex-col gap-8 max-w-3xl">
         <section>
-          <div className="bg-white border border-zinc-100 rounded-lg p-5">
+          <div className="glass rounded-card p-5">
             <ProfileForm
               fullName={profile?.full_name ?? ""}
               email={user?.email ?? ""}
@@ -32,10 +32,10 @@ export default async function EspaceProfilPage() {
         </section>
 
         <section>
-          <h2 className="text-xs uppercase tracking-wide text-zinc-500 font-medium mb-3">
+          <h2 className="text-xs uppercase tracking-wide text-ink-500 font-medium mb-3">
             Notifications
           </h2>
-          <div className="bg-white border border-zinc-100 rounded-lg p-5">
+          <div className="glass rounded-card p-5">
             <NotificationPreferencesForm
               notifyNewMessage={profile?.notify_new_message ?? true}
               notifyNewDocument={profile?.notify_new_document ?? true}
@@ -44,10 +44,10 @@ export default async function EspaceProfilPage() {
         </section>
 
         <section>
-          <h2 className="text-xs uppercase tracking-wide text-zinc-500 font-medium mb-3">
+          <h2 className="text-xs uppercase tracking-wide text-ink-500 font-medium mb-3">
             Sécurité
           </h2>
-          <div className="bg-white border border-zinc-100 rounded-lg p-5">
+          <div className="glass rounded-card p-5">
             <PasswordSecurityForm />
           </div>
         </section>

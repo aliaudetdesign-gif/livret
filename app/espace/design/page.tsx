@@ -15,7 +15,7 @@ export default async function DesignPage() {
 
   if (!project) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-ink-500">
         Aucun projet rattaché à ton compte pour l&apos;instant.
       </p>
     );
@@ -56,7 +56,7 @@ export default async function DesignPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-1">Design</h1>
-      <p className="text-sm text-zinc-500 mb-6">
+      <p className="text-sm text-ink-500 mb-6">
         Les éléments de marque partagés par ton agence.
       </p>
       <DesignGrid

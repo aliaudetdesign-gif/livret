@@ -9,20 +9,22 @@ export default function ConnexionPage() {
   const [state, formAction, pending] = useActionState(login, initialState);
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-[var(--color-noir-doux)] px-4">
-      <div className="w-full max-w-sm bg-white rounded-xl p-8">
-        <div className="mb-6">
-          <span className="text-xl font-semibold text-[var(--color-noir-doux)]">
+    // Plus de fond sombre plein écran : on laisse voir la nappe de couleur du
+    // layout et on pose une seule dalle de verre au centre.
+    <div className="flex flex-1 items-center justify-center px-4 py-16">
+      <div className="glass w-full max-w-sm rounded-panel p-9">
+        <div className="mb-7">
+          <span className="text-[23px] font-semibold tracking-[-0.02em] text-ink-900">
             livret<span className="text-gradient-terracotta">.</span>
           </span>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-[13.5px] text-ink-500 mt-1.5">
             Connecte-toi à ton espace agence ou client.
           </p>
         </div>
 
         <form action={formAction} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-700" htmlFor="email">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-ink-700" htmlFor="email">
               Email
             </label>
             <input
@@ -30,12 +32,12 @@ export default function ConnexionPage() {
               name="email"
               type="email"
               required
-              className="border border-zinc-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-terracotta)]"
+              className="bg-white/70 border border-white/60 rounded-field px-3 py-2 text-sm focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors"
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-700" htmlFor="password">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-ink-700" htmlFor="password">
               Mot de passe
             </label>
             <input
@@ -43,16 +45,16 @@ export default function ConnexionPage() {
               name="password"
               type="password"
               required
-              className="border border-zinc-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-terracotta)]"
+              className="bg-white/70 border border-white/60 rounded-field px-3 py-2 text-sm focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors"
             />
           </div>
 
-          {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {state.error && <p className="text-[13px] text-err-600">{state.error}</p>}
 
           <button
             type="submit"
             disabled={pending}
-            className="mt-2 bg-[var(--color-noir-doux)] text-white rounded-md py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+            className="btn-clay mt-2 py-2.5 text-sm font-semibold disabled:opacity-60"
           >
             {pending ? "Connexion..." : "Se connecter"}
           </button>

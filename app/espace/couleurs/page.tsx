@@ -7,7 +7,7 @@ export default async function CouleursPage() {
 
   if (!project) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-ink-500">
         Aucun projet rattaché à ton compte pour l&apos;instant.
       </p>
     );
@@ -24,12 +24,12 @@ export default async function CouleursPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-1">Palette de couleurs</h1>
-      <p className="text-sm text-zinc-500 mb-6">
+      <p className="text-sm text-ink-500 mb-6">
         Cliquez sur une couleur pour copier le code hexadécimal
       </p>
 
       {(colors ?? []).length === 0 ? (
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-ink-400">
           Aucune couleur ajoutée pour l&apos;instant.
         </p>
       ) : (

@@ -6,8 +6,8 @@ import { updateAgencyProfile, type AgencyProfileActionState } from "@/app/agence
 const initialState: AgencyProfileActionState = { error: null };
 
 const inputClass =
-  "w-full px-3 py-2 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1.5";
+  "w-full px-3 py-2 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 export function AgencyProfileForm({ fullName, email }: { fullName: string; email: string }) {
   const [state, formAction, pending] = useActionState(updateAgencyProfile, initialState);
@@ -37,13 +37,13 @@ export function AgencyProfileForm({ fullName, email }: { fullName: string; email
           <input
             value={email}
             disabled
-            className={`${inputClass} bg-zinc-50 text-zinc-400 cursor-not-allowed`}
+            className={`${inputClass} bg-white/55 text-ink-400 cursor-not-allowed`}
           />
         </div>
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
       )}
 
       <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export function AgencyProfileForm({ fullName, email }: { fullName: string; email
         >
           {pending ? "Enregistrement..." : "Enregistrer"}
         </button>
-        {saved && <span className="text-sm text-emerald-600">Enregistré.</span>}
+        {saved && <span className="text-sm text-ok-600">Enregistré.</span>}
       </div>
     </form>
   );

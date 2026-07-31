@@ -82,7 +82,7 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
   }
 
   if (entries.length === 0) {
-    return <p className="text-sm text-zinc-400">La corbeille est vide.</p>;
+    return <p className="text-sm text-ink-400">La corbeille est vide.</p>;
   }
 
   const groups = new Map<string, TrashEntry[]>();
@@ -100,14 +100,14 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
           type="button"
           onClick={handleEmptyTrash}
           disabled={isPending}
-          className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Vider la corbeille
         </button>
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
       )}
 
       <div className="flex flex-col gap-6">
@@ -118,11 +118,11 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
               {items.map((entry) => (
                 <li
                   key={`${entry.type}-${entry.id}`}
-                  className="flex items-center justify-between gap-3 bg-white border border-zinc-100 rounded-lg px-4 py-3"
+                  className="flex items-center justify-between gap-3 glass rounded-card px-4 py-3"
                 >
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{entry.label}</div>
-                    <div className="text-xs text-zinc-400">
+                    <div className="text-xs text-ink-400">
                       {entry.typeLabel} · Supprimé le {formatShortDate(entry.deletedAt)}
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
                       type="button"
                       onClick={() => handlePermanentDelete(entry)}
                       disabled={isPending && pendingId === entry.id}
-                      className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Supprimer
                     </button>

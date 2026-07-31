@@ -40,13 +40,13 @@ export default async function ProjetsPage({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold">Projets clients</h1>
-          <p className="text-zinc-500 text-sm">Visualisez et gérez vos projets</p>
+          <p className="text-ink-500 text-sm">Visualisez et gérez vos projets</p>
         </div>
         <div className="flex items-center gap-3">
           <ProjectSearch defaultValue={q} />
           <Link
             href="/agence/projets/nouveau"
-            className="bg-white border border-zinc-200 rounded-md px-4 py-2 text-sm font-medium hover:bg-zinc-50 transition-colors whitespace-nowrap"
+            className="glass-soft rounded-field px-4 py-2 text-sm font-medium hover:bg-white/80 transition-colors whitespace-nowrap"
           >
             + Nouveau projet
           </Link>
@@ -76,12 +76,12 @@ function StatIconCard({
   value: number;
 }) {
   return (
-    <div className="bg-white rounded-lg p-4 border border-zinc-100 flex items-center gap-3 hover-lift">
+    <div className="glass rounded-card p-4 flex items-center gap-3 hover-lift">
       <div className="w-10 h-10 shrink-0 rounded-lg bg-[var(--color-terracotta-tint)] text-[var(--color-terracotta-deep)] flex items-center justify-center">
         <Icon className="w-5 h-5" />
       </div>
       <div>
-        <div className="text-xs text-zinc-500 mb-0.5">{label}</div>
+        <div className="text-xs text-ink-500 mb-0.5">{label}</div>
         <div className="text-xl font-semibold">{value}</div>
       </div>
     </div>
@@ -103,14 +103,14 @@ function Section({
     <div className="mb-10">
       <h2
         className={`text-xs uppercase tracking-wide mb-3 ${
-          muted ? "text-zinc-400" : "text-zinc-500 font-medium"
+          muted ? "text-ink-400" : "text-ink-500 font-medium"
         }`}
       >
         {title}
       </h2>
 
       {projects.length === 0 && !showAddCard ? (
-        <p className="text-sm text-zinc-400">Aucun projet pour l&apos;instant.</p>
+        <p className="text-sm text-ink-400">Aucun projet pour l&apos;instant.</p>
       ) : (
         <div className="grid grid-cols-3 gap-4">
           {projects.map((project) => (
@@ -127,7 +127,7 @@ function NewProjectCard() {
   return (
     <Link
       href="/agence/projets/nouveau"
-      className="border border-dashed border-zinc-200 rounded-lg p-4 flex flex-col items-center justify-center text-center min-h-[168px] text-zinc-400 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors"
+      className="border border-dashed border-white/60 rounded-lg p-4 flex flex-col items-center justify-center text-center min-h-[168px] text-ink-400 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors"
     >
       <Plus className="w-5 h-5 mb-2" />
       <div className="text-sm font-medium">Nouveau projet</div>

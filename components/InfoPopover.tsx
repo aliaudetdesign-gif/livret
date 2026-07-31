@@ -45,14 +45,14 @@ export function InfoPopover({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-zinc-400 hover:text-[var(--color-terracotta-deep)] transition-colors"
+        className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-ink-400 hover:text-[var(--color-terracotta-deep)] transition-colors"
         aria-label="Plus d'informations"
       >
         <Info className="w-3.5 h-3.5" />
       </button>
 
       {open && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-64 bg-white border border-zinc-200 rounded-lg shadow-lg px-3 py-2.5 text-xs text-zinc-600 leading-relaxed">
+        <div className="absolute z-50 top-full left-0 mt-2 w-64 glass rounded-card px-3 py-2.5 text-xs text-ink-700 leading-relaxed">
           {text}
         </div>
       )}

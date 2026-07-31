@@ -7,7 +7,7 @@ export default async function LogosPage() {
 
   if (!project) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-ink-500">
         Aucun projet rattaché à ton compte pour l&apos;instant.
       </p>
     );
@@ -24,7 +24,7 @@ export default async function LogosPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-1">Logos</h1>
-      <p className="text-sm text-zinc-500 mb-6">{describeLogoFormats(assets ?? [])}</p>
+      <p className="text-sm text-ink-500 mb-6">{describeLogoFormats(assets ?? [])}</p>
 
       <LogoGrid assets={assets ?? []} />
     </div>

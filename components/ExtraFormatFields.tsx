@@ -5,8 +5,8 @@ import { useState } from "react";
 let uid = 0;
 
 const inputClass =
-  "w-full px-2 py-1.5 text-sm bg-white border border-zinc-200 rounded-md focus:outline-none focus:border-[var(--color-terracotta)] transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-500 mb-1";
+  "w-full px-2.5 py-1.5 text-sm bg-white/70 border border-white/60 rounded-field focus:outline-none focus:border-clay-500 focus:bg-white/90 transition-colors";
+const labelClass = "block text-xs font-medium text-ink-500 mb-1";
 
 // Lignes répétables "nom + fichier" pour joindre des formats supplémentaires à
 // un logo (ex: AI, EPS, favicon ICO), à la création comme à l'édition.
@@ -26,7 +26,7 @@ export function ExtraFormatFields() {
   return (
     <div className="flex flex-col gap-2">
       {rows.length > 0 && (
-        <p className="text-xs font-medium text-zinc-500">Formats supplémentaires</p>
+        <p className="text-xs font-medium text-ink-500">Formats supplémentaires</p>
       )}
 
       {rows.map((id, index) => (
@@ -44,13 +44,13 @@ export function ExtraFormatFields() {
             <input
               name={`extra_file_${index}`}
               type="file"
-              className={`${inputClass} file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-600`}
+              className={`${inputClass} file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
             />
           </div>
           <button
             type="button"
             onClick={() => removeRow(id)}
-            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md border border-zinc-200 text-zinc-400 hover:text-red-600"
+            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md border border-white/60 text-ink-400 hover:text-err-600"
             title="Retirer"
           >
             ✕

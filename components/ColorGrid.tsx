@@ -80,7 +80,7 @@ export function ColorGrid({
     return addSlot ? (
       <div className="grid grid-cols-4 gap-4">{addSlot}</div>
     ) : (
-      <p className="text-sm text-zinc-400">
+      <p className="text-sm text-ink-400">
         Rien à afficher pour l&apos;instant, ton agence n&apos;a pas encore ajouté d&apos;éléments ici.
       </p>
     );
@@ -93,7 +93,7 @@ export function ColorGrid({
           <button
             type="button"
             onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
-            className="text-sm font-medium text-zinc-500 hover:text-[var(--color-terracotta)]"
+            className="text-sm font-medium text-ink-500 hover:text-[var(--color-terracotta)]"
           >
             {selectionMode ? "Annuler" : "Sélectionner"}
           </button>
@@ -103,7 +103,7 @@ export function ColorGrid({
               type="button"
               onClick={handleBulkDelete}
               disabled={selected.size === 0 || isPending}
-              className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPending ? "Suppression..." : `Supprimer (${selected.size})`}
             </button>
@@ -112,7 +112,7 @@ export function ColorGrid({
       )}
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
       )}
 
       <div className="flex flex-col gap-6">
