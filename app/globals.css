@@ -1,43 +1,310 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Charte livret. — proposition A (liquid glass)
+   Source de référence : propositions-design/A-liquid-glass.html
+   Les anciens noms de tokens sont conservés en bas de ce bloc, en alias vers
+   les nouvelles valeurs, pour que les 116 appels existants
+   var(--color-terracotta), var(--color-creme)... héritent de la nouvelle
+   charte sans toucher aux composants.
+   ========================================================================== */
+
 :root {
-  --background: #f7f3ec;
-  --foreground: #1c1c1c;
-  --color-terracotta: #d85a30;
-  --color-terracotta-deep: #a83e1d;
-  --color-terracotta-tint: #fbe4da;
-  --color-terracotta-glow: rgba(216, 90, 48, 0.18);
-  --gradient-terracotta: linear-gradient(135deg, var(--color-terracotta), var(--color-terracotta-deep));
-  --color-noir-doux: #1c1c1c;
-  --color-creme: #f7f3ec;
-  --color-olive: #4a5a3a;
-  --color-sable: #d4a47a;
-  --color-brun: #8b5e3c;
-  --color-lin: #e8dfd2;
+  /* --- Fonds -------------------------------------------------------------- */
+  --shell: #f4f0ea;
+  --shell-deep: #ebe5dc;
+  --paper: #fbf9f6;
+  --line: #e4dfd7;
+
+  /* --- Encre -------------------------------------------------------------- */
+  --ink-900: #17161a;
+  --ink-700: #3a3841;
+  --ink-500: #625e69;
+  --ink-400: #6e6975;
+
+  /* --- Terre cuite (accent) ---------------------------------------------- */
+  --clay-600: #a64b2e;
+  --clay-500: #ba5636;
+  --clay-400: #da8664;
+  --clay-100: #f7dfd4;
+  --clay-glow: rgba(186, 86, 54, 0.3);
+
+  /* --- Secondaires -------------------------------------------------------- */
+  --sage: #5f6e52;
+  --sand: #d9b08c;
+  --bark: #8a6247;
+
+  /* --- États -------------------------------------------------------------- */
+  /* Succès : sage assombri pour rester lisible sur son propre tint (5,91:1) */
+  --ok-600: #4e5c42;
+  --ok-100: #e6ebe0;
+  /* Erreur : teinte 351°, nettement séparée de la terre cuite (15°) */
+  --err-600: #9e1c2f;
+  --err-100: #f9e1e3;
+  /* Attention */
+  --warn-600: #8a5a12;
+  --warn-100: #f7e9cf;
+
+  /* --- Gradients ---------------------------------------------------------- */
+  --grad-clay: linear-gradient(135deg, var(--clay-500), var(--clay-600));
+
+  /* --- Matière verre ------------------------------------------------------ */
+  --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.4));
+  --glass-fill-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.26));
+  --glass-edge: rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(34px) saturate(185%);
+  --glass-blur-soft: blur(22px) saturate(160%);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.28),
+    0 20px 44px -20px rgba(52, 36, 26, 0.3),
+    0 3px 10px -3px rgba(52, 36, 26, 0.14);
+  --glass-shadow-soft:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 12px 28px -16px rgba(52, 36, 26, 0.22),
+    0 2px 6px -2px rgba(52, 36, 26, 0.1);
+
+  /* --- Rayons ------------------------------------------------------------- */
+  --r-xl: 34px;
+  --r-lg: 28px;
+  --r-md: 20px;
+  --r-sm: 14px;
+  --r-xs: 10px;
+
+  /* --- Alias historiques (ne pas supprimer) ------------------------------- */
+  --background: var(--shell);
+  --foreground: var(--ink-900);
+  --color-terracotta: var(--clay-500);
+  --color-terracotta-deep: var(--clay-600);
+  --color-terracotta-tint: var(--clay-100);
+  --color-terracotta-glow: var(--clay-glow);
+  --gradient-terracotta: var(--grad-clay);
+  --color-noir-doux: var(--ink-900);
+  --color-creme: var(--shell);
+  --color-olive: var(--sage);
+  --color-sable: var(--sand);
+  --color-brun: var(--bark);
+  --color-lin: var(--line);
 }
 
+/* Expose les tokens à Tailwind v4 : chaque entrée --color-x génère
+   bg-x, text-x, border-x, ring-x, etc. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-shell: var(--shell);
+  --color-shell-deep: var(--shell-deep);
+  --color-paper: var(--paper);
+  --color-line: var(--line);
+
+  --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
+  --color-ink-500: var(--ink-500);
+  --color-ink-400: var(--ink-400);
+
+  --color-clay-600: var(--clay-600);
+  --color-clay-500: var(--clay-500);
+  --color-clay-400: var(--clay-400);
+  --color-clay-100: var(--clay-100);
+
+  --color-sage: var(--sage);
+  --color-sand: var(--sand);
+  --color-bark: var(--bark);
+
+  --color-ok-600: var(--ok-600);
+  --color-ok-100: var(--ok-100);
+  --color-err-600: var(--err-600);
+  --color-err-100: var(--err-100);
+  --color-warn-600: var(--warn-600);
+  --color-warn-100: var(--warn-100);
+
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--shell);
+  color: var(--ink-900);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ==========================================================================
+   Fond : nappe de couleur floutée, c'est ce que le verre réfracte
+   ========================================================================== */
+
+.mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--shell);
+}
+
+.mesh span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  display: block;
+}
+
+.mesh .b1 {
+  width: 640px;
+  height: 640px;
+  background: var(--clay-400);
+  top: -180px;
+  left: -120px;
+  opacity: 0.42;
+}
+
+.mesh .b2 {
+  width: 520px;
+  height: 520px;
+  background: var(--sand);
+  top: 38%;
+  right: -140px;
+  opacity: 0.5;
+}
+
+.mesh .b3 {
+  width: 560px;
+  height: 560px;
+  background: var(--sage);
+  bottom: -220px;
+  left: 26%;
+  opacity: 0.28;
+}
+
+.mesh .b4 {
+  width: 400px;
+  height: 400px;
+  background: var(--clay-500);
+  bottom: 12%;
+  right: 22%;
+  opacity: 0.2;
+}
+
+/* Grain fin, casse le côté plastique des dégradés */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.32;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   Matière verre
+   ========================================================================== */
+
+.glass {
+  position: relative;
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-md);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 42%);
+}
+
+.glass > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-soft {
+  position: relative;
+  background: var(--glass-fill-soft);
+  -webkit-backdrop-filter: var(--glass-blur-soft);
+  backdrop-filter: var(--glass-blur-soft);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--r-sm);
+  box-shadow: var(--glass-shadow-soft);
+}
+
+/* Navigateurs sans backdrop-filter : on remplace la translucidité par un
+   fond opaque clair, la hiérarchie reste lisible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-soft {
+    background: var(--paper);
+    border-color: var(--line);
+  }
+}
+
+/* Respect du réglage système de réduction de transparence */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-soft {
+    background: var(--paper);
+    border-color: var(--line);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .mesh span {
+    opacity: 0.12;
+  }
+
+  .grain {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Composants utilitaires
+   ========================================================================== */
+
 .bg-gradient-terracotta {
-  background-image: var(--gradient-terracotta);
+  background-image: var(--grad-clay);
 }
 
 .text-gradient-terracotta {
-  background-image: var(--gradient-terracotta);
+  background-image: var(--grad-clay);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.btn-clay {
+  background-image: var(--grad-clay);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 12px 26px -14px var(--clay-glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-clay:hover {
+  transform: translateY(-1px);
+  filter: saturate(112%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 16px 32px -14px var(--clay-glow);
+}
+
+.btn-clay:active {
+  transform: translateY(0);
 }
 
 .hover-lift {
@@ -46,5 +313,26 @@ body {
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px -10px var(--color-terracotta-glow);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 26px 52px -22px rgba(52, 36, 26, 0.34),
+    0 4px 12px -4px var(--clay-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-clay,
+  .hover-lift {
+    transition: none;
+  }
+
+  .btn-clay:hover,
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* Focus visible cohérent avec la charte */
+:focus-visible {
+  outline: 2px solid var(--clay-500);
+  outline-offset: 2px;
 }
