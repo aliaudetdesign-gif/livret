@@ -1,21 +1,23 @@
 import { Sidebar } from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
 
-const navGroups = [
+import type { NavGroup } from "@/components/Sidebar";
+
+const navGroups: NavGroup[] = [
   {
     label: "Menu",
     items: [
-      { label: "Dashboard", href: "/agence/dashboard" },
-      { label: "Projets clients", href: "/agence/projets" },
-      { label: "Messagerie", href: "/agence/messagerie" },
+      { label: "Dashboard", href: "/agence/dashboard", icon: "dashboard" },
+      { label: "Projets clients", href: "/agence/projets", icon: "projets" },
+      { label: "Messagerie", href: "/agence/messagerie", icon: "messagerie" },
     ],
   },
   {
     label: "Général",
     items: [
-      { label: "Corbeille", href: "/agence/corbeille" },
-      { label: "Réglages", href: "/agence/parametres" },
-      { label: "Aide", href: "/agence/aide" },
+      { label: "Corbeille", href: "/agence/corbeille", icon: "corbeille" },
+      { label: "Réglages", href: "/agence/parametres", icon: "reglages" },
+      { label: "Aide", href: "/agence/aide", icon: "aide" },
     ],
   },
 ];
@@ -35,7 +37,7 @@ export default async function AgenceLayout({
     : { data: null };
 
   return (
-    <div className="flex flex-1">
+    <div className="flex flex-1 gap-5 px-[22px] pt-7 pb-10">
       <Sidebar
         navGroups={navGroups}
         accountLabel={profile?.full_name || "AB.Design"}
@@ -43,7 +45,7 @@ export default async function AgenceLayout({
         accountHref="/agence/profil"
         avatarUrl={profile?.avatar_url ?? null}
       />
-      <main className="flex-1 bg-[var(--color-creme)] p-8">{children}</main>
+      <main className="flex-1 min-w-0">{children}</main>
     </div>
   );
 }

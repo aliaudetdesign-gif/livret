@@ -27,8 +27,18 @@ export default function RootLayout({
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
-        {children}
+      <body className="min-h-full flex flex-col overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
+        {/* Nappes de couleur floutées : c'est ce que le verre réfracte.
+            Sans elles, l'effet retombe à plat. */}
+        <div className="mesh" aria-hidden>
+          <span className="b1" />
+          <span className="b2" />
+          <span className="b3" />
+          <span className="b4" />
+        </div>
+        <div className="grain" aria-hidden />
+
+        <div className="relative z-[2] flex flex-1 flex-col">{children}</div>
       </body>
     </html>
   );

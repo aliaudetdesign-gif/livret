@@ -1,11 +1,13 @@
 import { Sidebar } from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
 
-const navItems = [
-  { label: "Dashboard", href: "/espace/dashboard" },
-  { label: "Administratif", href: "/espace/administratif" },
-  { label: "Design", href: "/espace/design" },
-  { label: "Messagerie", href: "/espace/messagerie" },
+import type { NavItem } from "@/components/Sidebar";
+
+const navItems: NavItem[] = [
+  { label: "Dashboard", href: "/espace/dashboard", icon: "dashboard" },
+  { label: "Administratif", href: "/espace/administratif", icon: "administratif" },
+  { label: "Design", href: "/espace/design", icon: "design" },
+  { label: "Messagerie", href: "/espace/messagerie", icon: "messagerie" },
 ];
 
 export default async function EspaceLayout({
@@ -23,7 +25,7 @@ export default async function EspaceLayout({
     : { data: null };
 
   return (
-    <div className="flex flex-1">
+    <div className="flex flex-1 gap-5 px-[22px] pt-7 pb-10">
       <Sidebar
         sectionLabel="Ma marque"
         navItems={navItems}
@@ -32,7 +34,7 @@ export default async function EspaceLayout({
         accountHref="/espace/profil"
         avatarUrl={profile?.avatar_url ?? null}
       />
-      <main className="flex-1 bg-[var(--color-creme)] p-8">{children}</main>
+      <main className="flex-1 min-w-0">{children}</main>
     </div>
   );
 }
