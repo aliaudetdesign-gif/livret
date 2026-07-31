@@ -208,7 +208,7 @@ export function LogoCard({
             type="checkbox"
             checked={selected}
             onChange={onToggleSelect}
-            className="w-4 h-4 accent-[var(--color-terracotta)]"
+            className="w-4 h-4 accent-clay-500"
           />
         </label>
       ) : (

@@ -37,7 +37,7 @@ export function DesignGrid({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="text-xs uppercase tracking-wide text-ink-400 mb-3">Essentiel</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">Essentiel</p>
         <div className="grid grid-cols-4 gap-4">
           {essentiel.map((card) => (
             <DesignCard key={card.key} card={card} href={sectionHref(card.key)} />
@@ -46,7 +46,7 @@ export function DesignGrid({
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-wide text-ink-400 mb-3">Compléments</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">Compléments</p>
         <div className="grid grid-cols-4 gap-4">
           {complements.map((card) => (
             <DesignCard key={card.key} card={card} href={sectionHref(card.key)} />

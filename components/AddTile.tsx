@@ -15,7 +15,7 @@ export function AddTile({
   variant?: "square" | "row" | "wide";
 }) {
   const baseClass =
-    "group flex items-center justify-center gap-3 border-2 border-dashed border-white/60 rounded-lg text-ink-500 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors";
+    "group flex items-center justify-center gap-3 border-2 border-dashed border-white/60 rounded-card text-ink-500 hover:border-clay-500 hover:text-clay-600 transition-colors";
 
   if (variant === "row") {
     return (

@@ -19,12 +19,12 @@ export default async function ParametresPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Réglages</h1>
+      <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-1">Réglages</h1>
       <p className="text-sm text-ink-500 mb-8">Abonnement et gestion des accès.</p>
 
       <div className="flex flex-col gap-8 max-w-3xl">
         <section>
-          <h2 className="text-xs uppercase tracking-wide text-ink-500 font-medium mb-3">
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">
             Abonnement
           </h2>
           <div className="glass rounded-card p-5">
@@ -37,7 +37,7 @@ export default async function ParametresPage() {
         </section>
 
         <section>
-          <h2 className="text-xs uppercase tracking-wide text-ink-500 font-medium mb-3">
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">
             Accès
           </h2>
           <div className="glass rounded-card p-5">

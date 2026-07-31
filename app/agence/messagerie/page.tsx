@@ -61,7 +61,7 @@ export default async function MessagerieAgencePage({
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold">Messagerie</h1>
+          <h1 className="text-[27px] font-semibold tracking-[-0.028em]">Messagerie</h1>
           <p className="text-sm text-ink-500">Échanger avec vos clients</p>
         </div>
         <div className="flex items-center gap-3">
@@ -99,8 +99,8 @@ function Section({
   return (
     <div className="mb-8">
       <h2
-        className={`text-xs uppercase tracking-wide mb-3 ${
-          muted ? "text-ink-400" : "text-ink-500 font-medium"
+        className={`text-[10px] font-semibold uppercase tracking-[0.13em] mb-3 ${
+          muted ? "text-ink-400/70" : "text-ink-400"
         }`}
       >
         {title}

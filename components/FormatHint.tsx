@@ -8,7 +8,7 @@ export function FormatHint({ text, children }: { text: string; children: ReactNo
   return (
     <span className="relative inline-flex group/hint">
       {children}
-      <span className="pointer-events-none absolute bottom-full left-0 mb-2 w-56 rounded-md bg-[var(--color-noir-doux)] text-white text-[11px] leading-snug px-2.5 py-1.5 opacity-0 group-hover/hint:opacity-100 transition-opacity z-30">
+      <span className="pointer-events-none absolute bottom-full left-0 mb-2 w-56 rounded-chip bg-ink-900 text-white text-[11px] leading-snug px-2.5 py-1.5 opacity-0 group-hover/hint:opacity-100 transition-opacity z-30">
         {text}
       </span>
     </span>

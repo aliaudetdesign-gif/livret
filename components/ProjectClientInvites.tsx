@@ -16,7 +16,7 @@ const inputClass =
 const labelClass = "block text-xs font-medium text-ink-500 mb-1.5";
 
 const statusStyle: Record<ProjectClientInvite["status"], string> = {
-  en_attente: "bg-[var(--color-terracotta-tint)] text-[var(--color-terracotta-deep)]",
+  en_attente: "bg-clay-100 text-clay-700",
   acceptee: "bg-ok-100 text-ok-600",
 };
 
@@ -120,7 +120,7 @@ export function ProjectClientInvites({
         <button
           type="submit"
           disabled={pending}
-          className="bg-gradient-terracotta text-white text-sm font-medium rounded-md px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-clay text-sm font-semibold px-4 py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {pending ? "..." : "Inviter"}
         </button>

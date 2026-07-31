@@ -83,7 +83,7 @@ export function Sidebar({
                   key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex items-center gap-2.5 px-[11px] py-[9px] rounded-xl text-[13.5px] transition-all duration-150 ${
+                  className={`flex items-center gap-2.5 px-[11px] py-[9px] rounded-[12px] text-[13.5px] transition-all duration-150 ${
                     active
                       ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.72))] text-ink-900 font-semibold shadow-[0_2px_8px_-3px_rgba(52,36,26,0.2),inset_0_1px_0_#fff]"
                       : "text-ink-700 hover:bg-white/55 hover:text-ink-900"
@@ -128,7 +128,7 @@ export function Sidebar({
         );
 
         const shell =
-          "mt-auto flex items-center gap-2.5 p-[11px] rounded-2xl bg-white/40 border border-white/50 transition-colors";
+          "mt-auto flex items-center gap-2.5 p-[11px] rounded-[16px] bg-white/40 border border-white/50 transition-colors";
 
         return accountHref ? (
           <Link href={accountHref} className={`${shell} hover:bg-white/65`}>

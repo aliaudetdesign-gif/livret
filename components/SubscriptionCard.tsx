@@ -6,7 +6,7 @@ import { formatShortDate } from "@/lib/format";
 
 const statusStyle: Record<Subscription["status"], string> = {
   actif: "bg-ok-100 text-ok-600",
-  en_pause: "bg-[var(--color-terracotta-tint)] text-[var(--color-terracotta-deep)]",
+  en_pause: "bg-clay-100 text-clay-700",
   annule: "bg-white/65 text-ink-500",
 };
 

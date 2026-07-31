@@ -32,7 +32,7 @@ export function DiscussionRow({
     >
       <span
         className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-          isUnread ? "bg-[var(--color-terracotta)]" : "bg-transparent"
+          isUnread ? "bg-clay-500" : "bg-transparent"
         }`}
       />
 
@@ -70,7 +70,7 @@ export function DiscussionRow({
               else await markThreadUnread(project.id);
             })
           }
-          className="w-7 h-7 rounded-md flex items-center justify-center text-ink-400 hover:text-[var(--color-terracotta-deep)] hover:bg-white transition-colors disabled:opacity-50"
+          className="w-7 h-7 rounded-chip flex items-center justify-center text-ink-400 hover:text-clay-600 hover:bg-white/85 transition-colors disabled:opacity-50"
         >
           {isUnread ? <MailOpen className="w-3.5 h-3.5" /> : <Mail className="w-3.5 h-3.5" />}
         </button>
@@ -83,7 +83,7 @@ export function DiscussionRow({
               await toggleArchiveProject(project.id, !project.archived);
             })
           }
-          className="w-7 h-7 rounded-md flex items-center justify-center text-ink-400 hover:text-[var(--color-terracotta-deep)] hover:bg-white transition-colors disabled:opacity-50"
+          className="w-7 h-7 rounded-chip flex items-center justify-center text-ink-400 hover:text-clay-600 hover:bg-white/85 transition-colors disabled:opacity-50"
         >
           {project.archived ? (
             <ArchiveRestore className="w-3.5 h-3.5" />

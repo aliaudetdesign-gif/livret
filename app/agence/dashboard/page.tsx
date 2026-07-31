@@ -250,7 +250,7 @@ export default async function AgenceDashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-[10px] uppercase tracking-[0.13em] text-ink-400 font-medium mb-3 px-1">
+        <h2 className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3 px-1">
           Projets actifs
         </h2>
         {activeProjects.length === 0 ? (

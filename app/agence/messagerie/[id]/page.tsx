@@ -49,7 +49,7 @@ export default async function ConversationPage({
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <Link
         href="/agence/messagerie"
-        className="text-sm text-ink-500 hover:text-[var(--color-terracotta-deep)] mb-4"
+        className="text-sm text-ink-500 hover:text-clay-600 mb-4"
       >
         ← Retour à la Messagerie
       </Link>

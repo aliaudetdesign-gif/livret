@@ -24,14 +24,14 @@ export function NewDiscussionButton({ projects }: { projects: Project[] }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 bg-gradient-terracotta text-white rounded-md px-4 py-2 text-sm font-medium hover-lift whitespace-nowrap"
+        className="flex items-center gap-1.5 btn-clay px-4 py-2.5 text-sm font-semibold whitespace-nowrap"
       >
         <Plus className="w-4 h-4" />
         Nouvelle discussion
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-64 glass rounded-card shadow-lg py-2 z-10 max-h-80 overflow-y-auto">
+        <div className="absolute right-0 mt-2 w-64 glass rounded-card py-2 z-10 max-h-80 overflow-y-auto">
           {projects.length === 0 ? (
             <p className="px-3 py-2 text-xs text-ink-400">Aucun client pour l&apos;instant.</p>
           ) : (

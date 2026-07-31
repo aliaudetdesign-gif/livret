@@ -12,7 +12,7 @@ function PdfIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="w-8 h-8 text-[var(--color-terracotta)]"
+      className="w-8 h-8 text-clay-600"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
@@ -117,7 +117,7 @@ export function SectionAssetGrid({
           <button
             type="button"
             onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
-            className="text-sm font-medium text-ink-500 hover:text-[var(--color-terracotta)]"
+            className="text-sm font-medium text-ink-500 hover:text-clay-600"
           >
             {selectionMode ? "Annuler" : "Sélectionner"}
           </button>
@@ -127,7 +127,7 @@ export function SectionAssetGrid({
               type="button"
               onClick={handleBulkDelete}
               disabled={selected.size === 0 || isPending}
-              className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-err-600 hover:underline disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed"
             >
               {isPending ? "Suppression..." : `Supprimer (${selected.size})`}
             </button>
@@ -136,7 +136,7 @@ export function SectionAssetGrid({
       )}
 
       {error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5 mb-4">{error}</p>
       )}
 
       <ul className="grid grid-cols-4 gap-4">
@@ -145,7 +145,7 @@ export function SectionAssetGrid({
           const isImage = asset.file_type.startsWith("image/");
 
           const preview = isImage ? (
-            <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
+            <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/55">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={asset.file_url}
@@ -154,7 +154,7 @@ export function SectionAssetGrid({
               />
             </div>
           ) : (
-            <div className="aspect-square w-full mb-2 rounded-md bg-white/55 flex items-center justify-center">
+            <div className="aspect-square w-full mb-2 rounded-field bg-white/55 flex items-center justify-center">
               <PdfIcon />
             </div>
           );
@@ -173,7 +173,7 @@ export function SectionAssetGrid({
                     checked={selected.has(asset.id)}
                     onChange={() => toggleSelect(asset.id)}
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute top-3 left-3 z-10 w-4 h-4 accent-[var(--color-terracotta)]"
+                    className="absolute top-3 left-3 z-10 w-4 h-4 accent-clay-500"
                   />
                   {preview}
                   <div className="text-sm font-medium truncate">{asset.label}</div>

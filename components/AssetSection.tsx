@@ -31,7 +31,7 @@ export async function AssetSection({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">{title}</h1>
+      <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-1">{title}</h1>
       <p className="text-sm text-ink-500 mb-6">{description}</p>
 
       {(assets ?? []).length === 0 ? (
@@ -47,7 +47,7 @@ export async function AssetSection({
               className="glass rounded-card p-4"
             >
               {type === "logo" || type === "moodboard" ? (
-                <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
+                <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/55">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={asset.value}

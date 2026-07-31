@@ -45,7 +45,7 @@ export function InfoPopover({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-ink-400 hover:text-[var(--color-terracotta-deep)] transition-colors"
+        className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-ink-400 hover:text-clay-600 transition-colors"
         aria-label="Plus d'informations"
       >
         <Info className="w-3.5 h-3.5" />

@@ -38,7 +38,7 @@ export default async function DesignSectionPage({
   const backLink = (
     <Link
       href="/espace/design"
-      className="text-sm text-ink-500 hover:text-[var(--color-terracotta)] mb-4 inline-block"
+      className="text-sm text-ink-500 hover:text-clay-600 mb-4 inline-block"
     >
       ← Design
     </Link>
@@ -56,7 +56,7 @@ export default async function DesignSectionPage({
     return (
       <div>
         {backLink}
-        <h1 className="text-2xl font-semibold mb-6">{ESSENTIEL_LABELS[type]}</h1>
+        <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-6">{ESSENTIEL_LABELS[type]}</h1>
 
         {(assets ?? []).length === 0 ? (
           <p className="text-sm text-ink-400">
@@ -77,7 +77,7 @@ export default async function DesignSectionPage({
             {(assets ?? []).map((asset) => (
               <div key={asset.id} className="glass rounded-card p-4">
                 {FILE_TYPES.includes(type) ? (
-                  <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
+                  <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/55">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={asset.value}
@@ -120,7 +120,7 @@ export default async function DesignSectionPage({
   return (
     <div>
       {backLink}
-      <h1 className="text-2xl font-semibold mb-6">
+      <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-6">
         {projectSection.section_types.icon} {projectSection.section_types.label}
       </h1>
       <SectionAssetGrid assets={sectionAssets ?? []} />

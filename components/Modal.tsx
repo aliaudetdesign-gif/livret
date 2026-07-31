@@ -2,10 +2,12 @@
 
 import { useEffect } from "react";
 
-// Overlay générique : fond assombri, contenu centré dans une carte blanche,
-// fermeture au clic sur le fond ou à la touche Échap. Utilisé pour ouvrir les
-// formulaires d'ajout (logo, typographie, document, fichier de section...)
-// en pop-up plutôt qu'en formulaire toujours visible.
+// Overlay générique : le fond est assombri à l'encre plutôt qu'au noir pur et
+// légèrement flouté, pour que la dalle de verre du formulaire se détache sans
+// que la page disparaisse complètement. Fermeture au clic sur le fond ou à la
+// touche Échap. Utilisé pour ouvrir les formulaires d'ajout (logo,
+// typographie, document, fichier de section...) en pop-up plutôt qu'en
+// formulaire toujours visible.
 export function Modal({
   open,
   onClose,
@@ -29,7 +31,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 backdrop-blur-[3px] p-4"
       onClick={onClose}
     >
       <div

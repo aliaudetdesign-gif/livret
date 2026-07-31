@@ -62,12 +62,12 @@ export function NouveauProjetForm({
         </div>
         <div>
           <label className={labelClass}>Client</label>
-          <div className="flex gap-1 mb-2 bg-white/65 rounded-md p-1 w-fit">
+          <div className="flex gap-1 mb-2 bg-white/65 rounded-field p-1 w-fit">
             <button
               type="button"
               onClick={() => setClientMode("nouveau")}
-              className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
-                clientMode === "nouveau" ? "bg-white shadow-sm text-ink-900" : "text-ink-500"
+              className={`text-xs font-semibold px-3 py-1.5 rounded-chip transition-colors ${
+                clientMode === "nouveau" ? "bg-white/95 shadow-[0_2px_6px_-2px_rgba(52,36,26,0.2)] text-ink-900" : "text-ink-500"
               }`}
             >
               Nouveau client
@@ -75,8 +75,8 @@ export function NouveauProjetForm({
             <button
               type="button"
               onClick={() => setClientMode("existant")}
-              className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
-                clientMode === "existant" ? "bg-white shadow-sm text-ink-900" : "text-ink-500"
+              className={`text-xs font-semibold px-3 py-1.5 rounded-chip transition-colors ${
+                clientMode === "existant" ? "bg-white/95 shadow-[0_2px_6px_-2px_rgba(52,36,26,0.2)] text-ink-900" : "text-ink-500"
               }`}
             >
               Client existant
@@ -159,13 +159,13 @@ export function NouveauProjetForm({
       </div>
 
       {state.error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5">{state.error}</p>
       )}
 
       <button
         type="submit"
         disabled={pending}
-        className="self-start bg-gradient-terracotta text-white text-sm font-medium rounded-md px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+        className="self-start btn-clay text-sm font-semibold px-4 py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {pending ? "Création..." : "Créer le projet"}
       </button>

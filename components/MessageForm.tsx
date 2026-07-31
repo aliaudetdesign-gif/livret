@@ -36,7 +36,7 @@ export function MessageForm({ projectId }: { projectId: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="shrink-0 w-9 h-9 rounded-md bg-gradient-terracotta text-white flex items-center justify-center hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+          className="shrink-0 w-9 h-9 rounded-field bg-gradient-terracotta text-white flex items-center justify-center hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <Send className="w-4 h-4" />
         </button>

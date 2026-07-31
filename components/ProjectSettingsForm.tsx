@@ -112,20 +112,20 @@ export function ProjectSettingsForm({ project }: { project: Project }) {
           type="checkbox"
           name="archived"
           defaultChecked={project.archived}
-          className="w-4 h-4 accent-[var(--color-terracotta)]"
+          className="w-4 h-4 accent-clay-500"
         />
         Projet archivé
       </label>
 
       {state.error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5">{state.error}</p>
       )}
 
       <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={pending}
-          className="self-start bg-gradient-terracotta text-white text-sm font-medium rounded-md px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+          className="self-start btn-clay text-sm font-semibold px-4 py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {pending ? "Enregistrement..." : "Enregistrer"}
         </button>

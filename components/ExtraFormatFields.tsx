@@ -44,13 +44,13 @@ export function ExtraFormatFields() {
             <input
               name={`extra_file_${index}`}
               type="file"
-              className={`${inputClass} file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
+              className={`${inputClass} file:mr-2 file:py-1 file:px-2 file:rounded-chip file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
             />
           </div>
           <button
             type="button"
             onClick={() => removeRow(id)}
-            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md border border-white/60 text-ink-400 hover:text-err-600"
+            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-chip bg-white/70 border border-white/60 text-ink-400 hover:text-err-600 transition-colors"
             title="Retirer"
           >
             ✕
@@ -61,7 +61,7 @@ export function ExtraFormatFields() {
       <button
         type="button"
         onClick={addRow}
-        className="self-start text-xs font-medium text-[var(--color-terracotta)] hover:underline"
+        className="self-start text-xs font-medium text-clay-600 hover:underline"
       >
         + Ajouter un format
       </button>

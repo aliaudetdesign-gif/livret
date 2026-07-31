@@ -37,7 +37,7 @@ export function AddSectionForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-3 glass-soft border-dashed rounded-lg p-4 text-left text-sm text-ink-500 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors"
+        className="flex items-center gap-3 glass-soft border-dashed rounded-card p-4 text-left text-sm text-ink-500 hover:border-clay-500 hover:text-clay-600 transition-colors"
       >
         <span className="text-xl leading-none">+</span>
         Ajouter une section
@@ -96,14 +96,14 @@ export function AddSectionForm({
       )}
 
       {state.error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5">{state.error}</p>
       )}
 
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={pending}
-          className="bg-gradient-terracotta text-white text-sm font-medium rounded-md px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-clay text-sm font-semibold px-4 py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {pending ? "Ajout..." : "Ajouter"}
         </button>

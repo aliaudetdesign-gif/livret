@@ -55,7 +55,7 @@ export default async function DesignPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Design</h1>
+      <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-1">Design</h1>
       <p className="text-sm text-ink-500 mb-6">
         Les éléments de marque partagés par ton agence.
       </p>

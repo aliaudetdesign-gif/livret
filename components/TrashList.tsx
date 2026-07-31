@@ -100,14 +100,14 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
           type="button"
           onClick={handleEmptyTrash}
           disabled={isPending}
-          className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-sm font-medium text-err-600 hover:underline disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed"
         >
           Vider la corbeille
         </button>
       </div>
 
       {error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5 mb-4">{error}</p>
       )}
 
       <div className="flex flex-col gap-6">
@@ -131,7 +131,7 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
                       type="button"
                       onClick={() => handleRestore(entry)}
                       disabled={isPending && pendingId === entry.id}
-                      className="text-sm font-medium text-[var(--color-terracotta-deep)] hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="text-sm font-medium text-clay-700 hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Restaurer
                     </button>
@@ -139,7 +139,7 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
                       type="button"
                       onClick={() => handlePermanentDelete(entry)}
                       disabled={isPending && pendingId === entry.id}
-                      className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="text-sm font-medium text-err-600 hover:underline disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed"
                     >
                       Supprimer
                     </button>

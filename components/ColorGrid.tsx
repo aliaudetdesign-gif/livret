@@ -93,7 +93,7 @@ export function ColorGrid({
           <button
             type="button"
             onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
-            className="text-sm font-medium text-ink-500 hover:text-[var(--color-terracotta)]"
+            className="text-sm font-medium text-ink-500 hover:text-clay-600"
           >
             {selectionMode ? "Annuler" : "Sélectionner"}
           </button>
@@ -103,7 +103,7 @@ export function ColorGrid({
               type="button"
               onClick={handleBulkDelete}
               disabled={selected.size === 0 || isPending}
-              className="text-sm font-medium text-err-600 hover:text-err-600 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-err-600 hover:underline disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed"
             >
               {isPending ? "Suppression..." : `Supprimer (${selected.size})`}
             </button>
@@ -112,7 +112,7 @@ export function ColorGrid({
       )}
 
       {error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2 mb-4">{error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5 mb-4">{error}</p>
       )}
 
       <div className="flex flex-col gap-6">

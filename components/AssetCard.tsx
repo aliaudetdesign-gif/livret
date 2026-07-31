@@ -73,7 +73,7 @@ export function AssetCard({
             type="checkbox"
             checked={selected}
             onChange={onToggleSelect}
-            className="w-4 h-4 accent-[var(--color-terracotta)]"
+            className="w-4 h-4 accent-clay-500"
           />
         </label>
       ) : (
@@ -101,7 +101,7 @@ export function AssetCard({
       )}
 
       {isFile ? (
-        <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white/55">
+        <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/55">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={asset.value}
@@ -138,7 +138,7 @@ export function AssetCard({
             <button
               type="submit"
               disabled={pending}
-              className="text-xs font-medium bg-gradient-terracotta text-white rounded-md px-3 py-1.5 disabled:opacity-60"
+              className="btn-clay text-xs font-semibold px-3.5 py-1.5 disabled:opacity-60"
             >
               {pending ? "..." : "Enregistrer"}
             </button>

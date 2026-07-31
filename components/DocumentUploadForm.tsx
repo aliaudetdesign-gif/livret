@@ -81,18 +81,18 @@ export function DocumentUploadForm({
           type="file"
           accept="application/pdf"
           required
-          className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
+          className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded-chip file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
         />
       </div>
 
       {state.error && (
-        <p className="text-sm text-err-600 bg-err-100 rounded-md px-3 py-2">{state.error}</p>
+        <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5">{state.error}</p>
       )}
 
       <button
         type="submit"
         disabled={pending}
-        className="self-start bg-gradient-terracotta text-white text-sm font-medium rounded-md px-4 py-2 hover-lift disabled:opacity-60 disabled:cursor-not-allowed"
+        className="self-start btn-clay text-sm font-semibold px-4 py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {pending ? "Ajout..." : "Ajouter"}
       </button>

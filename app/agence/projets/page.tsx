@@ -39,14 +39,14 @@ export default async function ProjetsPage({
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold">Projets clients</h1>
+          <h1 className="text-[27px] font-semibold tracking-[-0.028em]">Projets clients</h1>
           <p className="text-ink-500 text-sm">Visualisez et gérez vos projets</p>
         </div>
         <div className="flex items-center gap-3">
           <ProjectSearch defaultValue={q} />
           <Link
             href="/agence/projets/nouveau"
-            className="glass-soft rounded-field px-4 py-2 text-sm font-medium hover:bg-white/80 transition-colors whitespace-nowrap"
+            className="btn-clay px-4 py-2.5 text-sm font-semibold whitespace-nowrap"
           >
             + Nouveau projet
           </Link>
@@ -77,7 +77,7 @@ function StatIconCard({
 }) {
   return (
     <div className="glass rounded-card p-4 flex items-center gap-3 hover-lift">
-      <div className="w-10 h-10 shrink-0 rounded-lg bg-[var(--color-terracotta-tint)] text-[var(--color-terracotta-deep)] flex items-center justify-center">
+      <div className="w-10 h-10 shrink-0 rounded-field bg-clay-100 text-clay-700 flex items-center justify-center">
         <Icon className="w-5 h-5" />
       </div>
       <div>
@@ -102,8 +102,8 @@ function Section({
   return (
     <div className="mb-10">
       <h2
-        className={`text-xs uppercase tracking-wide mb-3 ${
-          muted ? "text-ink-400" : "text-ink-500 font-medium"
+        className={`text-[10px] font-semibold uppercase tracking-[0.13em] mb-3 ${
+          muted ? "text-ink-400/70" : "text-ink-400"
         }`}
       >
         {title}
@@ -127,7 +127,7 @@ function NewProjectCard() {
   return (
     <Link
       href="/agence/projets/nouveau"
-      className="border border-dashed border-white/60 rounded-lg p-4 flex flex-col items-center justify-center text-center min-h-[168px] text-ink-400 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)] transition-colors"
+      className="border border-dashed border-white/60 rounded-card p-4 flex flex-col items-center justify-center text-center min-h-[168px] text-ink-400 hover:border-clay-500 hover:text-clay-600 transition-colors"
     >
       <Plus className="w-5 h-5 mb-2" />
       <div className="text-sm font-medium">Nouveau projet</div>

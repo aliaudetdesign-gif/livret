@@ -284,7 +284,7 @@ export default async function ProjetDetailPage({
             <div>
               <Link
                 href={`/agence/projets/${id}?tab=design`}
-                className="text-sm text-ink-500 hover:text-[var(--color-terracotta)] mb-4 inline-block"
+                className="text-sm text-ink-500 hover:text-clay-600 mb-4 inline-block"
               >
                 ← Design
               </Link>
@@ -308,7 +308,7 @@ export default async function ProjetDetailPage({
               <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/agence/projets/${id}?tab=design`}
-                  className="text-sm text-ink-500 hover:text-[var(--color-terracotta)] inline-block"
+                  className="text-sm text-ink-500 hover:text-clay-600 inline-block"
                 >
                   ← Design
                 </Link>

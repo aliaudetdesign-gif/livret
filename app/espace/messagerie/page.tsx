@@ -44,7 +44,7 @@ export default async function MessagerieClientPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)]">
-      <h1 className="text-2xl font-semibold mb-1">Messagerie</h1>
+      <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-1">Messagerie</h1>
       <p className="text-sm text-ink-500 mb-4">
         Échange avec ton agence à propos de {project.name}.
       </p>

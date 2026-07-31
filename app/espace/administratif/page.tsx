@@ -23,7 +23,7 @@ export default async function AdministratifClientPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Administratif</h1>
+      <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-1">Administratif</h1>
       <p className="text-sm text-ink-500 mb-6">
         Devis, factures et brief partagés par ton agence.
       </p>
