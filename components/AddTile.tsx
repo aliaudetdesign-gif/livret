@@ -12,10 +12,23 @@ export function AddTile({
   title: string;
   subtitle?: string;
   onClick: () => void;
-  variant?: "square" | "row" | "wide";
+  variant?: "square" | "row" | "wide" | "pill";
 }) {
   const baseClass =
     "group flex items-center justify-center gap-3 border-2 border-dashed border-white/60 rounded-card text-ink-500 hover:border-clay-500 hover:text-clay-600 transition-colors";
+
+  if (variant === "pill") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-dashed border-white/60 text-xs font-medium text-ink-500 hover:border-clay-500 hover:text-clay-600 transition-colors shrink-0"
+      >
+        <span className="text-sm leading-none">+</span>
+        {title}
+      </button>
+    );
+  }
 
   if (variant === "row") {
     return (

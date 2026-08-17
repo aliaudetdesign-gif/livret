@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { collectAssetStoragePaths, extractStoragePath } from "@/lib/storagePaths";
+import { collectAssetStoragePaths, collectSectionAssetStoragePaths, extractStoragePath } from "@/lib/storagePaths";
+import { TRASH_RETENTION_DAYS } from "@/lib/trash";
+import { getDemoScope } from "@/lib/demoMode";
 
 export type TrashItemType =
   | "brand_asset"
@@ -100,7 +102,7 @@ async function purgeItem(
   } else if (type === "section_asset") {
     const { data: asset, error: fetchError } = await supabase
       .from("section_assets")
-      .select("file_url")
+      .select("file_url, preview_url, metadata")
       .eq("id", id)
       .single();
 
@@ -108,23 +110,21 @@ async function purgeItem(
       return { error: fetchError?.message ?? "Fichier introuvable." };
     }
 
-    const path = extractStoragePath(asset.file_url, "project-sections");
-    if (path) {
-      await supabase.storage.from("project-sections").remove([path]);
+    const paths = collectSectionAssetStoragePaths(asset);
+    if (paths.length > 0) {
+      await supabase.storage.from("project-sections").remove(paths);
     }
   } else if (type === "project_section") {
     const { data: assets, error: fetchError } = await supabase
       .from("section_assets")
-      .select("file_url")
+      .select("file_url, preview_url, metadata")
       .eq("project_section_id", id);
 
     if (fetchError) {
       return { error: fetchError.message };
     }
 
-    const paths = (assets ?? [])
-      .map((asset) => extractStoragePath(asset.file_url, "project-sections"))
-      .filter((path): path is string => !!path);
+    const paths = (assets ?? []).flatMap((asset) => collectSectionAssetStoragePaths(asset));
 
     if (paths.length > 0) {
       await supabase.storage.from("project-sections").remove(paths);
@@ -172,12 +172,10 @@ async function purgeItem(
     if (sectionIds.length > 0) {
       const { data: sectionAssets } = await supabase
         .from("section_assets")
-        .select("file_url")
+        .select("file_url, preview_url, metadata")
         .in("project_section_id", sectionIds);
 
-      const sectionAssetPaths = (sectionAssets ?? [])
-        .map((a) => extractStoragePath(a.file_url, "project-sections"))
-        .filter((path): path is string => !!path);
+      const sectionAssetPaths = (sectionAssets ?? []).flatMap((a) => collectSectionAssetStoragePaths(a));
 
       if (sectionAssetPaths.length > 0) {
         await supabase.storage.from("project-sections").remove(sectionAssetPaths);
@@ -216,6 +214,10 @@ export async function permanentlyDeleteItem(
 // actuellement marqués comme supprimés, tous types confondus. Irréversible.
 export async function emptyTrash(): Promise<{ error: string | null }> {
   const supabase = await createClient();
+  // Ne vide que la corbeille du scope courant (réel ou démo) : un compte
+  // agence réel en mode démo ne doit jamais purger ses vraies données, et
+  // inversement.
+  const scope = await getDemoScope();
 
   const [
     { data: sectionAssets },
@@ -224,11 +226,27 @@ export async function emptyTrash(): Promise<{ error: string | null }> {
     { data: documents },
     { data: projects },
   ] = await Promise.all([
-    supabase.from("section_assets").select("id").not("deleted_at", "is", null),
-    supabase.from("project_sections").select("id").not("deleted_at", "is", null),
-    supabase.from("brand_assets").select("id").not("deleted_at", "is", null),
-    supabase.from("project_documents").select("id").not("deleted_at", "is", null),
-    supabase.from("projects").select("id").not("deleted_at", "is", null),
+    supabase
+      .from("section_assets")
+      .select("id, project_sections!inner(projects!inner(is_demo))")
+      .not("deleted_at", "is", null)
+      .eq("project_sections.projects.is_demo", scope),
+    supabase
+      .from("project_sections")
+      .select("id, projects!inner(is_demo)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope),
+    supabase
+      .from("brand_assets")
+      .select("id, projects!inner(is_demo)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope),
+    supabase
+      .from("project_documents")
+      .select("id, projects!inner(is_demo)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope),
+    supabase.from("projects").select("id").not("deleted_at", "is", null).eq("is_demo", scope),
   ]);
 
   // Ordre important : les fichiers des section_assets sont nettoyés avant que
@@ -252,5 +270,78 @@ export async function emptyTrash(): Promise<{ error: string | null }> {
   }
 
   revalidateAll();
+  return { error: null };
+}
+
+// Purge automatiquement tout élément de la corbeille au-delà du délai de
+// rétention. Faute d'infrastructure de tâche planifiée (le projet tourne en
+// local, sans déploiement), ce nettoyage est déclenché à chaque chargement
+// de la page Corbeille plutôt que par un cron serveur. Pas d'appel à
+// revalidateAll() ici : la fonction s'exécute pendant le rendu de la page
+// (Next.js interdit revalidatePath en dehors d'une Server Action/Route
+// Handler), et les lectures qui suivent dans le même rendu verront déjà
+// l'état à jour sans avoir besoin d'invalider le cache.
+export async function purgeExpiredTrash(): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const scope = await getDemoScope();
+  const cutoff = new Date(Date.now() - TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  const [
+    { data: sectionAssets },
+    { data: sections },
+    { data: brandAssets },
+    { data: documents },
+    { data: projects },
+  ] = await Promise.all([
+    supabase
+      .from("section_assets")
+      .select("id, project_sections!inner(projects!inner(is_demo))")
+      .not("deleted_at", "is", null)
+      .eq("project_sections.projects.is_demo", scope)
+      .lt("deleted_at", cutoff),
+    supabase
+      .from("project_sections")
+      .select("id, projects!inner(is_demo)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope)
+      .lt("deleted_at", cutoff),
+    supabase
+      .from("brand_assets")
+      .select("id, projects!inner(is_demo)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope)
+      .lt("deleted_at", cutoff),
+    supabase
+      .from("project_documents")
+      .select("id, projects!inner(is_demo)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope)
+      .lt("deleted_at", cutoff),
+    supabase
+      .from("projects")
+      .select("id")
+      .not("deleted_at", "is", null)
+      .eq("is_demo", scope)
+      .lt("deleted_at", cutoff),
+  ]);
+
+  // Même ordre que emptyTrash() : les enfants avant les parents qui les
+  // entraînent en cascade.
+  for (const item of sectionAssets ?? []) {
+    await purgeItem(supabase, "section_asset", item.id);
+  }
+  for (const item of sections ?? []) {
+    await purgeItem(supabase, "project_section", item.id);
+  }
+  for (const item of brandAssets ?? []) {
+    await purgeItem(supabase, "brand_asset", item.id);
+  }
+  for (const item of documents ?? []) {
+    await purgeItem(supabase, "project_document", item.id);
+  }
+  for (const item of projects ?? []) {
+    await purgeItem(supabase, "project", item.id);
+  }
+
   return { error: null };
 }

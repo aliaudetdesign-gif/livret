@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MoreVertical } from "lucide-react";
 import { deleteProject, updateProjectStatus } from "@/app/agence/projets/[id]/actions";
 import { toggleArchiveProject } from "@/app/agence/messagerie/actions";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { Project, ProjectStatus } from "@/lib/types";
 
 const STATUS_OPTIONS: { value: ProjectStatus; label: string }[] = [
@@ -23,6 +24,7 @@ export function ProjectCardMenu({ project }: { project: Project }) {
   const [statusOpen, setStatusOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,23 +68,36 @@ export function ProjectCardMenu({ project }: { project: Project }) {
   function handleDelete(e: React.MouseEvent) {
     stop(e);
     setOpen(false);
-    const confirmed = window.confirm(
-      `Déplacer "${project.name}" dans la corbeille ? Il restera récupérable depuis la Corbeille.`
-    );
-    if (!confirmed) return;
+    setConfirmOpen(true);
+  }
+
+  function runDelete() {
     startTransition(async () => {
       const result = await deleteProject(project.id);
       if (result.error) setError(result.error);
       else router.refresh();
+      setConfirmOpen(false);
     });
   }
 
   return (
-    <div ref={ref} className="relative shrink-0">
+    // onClick={stop} au niveau racine : le composant est imbriqué dans le
+    // <Link> de ProjectCard (voir ProjectCard.tsx), et ConfirmDialog rend son
+    // fond en position fixed mais reste un descendant DOM de ce conteneur.
+    // Sans ce blocage, cliquer sur le fond du ConfirmDialog (pour annuler)
+    // remonterait jusqu'au Link et déclencherait une navigation indésirable.
+    <div ref={ref} className="relative shrink-0" onClick={stop}>
       <button
         type="button"
         onClick={(e) => {
           stop(e);
+          // Focus explicite : nécessaire pour que `focus-within` sur la carte
+          // (voir ProjectCard) se déclenche de façon fiable, Safari ne
+          // donnant pas le focus aux boutons au clic par défaut. C'est ce qui
+          // fait passer la carte devant ses voisines le temps que le menu
+          // soit ouvert (sans quoi la carte suivante, elle aussi `.glass`
+          // donc son propre contexte d'empilement, se réaffiche par-dessus).
+          e.currentTarget.focus();
           setOpen((v) => !v);
           setStatusOpen(false);
         }}
@@ -95,7 +110,7 @@ export function ProjectCardMenu({ project }: { project: Project }) {
 
       {open && (
         <div
-          className="glass absolute z-20 top-full right-0 mt-2 w-52 rounded-field overflow-hidden text-[13px]"
+          className="bg-[var(--paper)] border border-white/60 shadow-[0_20px_45px_-18px_rgba(23,22,26,0.45)] animate-pop-in absolute z-20 top-full right-0 mt-2 w-52 rounded-field overflow-hidden text-[13px]"
           onClick={stop}
         >
           <button
@@ -118,7 +133,7 @@ export function ProjectCardMenu({ project }: { project: Project }) {
               Changer le statut
             </button>
             {statusOpen && (
-              <div className="border-t border-white/50 bg-white/30">
+              <div className="animate-fade-in border-t border-white/50 bg-white/30">
                 {STATUS_OPTIONS.map((option) => (
                   <button
                     key={option.value}
@@ -152,6 +167,15 @@ export function ProjectCardMenu({ project }: { project: Project }) {
           {error}
         </p>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Déplacer "${project.name}" dans la corbeille ?`}
+        message="Le projet restera récupérable depuis la Corbeille."
+        pending={isPending}
+        onConfirm={runDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

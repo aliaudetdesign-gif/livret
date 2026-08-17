@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getDemoScope } from "@/lib/demoMode";
 import {
   duplicateBrandAssetsForNewProject,
   duplicateDocumentsForNewProject,
@@ -22,6 +23,7 @@ export async function createProject(
   }
 
   const supabase = await createClient();
+  const scope = await getDemoScope();
 
   const sector = (formData.get("sector") as string)?.trim() || null;
   const city = (formData.get("city") as string)?.trim() || null;
@@ -58,12 +60,15 @@ export async function createProject(
 
   // Client existant : on récupère ses projets précédents avant de créer le
   // nouveau, pour dupliquer charte graphique et administratif (devis/facture).
+  // Limité au même scope (réel/démo) que le nouveau projet, pour ne jamais
+  // mélanger les deux populations de données.
   let priorProjectIds: string[] = [];
   if (client_profile_id) {
     const { data: priorProjects } = await supabase
       .from("projects")
       .select("id")
       .eq("client_profile_id", client_profile_id)
+      .eq("is_demo", scope)
       .is("deleted_at", null);
     priorProjectIds = (priorProjects ?? []).map((p) => p.id as string);
   }
@@ -78,6 +83,7 @@ export async function createProject(
       start_date,
       end_date,
       client_profile_id,
+      is_demo: scope,
     })
     .select("id")
     .single();

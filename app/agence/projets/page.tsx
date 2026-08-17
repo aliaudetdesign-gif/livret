@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Lightbulb, Wrench, Camera, CircleCheckBig, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Project } from "@/lib/types";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ProjectSearch } from "@/components/ProjectSearch";
+import { getDemoScope } from "@/lib/demoMode";
 
 export default async function ProjetsPage({
   searchParams,
@@ -12,11 +13,13 @@ export default async function ProjetsPage({
 }) {
   const { q = "" } = await searchParams;
   const supabase = await createClient();
+  const scope = await getDemoScope();
 
   let query = supabase
     .from("projects")
     .select("*")
     .is("deleted_at", null)
+    .eq("is_demo", scope)
     .order("created_at", { ascending: false });
 
   const term = q.trim().replace(/[%,]/g, "");
@@ -54,10 +57,10 @@ export default async function ProjetsPage({
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-10">
-        <StatIconCard icon={Lightbulb} label="Projets actifs" value={activeProjects.length} />
-        <StatIconCard icon={Wrench} label="En attente de validation" value={waitingValidation} />
-        <StatIconCard icon={Camera} label="Travail en cours" value={inProgress} />
-        <StatIconCard icon={CircleCheckBig} label="Total des projets" value={(projects ?? []).length} />
+        <StatIconCard emoji="📂" label="Projets actifs" value={activeProjects.length} />
+        <StatIconCard emoji="📋" label="En attente de validation" value={waitingValidation} />
+        <StatIconCard emoji="🎨" label="Travail en cours" value={inProgress} />
+        <StatIconCard emoji="📦" label="Total des projets" value={(projects ?? []).length} />
       </div>
 
       <Section title="Projets actifs" projects={activeProjects} showAddCard />
@@ -67,18 +70,18 @@ export default async function ProjetsPage({
 }
 
 function StatIconCard({
-  icon: Icon,
+  emoji,
   label,
   value,
 }: {
-  icon: typeof Lightbulb;
+  emoji: string;
   label: string;
   value: number;
 }) {
   return (
     <div className="glass rounded-card p-4 flex items-center gap-3 hover-lift">
-      <div className="w-10 h-10 shrink-0 rounded-field bg-clay-100 text-clay-700 flex items-center justify-center">
-        <Icon className="w-5 h-5" />
+      <div className="w-10 h-10 shrink-0 rounded-field bg-clay-100 flex items-center justify-center text-[19px] leading-none">
+        {emoji}
       </div>
       <div>
         <div className="text-xs text-ink-500 mb-0.5">{label}</div>

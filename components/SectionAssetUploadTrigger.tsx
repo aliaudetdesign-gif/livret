@@ -17,12 +17,7 @@ export function SectionAssetUploadTrigger({
 
   return (
     <>
-      <AddTile
-        title="Ajouter un fichier"
-        subtitle="PNG, SVG, PDF"
-        variant="square"
-        onClick={() => setOpen(true)}
-      />
+      <AddTile title="Ajouter un fichier" variant="pill" onClick={() => setOpen(true)} />
       <Modal open={open} onClose={() => setOpen(false)}>
         <SectionAssetUploadForm
           projectId={projectId}

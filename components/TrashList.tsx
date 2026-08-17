@@ -8,7 +8,24 @@ import {
   restoreItem,
   type TrashItemType,
 } from "@/app/agence/corbeille/actions";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { formatShortDate } from "@/lib/format";
+import { TRASH_RETENTION_DAYS } from "@/lib/trash";
+
+// Nombre de jours restants avant suppression définitive automatique d'un
+// élément, à partir de sa date de mise à la corbeille.
+function daysUntilPurge(deletedAt: string): number {
+  const purgeDate = new Date(deletedAt).getTime() + TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const diff = purgeDate - Date.now();
+  return Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
+}
+
+function purgeLabel(deletedAt: string): string {
+  const days = daysUntilPurge(deletedAt);
+  if (days <= 0) return "Suppression définitive imminente";
+  if (days === 1) return "Suppression définitive dans 1 jour";
+  return `Suppression définitive dans ${days} jours`;
+}
 
 export type TrashEntry = {
   type: TrashItemType;
@@ -25,6 +42,9 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
   const [isPending, startTransition] = useTransition();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<
+    { type: "single"; entry: TrashEntry } | { type: "empty" } | null
+  >(null);
 
   function handleRestore(entry: TrashEntry) {
     setError(null);
@@ -43,42 +63,45 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
   }
 
   function handlePermanentDelete(entry: TrashEntry) {
-    const confirmed = window.confirm(
-      `Supprimer définitivement "${entry.label}" ? Cette action est irréversible.`
-    );
-    if (!confirmed) return;
-
-    setError(null);
-    setPendingId(entry.id);
-    startTransition(async () => {
-      try {
-        const result = await permanentlyDeleteItem(entry.type, entry.id);
-        if (result.error) setError(result.error);
-        else router.refresh();
-      } catch {
-        setError("Une erreur est survenue, réessaie.");
-      } finally {
-        setPendingId(null);
-      }
-    });
+    setConfirmAction({ type: "single", entry });
   }
 
   function handleEmptyTrash() {
-    const confirmed = window.confirm(
-      "Vider entièrement la corbeille ? Tous les éléments seront supprimés définitivement."
-    );
-    if (!confirmed) return;
+    setConfirmAction({ type: "empty" });
+  }
 
-    setError(null);
-    startTransition(async () => {
-      try {
-        const result = await emptyTrash();
-        if (result.error) setError(result.error);
-        else router.refresh();
-      } catch {
-        setError("Une erreur est survenue, réessaie.");
-      }
-    });
+  function runConfirmedAction() {
+    if (!confirmAction) return;
+
+    if (confirmAction.type === "single") {
+      const entry = confirmAction.entry;
+      setError(null);
+      setPendingId(entry.id);
+      startTransition(async () => {
+        try {
+          const result = await permanentlyDeleteItem(entry.type, entry.id);
+          if (result.error) setError(result.error);
+          else router.refresh();
+        } catch {
+          setError("Une erreur est survenue, réessaie.");
+        } finally {
+          setPendingId(null);
+        }
+        setConfirmAction(null);
+      });
+    } else {
+      setError(null);
+      startTransition(async () => {
+        try {
+          const result = await emptyTrash();
+          if (result.error) setError(result.error);
+          else router.refresh();
+        } catch {
+          setError("Une erreur est survenue, réessaie.");
+        }
+        setConfirmAction(null);
+      });
+    }
   }
 
   if (entries.length === 0) {
@@ -125,6 +148,7 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
                     <div className="text-xs text-ink-400">
                       {entry.typeLabel} · Supprimé le {formatShortDate(entry.deletedAt)}
                     </div>
+                    <div className="text-xs text-err-600 mt-0.5">{purgeLabel(entry.deletedAt)}</div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <button
@@ -150,6 +174,25 @@ export function TrashList({ entries }: { entries: TrashEntry[] }) {
           </div>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmAction}
+        title={
+          confirmAction?.type === "empty"
+            ? "Vider entièrement la corbeille ?"
+            : confirmAction?.type === "single"
+              ? `Supprimer définitivement "${confirmAction.entry.label}" ?`
+              : ""
+        }
+        message={
+          confirmAction?.type === "empty"
+            ? "Tous les éléments seront supprimés définitivement."
+            : "Cette action est irréversible."
+        }
+        pending={isPending}
+        onConfirm={runConfirmedAction}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }

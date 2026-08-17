@@ -6,15 +6,17 @@ import { Modal } from "@/components/Modal";
 import { AssetUploadForm } from "@/components/AssetUploadForm";
 import type { AssetType } from "@/lib/types";
 
-const tileLabels: Record<AssetType, { title: string; subtitle: string }> = {
-  logo: { title: "Nouveau logo", subtitle: "Ajouter une nouvelle version" },
-  couleur: { title: "Nouvelle couleur", subtitle: "Ajouter une couleur" },
-  typographie: { title: "Nouvelle typographie", subtitle: "Ajouter une police" },
-  moodboard: { title: "Nouveau visuel", subtitle: "Ajouter une image" },
+const pillLabels: Record<AssetType, string> = {
+  logo: "Nouveau logo",
+  couleur: "Nouvelle couleur",
+  typographie: "Nouvelle typographie",
+  moodboard: "Nouveau visuel",
+  guide: "Nouveau guide",
 };
 
-// Tuile "+" qui ouvre le formulaire d'ajout d'un élément d'identité de marque
-// (logo, couleur, typographie, moodboard) en pop-up.
+// Bouton "+" (pilule, dans la barre du haut de la grille) qui ouvre le
+// formulaire d'ajout d'un élément d'identité de marque (logo, couleur,
+// typographie, moodboard) en pop-up.
 export function AssetUploadTrigger({
   projectId,
   type,
@@ -23,16 +25,10 @@ export function AssetUploadTrigger({
   type: AssetType;
 }) {
   const [open, setOpen] = useState(false);
-  const { title, subtitle } = tileLabels[type];
 
   return (
     <>
-      <AddTile
-        title={title}
-        subtitle={subtitle}
-        variant={type === "typographie" ? "wide" : "square"}
-        onClick={() => setOpen(true)}
-      />
+      <AddTile title={pillLabels[type]} variant="pill" onClick={() => setOpen(true)} />
       <Modal open={open} onClose={() => setOpen(false)}>
         <AssetUploadForm projectId={projectId} type={type} onSuccess={() => setOpen(false)} />
       </Modal>

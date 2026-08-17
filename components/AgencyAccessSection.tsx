@@ -2,6 +2,7 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { inviteAgencyMember, removeAgencyInvite, type InviteActionState } from "@/app/agence/parametres/actions";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { AgencyInvite } from "@/lib/types";
 import { formatShortDate } from "@/lib/format";
 
@@ -24,15 +25,18 @@ const statusLabel: Record<AgencyInvite["status"], string> = {
 function InviteRow({ invite }: { invite: AgencyInvite }) {
   const [isDeleting, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   function handleRemove() {
-    const confirmed = window.confirm(`Retirer l'invitation de ${invite.email} ?`);
-    if (!confirmed) return;
+    setConfirmOpen(true);
+  }
 
+  function runRemove() {
     setError(null);
     startTransition(async () => {
       const result = await removeAgencyInvite(invite.id);
       if (result.error) setError(result.error);
+      setConfirmOpen(false);
     });
   }
 
@@ -60,6 +64,15 @@ function InviteRow({ invite }: { invite: AgencyInvite }) {
           ✕
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Retirer l'invitation de ${invite.email} ?`}
+        message="Cette action est irréversible."
+        pending={isDeleting}
+        onConfirm={runRemove}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

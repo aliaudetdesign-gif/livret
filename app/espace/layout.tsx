@@ -8,6 +8,7 @@ const navItems: NavItem[] = [
   { label: "Administratif", href: "/espace/administratif", icon: "administratif" },
   { label: "Design", href: "/espace/design", icon: "design" },
   { label: "Messagerie", href: "/espace/messagerie", icon: "messagerie" },
+  { label: "Aide", href: "/espace/aide", icon: "aide" },
 ];
 
 export default async function EspaceLayout({

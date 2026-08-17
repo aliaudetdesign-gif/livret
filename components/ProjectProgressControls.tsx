@@ -83,7 +83,7 @@ export function StatusToggle({
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-1.5 z-10 bg-ink-900 border border-white/12 rounded-field shadow-[0_20px_40px_-18px_rgba(23,22,26,0.7)] overflow-hidden min-w-[180px]">
+        <div className="animate-pop-in absolute top-full right-0 mt-1.5 z-10 bg-ink-900 border border-white/12 rounded-field shadow-[0_20px_40px_-18px_rgba(23,22,26,0.7)] overflow-hidden min-w-[180px]">
           {STATUS_OPTIONS.map((option) => (
             <button
               key={option.value}

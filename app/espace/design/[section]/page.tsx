@@ -5,14 +5,19 @@ import { ColorGrid } from "@/components/ColorGrid";
 import { SectionAssetGrid } from "@/components/SectionAssetGrid";
 import { TypographyCard } from "@/components/TypographyCard";
 import { LogoGrid } from "@/components/LogoGrid";
-import type { AssetType } from "@/lib/types";
+import { DownloadableAssetImage } from "@/components/DownloadableAssetImage";
+import { DownloadableGuidePreview } from "@/components/DownloadableGuidePreview";
+import type { AssetType, GuideMetadata } from "@/lib/types";
 
 const FILE_TYPES: AssetType[] = ["logo", "moodboard"];
-const ESSENTIEL_LABELS: Record<AssetType, string> = {
+// "moodboard" reste une valeur AssetType valide (les lignes brand_assets
+// existantes ne sont pas supprimées, voir migration 024) mais n'est plus une
+// section Essentiel accessible : elle a basculé en section Compléments.
+const ESSENTIEL_LABELS: Record<Exclude<AssetType, "moodboard">, string> = {
   logo: "Logos",
   couleur: "Couleurs",
   typographie: "Typographies",
-  moodboard: "Visuels & Moodboard",
+  guide: "Guide d'utilisation",
 };
 const ESSENTIEL_KEYS = Object.keys(ESSENTIEL_LABELS);
 
@@ -45,7 +50,7 @@ export default async function DesignSectionPage({
   );
 
   if (isEssentiel) {
-    const type = section as AssetType;
+    const type = section as Exclude<AssetType, "moodboard">;
     const { data: assets } = await supabase
       .from("brand_assets")
       .select("*")
@@ -72,19 +77,28 @@ export default async function DesignSectionPage({
           </div>
         ) : type === "logo" ? (
           <LogoGrid assets={assets ?? []} />
+        ) : type === "guide" ? (
+          <div className="grid grid-cols-3 gap-4">
+            {(assets ?? []).map((asset) => {
+              const metadata = asset.metadata as unknown as GuideMetadata | null;
+              return (
+                <div key={asset.id} className="glass rounded-card p-4">
+                  <DownloadableGuidePreview
+                    previewUrl={metadata?.generatedPreview ?? null}
+                    fileUrl={asset.value}
+                    alt={asset.label}
+                  />
+                  <div className="font-medium text-sm">{asset.label}</div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <div className="grid grid-cols-3 gap-4">
             {(assets ?? []).map((asset) => (
               <div key={asset.id} className="glass rounded-card p-4">
                 {FILE_TYPES.includes(type) ? (
-                  <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/55">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={asset.value}
-                      alt={asset.label}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
+                  <DownloadableAssetImage src={asset.value} alt={asset.label} />
                 ) : null}
                 <div className="font-medium text-sm">{asset.label}</div>
                 {!FILE_TYPES.includes(type) && (
@@ -121,9 +135,13 @@ export default async function DesignSectionPage({
     <div>
       {backLink}
       <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-6">
-        {projectSection.section_types.icon} {projectSection.section_types.label}
+        {projectSection.section_types.icon} {projectSection.section_types.label}{" "}
+        <span className="text-ink-400 font-normal">({(sectionAssets ?? []).length})</span>
       </h1>
-      <SectionAssetGrid assets={sectionAssets ?? []} />
+      <SectionAssetGrid
+        assets={sectionAssets ?? []}
+        template={projectSection.section_types.template}
+      />
     </div>
   );
 }

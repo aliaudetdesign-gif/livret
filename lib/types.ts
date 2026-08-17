@@ -24,6 +24,7 @@ export interface Profile {
   notify_new_message: boolean;
   notify_new_document: boolean;
   professional_link: string | null; // LinkedIn / site / portfolio, agence uniquement
+  is_demo_account: boolean; // compte recruteur dédié, scopé is_demo=true par la RLS
   created_at: string;
 }
 
@@ -39,12 +40,13 @@ export interface Project {
   start_date: string | null;
   end_date: string | null;
   archived: boolean;
+  is_demo: boolean; // projet de démonstration, isolé des vrais projets clients
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
-export type AssetType = "logo" | "couleur" | "typographie" | "moodboard";
+export type AssetType = "logo" | "couleur" | "typographie" | "moodboard" | "guide";
 
 // Groupe d'affichage d'une couleur dans la palette (mockup "Livret couleurs").
 export type ColorCategory = "primaire" | "secondaire";
@@ -70,13 +72,23 @@ export const COLOR_FORMAT_DESCRIPTIONS: Record<ColorInputFormat, string> = {
 
 export type TypographyCategory = "titrage" | "corps_de_texte" | "accent";
 
+// Un fichier de police déposé, avec sa graisse détectée automatiquement
+// (ou saisie manuellement en repli si la détection échoue).
+export interface TypographyFile {
+  weight: string; // ex: "Regular", "SemiBold", "Bold", "Italic"
+  url: string;
+  filename: string;
+}
+
 // Contenu de BrandAsset.metadata quand type === "typographie".
 export interface TypographyMetadata {
   source: string | null; // ex: "Google Fonts - Libre", "Système"
   previewText: string;
   previewSubtext: string | null;
-  weights: string[]; // ex: ["Regular", "SemiBold", "Bold", "Italic"]
-  fileUrl: string | null; // fichier de police déposé par l'agence, pour le téléchargement
+  weights: string[]; // ex: ["Regular", "SemiBold", "Bold", "Italic"], dérivé de `files`
+  files: TypographyFile[]; // fichiers de police déposés par l'agence, un par graisse
+  /** @deprecated conservé pour les entrées créées avant le passage au multi-fichiers */
+  fileUrl?: string | null;
 }
 
 // Fond sur lequel une déclinaison de logo est prévue pour être utilisée.
@@ -111,6 +123,13 @@ export interface LogoMetadata {
   generatedPreview?: string | null; // aperçu PNG généré côté client depuis un PDF seul, pour l'affichage
 }
 
+// Contenu de BrandAsset.metadata quand type === "guide". BrandAsset.value
+// reste l'URL du PDF déposé. Un élément = un PDF (comme le moodboard, mais
+// pour des fichiers PDF plutôt que des images).
+export interface GuideMetadata {
+  generatedPreview: string | null; // aperçu PNG généré côté client depuis la 1re page du PDF
+}
+
 export interface BrandAsset {
   id: string;
   project_id: string;
@@ -132,11 +151,14 @@ export interface ProjectDocument {
   created_at: string;
 }
 
+export type SectionTemplate = "video" | "figma" | "mockup" | "moodboard" | "illustrations" | "packaging";
+
 export interface SectionType {
   id: string;
   key: string;
   label: string;
   icon: string;
+  template: SectionTemplate | null;
   created_at: string;
 }
 
@@ -148,12 +170,32 @@ export interface ProjectSection {
   section_types: SectionType; // section jointe (embed Supabase)
 }
 
+// Contenu de SectionAsset.metadata quand le designer a choisi le mode
+// "Plusieurs formats" à l'ajout (optionnel, décidé au cas par cas, pas lié au
+// type de section). Même principe que LogoMetadata.formats/extraFormats,
+// sans les champs fond/sous-titre qui n'ont pas de sens hors logo.
+export interface SectionAssetMetadata {
+  formats: {
+    pdf?: string;
+    png?: string;
+    svg?: string;
+  };
+  extraFormats?: LogoFormatExtra[];
+  generatedPreview?: string | null;
+}
+
 export interface SectionAsset {
   id: string;
   project_section_id: string;
   label: string;
   file_url: string;
   file_type: string;
+  // Aperçu généré côté client pour les PDF (même principe que generatedPreview
+  // sur les logos), affiché à la place de l'icône PDF générique quand présent.
+  preview_url: string | null;
+  // Renseigné uniquement pour un fichier ajouté en mode "Plusieurs formats"
+  // (voir SectionAssetMetadata) ; null pour un fichier simple.
+  metadata: Record<string, unknown> | null;
   created_at: string;
 }
 

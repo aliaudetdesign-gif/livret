@@ -31,14 +31,15 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 backdrop-blur-[3px] p-4"
+      className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 backdrop-blur-[3px] p-4"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md max-h-[90vh] overflow-y-auto"
+        className="animate-pop-in relative w-full max-w-md max-h-[90vh] overflow-y-auto"
+        style={{ transformOrigin: "center" }}
       >
         <button
           type="button"

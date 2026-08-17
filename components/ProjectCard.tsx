@@ -34,11 +34,11 @@ export function ProjectCard({ project, muted }: { project: Project; muted?: bool
   return (
     <Link
       href={`/agence/projets/${project.id}`}
-      className={`glass rounded-card p-[19px] ${
+      className={`glass rounded-card p-[19px] relative focus-within:z-30 ${
         muted ? "opacity-70" : "hover-lift"
       }`}
     >
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-3 mb-3 relative z-10">
         <div
           className="w-9 h-9 rounded-chip text-xs flex items-center justify-center font-semibold shrink-0"
           style={{ backgroundColor: avatarColor.background, color: avatarColor.text }}

@@ -12,7 +12,6 @@ import { SectionAssetUploadTrigger } from "@/components/SectionAssetUploadTrigge
 import { AssetGrid } from "@/components/AssetGrid";
 import { ColorGrid } from "@/components/ColorGrid";
 import { AssetUploadTrigger } from "@/components/AssetUploadTrigger";
-import { DeleteSectionButton } from "@/components/DeleteSectionButton";
 import { ProjectSettingsForm } from "@/components/ProjectSettingsForm";
 import { ProjectClientInvites } from "@/components/ProjectClientInvites";
 import type { AssetType, ProjectSection } from "@/lib/types";
@@ -21,7 +20,7 @@ const ESSENTIEL: { key: AssetType; label: string; icon: string }[] = [
   { key: "logo", label: "Logos", icon: "🖼️" },
   { key: "couleur", label: "Couleurs", icon: "🎨" },
   { key: "typographie", label: "Typographies", icon: "Aa" },
-  { key: "moodboard", label: "Visuels & Moodboard", icon: "📷" },
+  { key: "guide", label: "Guide d'utilisation", icon: "📘" },
 ];
 const ESSENTIEL_KEYS = ESSENTIEL.map((e) => e.key) as string[];
 
@@ -137,6 +136,7 @@ export default async function ProjetDetailPage({
     label: ps.section_types.label,
     icon: ps.section_types.icon,
     count: (ps.section_assets ?? []).filter((a) => !a.deleted_at).length,
+    sectionTypeId: ps.section_type_id,
   }));
 
   const usedTypeIds = new Set((projectSections ?? []).map((ps) => ps.section_type_id));
@@ -275,10 +275,11 @@ export default async function ProjetDetailPage({
             <DesignGrid
               essentiel={essentielCards}
               complements={complementCards}
-              sectionHref={(key) => `/agence/projets/${id}?tab=design&section=${key}`}
+              sectionHrefTemplate={`/agence/projets/${id}?tab=design&section={key}`}
               addSectionSlot={
                 <AddSectionForm projectId={project.id} availableSectionTypes={availableSectionTypes} />
               }
+              projectId={project.id}
             />
           ) : isEssentielSection ? (
             <div>
@@ -305,25 +306,23 @@ export default async function ProjetDetailPage({
             </div>
           ) : currentSection ? (
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <Link
-                  href={`/agence/projets/${id}?tab=design`}
-                  className="text-sm text-ink-500 hover:text-clay-600 inline-block"
-                >
-                  ← Design
-                </Link>
-                <DeleteSectionButton
-                  projectId={project.id}
-                  projectSectionId={currentSection.id}
-                  sectionLabel={currentSection.section_types.label}
-                />
-              </div>
+              <Link
+                href={`/agence/projets/${id}?tab=design`}
+                className="text-sm text-ink-500 hover:text-clay-600 mb-4 inline-block"
+              >
+                ← Design
+              </Link>
               <p className="text-sm font-medium mb-4">
-                {currentSection.section_types.icon} {currentSection.section_types.label}
+                {currentSection.section_types.icon} {currentSection.section_types.label}{" "}
+                <span className="text-ink-400 font-normal">
+                  ({(sectionAssets ?? []).length})
+                </span>
               </p>
               <SectionAssetGrid
                 assets={sectionAssets ?? []}
                 projectId={project.id}
+                projectSectionId={currentSection.id}
+                template={currentSection.section_types.template}
                 addSlot={
                   <SectionAssetUploadTrigger
                     projectId={project.id}

@@ -16,30 +16,39 @@ Le projet n'est ni versionné avec Git, ni déployé (pas de Vercel, pas de CI) 
 
 ## Charte graphique — à respecter impérativement
 
-Les tokens sont définis dans `app/globals.css` sous `:root`. **Ne jamais utiliser les couleurs Tailwind par défaut** (`bg-blue-500`, `text-gray-700`, etc.) : elles cassent l'identité visuelle du projet. Toujours passer par `bg-[var(--color-...)]` ou les classes utilitaires ci-dessous.
+**Mise à jour majeure (31 juillet 2026)** : la charte est passée d'une palette plate (crème/terracotta) à un style **liquid glass**, conçu avec Claude Opus. Trois pistes explorées dans `propositions-design/` (A-liquid-glass, B-editorial-espace, C-hybride) ; c'est **la piste A qui a été retenue et intégrée dans le vrai code**, pas juste comme maquette HTML. Référence de vérité : `app/globals.css`, en tête de fichier `Charte livret. — proposition A (liquid glass)`.
 
-Palette :
+Les anciens noms de tokens (`--color-terracotta`, `--color-creme`, etc.) sont conservés en alias vers les nouvelles valeurs, pour que les composants existants continuent de fonctionner sans réécriture systématique. **Ne jamais utiliser les couleurs Tailwind par défaut** (`bg-blue-500`, `text-gray-700`, `bg-zinc-100`, etc.) : elles cassent l'identité visuelle. Un audit (3 août 2026) confirme qu'il n'en reste aucune trace dans le code actif — seul `_Archive/components/ColorSwatch.tsx` (archivé, non utilisé) en contient encore.
+
+Tokens principaux :
 
 | Token | Valeur | Usage |
 |---|---|---|
-| `--background` / `--color-creme` | `#f7f3ec` | Fond global |
-| `--foreground` / `--color-noir-doux` | `#1c1c1c` | Texte principal |
-| `--color-terracotta` | `#d85a30` | Couleur d'accent, actions primaires |
-| `--color-terracotta-deep` | `#a83e1d` | Fin de gradient, hover |
-| `--color-terracotta-tint` | `#fbe4da` | Fonds légers, badges |
-| `--color-terracotta-glow` | `rgba(216, 90, 48, 0.18)` | Ombres portées |
-| `--color-olive` | `#4a5a3a` | Couleur secondaire |
-| `--color-sable` | `#d4a47a` | Couleur secondaire |
-| `--color-brun` | `#8b5e3c` | Couleur secondaire |
-| `--color-lin` | `#e8dfd2` | Bordures, séparateurs, fonds de cartes |
+| `--shell` | `#f4f0ea` | Fond global (alias `--background`) |
+| `--shell-deep` | `#ebe5dc` | Fond légèrement plus soutenu |
+| `--paper` | `#fbf9f6` | Fond "papier" (fallback sans glass, mode réduction transparence) |
+| `--line` | `#e4dfd7` | Bordures, séparateurs (alias `--color-lin`) |
+| `--ink-900` | `#17161a` | Texte principal (alias `--foreground` / `--color-noir-doux`) |
+| `--ink-700` / `--ink-500` / `--ink-400` | — | Texte secondaire, dégradé de gris |
+| `--clay-700/600/500/400/100` | `#9c4529` → `#f7dfd4` | Terre cuite, couleur d'accent (alias `--color-terracotta*`) |
+| `--sage` | `#5f6e52` | Secondaire (alias `--color-olive`) |
+| `--sand` | `#d9b08c` | Secondaire (alias `--color-sable`) |
+| `--bark` | `#8a6247` | Secondaire (alias `--color-brun`) |
+| `--ok-600/100`, `--err-600/300/100`, `--warn-600/100` | — | États (succès/erreur/attention), contrastes AA vérifiés (commentaires dans le CSS) |
 
-Gradient : `--gradient-terracotta` = `linear-gradient(135deg, terracotta, terracotta-deep)`.
+Matière verre : `--glass-fill`, `--glass-fill-soft`, `--glass-edge`, `--glass-blur` (`blur(34px) saturate(185%)`), `--glass-shadow(-soft)`. Classes : `.glass` (cartes, blur fort), `.glass-soft` (blur plus léger), `.mesh` + `.mesh .b1-b4` (nappes de couleur floutées en fond, ce que le verre réfracte), `.grain` (bruit fin en overlay, casse l'effet plastique). Fallback automatique en fond opaque `--paper` si `backdrop-filter` non supporté ou si `prefers-reduced-transparency: reduce`.
 
-Classes utilitaires maison disponibles : `.bg-gradient-terracotta`, `.text-gradient-terracotta` (gradient appliqué au texte), `.hover-lift` (translation -2px + ombre terracotta au survol, transition 0.2s).
+Rayons : `--r-xs` à `--r-xl`, exposés à Tailwind via `rounded-chip` / `rounded-field` / `rounded-card` / `rounded-panel` / `rounded-hero` (volontairement pas `rounded-sm/md/lg` pour ne pas casser les `rounded-*` déjà en place ailleurs).
+
+Gradient : `--grad-clay` (alias `--gradient-terracotta`). Classes utilitaires : `.bg-gradient-terracotta`, `.text-gradient-terracotta`, `.btn-clay` (bouton pilule dégradé, hover/active), `.hover-lift` (translation -2px + ombre au survol). Toutes respectent `prefers-reduced-motion: reduce`.
 
 Typographie : Geist et Geist Mono chargées via `next/font/google` dans `app/layout.tsx`, exposées en `--font-geist-sans` et `--font-geist-mono`, mappées sur `--font-sans` et `--font-mono` dans le bloc `@theme inline`.
 
 Le titre du produit s'écrit `livret.` en minuscules, avec le point (voir `metadata` dans `app/layout.tsx`).
+
+### Chantier en cours : peaufinage de la fluidité
+
+Le style visuel (couleurs/tokens) est appliqué de façon cohérente partout. Le chantier ouvert le 3 août 2026 porte sur les détails d'interaction qui cassent encore la fluidité attendue d'une interface "liquid glass" : ouverture/fermeture de menus et popovers sans transition (apparition/disparition brutale via rendu conditionnel `{open && (...)}`), à vérifier notamment dans `StatusToggle` et `ProgressBar` (`ProjectProgressControls.tsx`), `ProjectCardMenu`, `InfoPopover`, `Modal`, `NewDiscussionButton`. Rien n'est encore corrigé à ce stade, c'est un audit à démarrer.
 
 ## Maquettes de référence
 
@@ -84,6 +93,26 @@ Routes : `dashboard`, `logos`, `couleurs`, `typographies`, `moodboard`, `design`
 - Statuts de projet (en cours / attente de validation / livré) et barre de progression à 5 checkpoints, éditables depuis le menu ⋮ sur chaque `ProjectCard` ou le header de la fiche projet.
 - Invitations client par email (suivi manuel en base, `project_client_invites` — pas de création automatique de compte Supabase Auth, ça demanderait une clé service-role).
 - Duplication des assets de marque et documents administratifs quand on crée un nouveau projet pour un client existant.
+- Mode démo côté agence (17 août 2026) : interface agence complète dupliquée en scope `is_demo`, isolée par RLS, pour montrer le produit à des recruteurs sans exposer les vraies données. Détails dans la section dédiée ci-dessous.
+
+## Mode démo agence
+
+Objectif : un recruteur peut consulter toute l'interface agence (dashboard, projets, messagerie, corbeille) avec des données de démonstration, sans jamais voir ni pouvoir modifier les vrais projets clients d'Alexandre. Et inversement, Alexandre garde la main pour enrichir cette démo depuis son propre compte, sans que ça touche ses projets réels. Aucune démo côté client (`/espace/*`) : périmètre agence uniquement.
+
+Architecture (migration `028_demo_mode.sql`) :
+- `projects.is_demo boolean` porte le flag racine. Les tables enfants (`brand_assets`, `messages`, `project_documents`, `project_sections`, `section_assets`, `project_client_invites`) n'ont pas de colonne `is_demo` propre : leur statut démo se déduit dynamiquement via leur `project_id` (fonctions SQL `project_is_demo()` / `section_is_demo()`), pour ne jamais avoir à le stamper manuellement à chaque insert.
+- `profiles.is_demo_account boolean` marque le compte recruteur dédié (un seul, à créer manuellement, voir plus bas).
+- RLS : quasi toutes les policies agence suivent le motif `is_agence() and (not current_profile_is_demo() or <ligne_est_démo>)`. Le compte recruteur ne voit et ne modifie donc que des lignes `is_demo = true`, isolation appliquée au niveau base de données. Le compte agence réel (Alexandre) garde accès aux deux, c'est un cookie qui détermine ce qu'il voit à l'écran, pas la RLS.
+- `lib/demoMode.ts` : `getDemoScope()` (React `cache()`) renvoie `true`/`false` selon le profil (toujours `true` si `is_demo_account`) ou, sinon, le cookie `livret_demo_mode`.
+- Bascule pour Alexandre : widget "Modifier la démo" dans `/agence/profil` (`enterDemoMode()`, pose le cookie, redirige vers le dashboard démo) et bandeau "Quitter la démo" dans `app/agence/layout.tsx` (`exitDemoMode()`, retire le cookie). Les deux actions vivent dans `app/profil/actions.ts`.
+- Toutes les requêtes de lecture globales côté agence (`dashboard`, `projets`, `messagerie`, `corbeille`) filtrent désormais par `.eq("is_demo", scope)`, avec jointure `!inner` sur `projects` quand la table n'a pas de lien direct. `createProject` (`app/agence/projets/nouveau/actions.ts`) stampe `is_demo: scope` à la création et limite la duplication de charte/administratif aux projets du même scope. `emptyTrash`/`purgeExpiredTrash` (`app/agence/corbeille/actions.ts`) ne purgent que le scope courant.
+
+**Étape manuelle restante (jamais faite par Claude, pas de clé service-role)** : créer le compte recruteur dédié.
+1. Exécuter `supabase/migrations/028_demo_mode.sql` dans Supabase Dashboard > SQL Editor (si pas déjà fait).
+2. Supabase Dashboard > Authentication > Users > Add user : créer un compte avec un email/mot de passe dédiés à la démo.
+3. Dans la table `profiles`, insérer ou mettre à jour la ligne de ce nouvel utilisateur : `role = 'agence'`, `is_demo_account = true`.
+4. Se connecter avec le compte agence réel, aller sur `/agence/profil`, cliquer "Entrer en mode démo", créer au moins un projet pour peupler la démo (il sera automatiquement `is_demo = true`).
+5. Communiquer les identifiants du compte recruteur aux personnes concernées — elles se connectent normalement via `/connexion`.
 
 ### Convention technique établie
 - RLS Supabase via la fonction `is_agence()` (security definer).
@@ -97,9 +126,11 @@ Routes : `dashboard`, `logos`, `couleurs`, `typographies`, `moodboard`, `design`
 
 Fichiers dans `supabase/migrations/`, numérotés, à exécuter manuellement dans Supabase Dashboard > SQL Editor (pas de clé service-role disponible pour automatiser).
 
-Présents : 002 à 018, puis 020. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
+Présents : 002 à 018, puis 020 à 028. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
 
 `020_projects_soft_delete.sql` (ajoute `deleted_at` sur `projects` + policy delete définitive agence) : créée récemment, **statut d'exécution non confirmé** — à vérifier en priorité avec l'utilisateur avant de considérer le soft-delete des projets comme fonctionnel en prod/dev.
+
+`028_demo_mode.sql` (colonnes `is_demo` / `is_demo_account` + RLS mode démo agence) : écrite le 17 août 2026, **statut d'exécution non confirmé** — voir section "Mode démo agence" ci-dessus pour les étapes manuelles restantes. Le code applicatif suppose déjà cette migration exécutée.
 
 ## Prochaines étapes probables
 

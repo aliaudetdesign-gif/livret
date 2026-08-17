@@ -9,35 +9,12 @@ import {
 } from "@/app/agence/projets/[id]/actions";
 import { ExtraFormatFields } from "@/components/ExtraFormatFields";
 import { InfoPopover } from "@/components/InfoPopover";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { downloadFile, guessFilename } from "@/lib/download";
 
 export type FormatKey = keyof LogoMetadata["formats"];
 
 export const FORMAT_LABELS: Record<FormatKey, string> = { svg: "SVG", png: "PNG", pdf: "PDF" };
-
-// Déclenche un vrai téléchargement (et non une ouverture d'onglet) même pour
-// des fichiers cross-origin (storage Supabase) : l'attribut download seul est
-// ignoré par les navigateurs sur ce type d'URL. On récupère le fichier en
-// blob puis on télécharge depuis une URL locale (même origine).
-async function downloadFile(url: string, filename: string) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  const blobUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = blobUrl;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(blobUrl);
-}
-
-// Devine une extension de fichier plausible à partir de l'URL, pour nommer le
-// fichier téléchargé (l'URL de storage porte déjà le nom d'origine).
-function guessFilename(label: string, url: string): string {
-  const match = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
-  const ext = match ? match[1] : "";
-  return ext ? `${label}.${ext}` : label;
-}
 
 const backgroundStyles: Record<LogoBackground, string> = {
   dark: "bg-ink-900 text-white",
@@ -110,6 +87,7 @@ export function LogoCard({
 
   const [isDeleting, startTransition] = useTransition();
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (wasPending.current && !pending && !state.error) {
@@ -152,11 +130,11 @@ export function LogoCard({
 
   function handleDelete() {
     if (!projectId) return;
-    const confirmed = window.confirm(
-      `Supprimer "${asset.label}" ? Cette action est irréversible.`
-    );
-    if (!confirmed) return;
+    setConfirmOpen(true);
+  }
 
+  function runDelete() {
+    if (!projectId) return;
     setDeleteError(null);
     startTransition(async () => {
       try {
@@ -165,6 +143,7 @@ export function LogoCard({
       } catch {
         setDeleteError("Une erreur est survenue, réessaie.");
       }
+      setConfirmOpen(false);
     });
   }
 
@@ -194,10 +173,10 @@ export function LogoCard({
   const isGeneratedFallback = !metadata.formats.svg && !metadata.formats.png && !!previewUrl;
 
   return (
-    <div className="glass hover-lift group relative rounded-card overflow-hidden">
+    <div className="glass hover-lift group relative rounded-card">
       {recentlyAdded && (
         <span
-          className="absolute top-3 right-3 z-20 w-2.5 h-2.5 rounded-full bg-clay-500 shadow-[0_0_0_3px_rgba(255,255,255,0.6)]"
+          className="absolute top-3 right-3 z-20 w-2.5 h-2.5 rounded-full bg-clay-500 shadow-[0_0_0_3px_rgba(255,255,255,0.6)] group-hover:opacity-0 transition-opacity"
           title="Récemment ajouté"
         />
       )}
@@ -214,11 +193,11 @@ export function LogoCard({
       ) : (
         editable &&
         !isEditing && (
-          <div className="absolute top-3 left-3 z-20 hidden group-hover:flex gap-1">
+          <div className="absolute top-3 right-3 z-20 hidden group-hover:flex gap-1">
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-clay-600 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/95 border border-white/70 shadow-[0_4px_12px_-4px_rgba(23,22,26,0.4)] text-ink-700 hover:text-clay-600 transition-colors"
               title="Modifier"
             >
               ✎
@@ -227,7 +206,7 @@ export function LogoCard({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
+              className="w-7 h-7 flex items-center justify-center rounded-chip bg-white/95 border border-white/70 shadow-[0_4px_12px_-4px_rgba(23,22,26,0.4)] text-ink-700 hover:text-err-600 transition-colors disabled:opacity-50"
               title="Supprimer"
             >
               ✕
@@ -237,7 +216,7 @@ export function LogoCard({
       )}
 
       <div
-        className={`relative aspect-[4/3] w-full flex items-center justify-center border-b border-white/45 ${
+        className={`relative aspect-[4/3] w-full flex items-center justify-center border-b border-white/45 overflow-hidden rounded-t-card ${
           isGeneratedFallback ? "bg-white/60" : backgroundStyles[metadata.background]
         }`}
       >
@@ -390,6 +369,15 @@ export function LogoCard({
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Supprimer "${asset.label}" ?`}
+        message="Récupérable depuis la Corbeille en cas d'erreur."
+        pending={isDeleting}
+        onConfirm={runDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

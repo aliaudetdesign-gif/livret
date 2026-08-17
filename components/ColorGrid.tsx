@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { deleteBrandAssets } from "@/app/agence/projets/[id]/actions";
 import { ColorCard } from "@/components/ColorCard";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { BrandAsset, ColorCategory, ColorMetadata } from "@/lib/types";
 import type { ReactNode } from "react";
 
@@ -39,6 +40,7 @@ export function ColorGrid({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [confirmBulkOpen, setConfirmBulkOpen] = useState(false);
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -56,30 +58,29 @@ export function ColorGrid({
 
   function handleBulkDelete() {
     if (!projectId || selected.size === 0) return;
-    const confirmed = window.confirm(
-      `Supprimer ${selected.size} couleur${selected.size > 1 ? "s" : ""} ? Cette action est irréversible.`
-    );
-    if (!confirmed) return;
+    setConfirmBulkOpen(true);
+  }
 
+  function runBulkDelete() {
+    if (!projectId) return;
     setError(null);
     startTransition(async () => {
       try {
         const result = await deleteBrandAssets(Array.from(selected), projectId);
         if (result.error) {
           setError(result.error);
-          return;
+        } else {
+          exitSelectionMode();
         }
-        exitSelectionMode();
       } catch {
         setError("Une erreur est survenue, réessaie.");
       }
+      setConfirmBulkOpen(false);
     });
   }
 
-  if (assets.length === 0) {
-    return addSlot ? (
-      <div className="grid grid-cols-4 gap-4">{addSlot}</div>
-    ) : (
+  if (assets.length === 0 && !editable) {
+    return (
       <p className="text-sm text-ink-400">
         Rien à afficher pour l&apos;instant, ton agence n&apos;a pas encore ajouté d&apos;éléments ici.
       </p>
@@ -90,15 +91,27 @@ export function ColorGrid({
     <div>
       {editable && (
         <div className="flex items-center justify-between mb-4">
-          <button
-            type="button"
-            onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
-            className="text-sm font-medium text-ink-500 hover:text-clay-600"
-          >
-            {selectionMode ? "Annuler" : "Sélectionner"}
-          </button>
+          {selectionMode ? (
+            <button
+              type="button"
+              onClick={exitSelectionMode}
+              className="text-sm font-medium text-ink-500 hover:text-clay-600"
+            >
+              Annuler
+            </button>
+          ) : assets.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => setSelectionMode(true)}
+              className="text-sm font-medium text-ink-500 hover:text-clay-600"
+            >
+              Sélectionner
+            </button>
+          ) : (
+            <span />
+          )}
 
-          {selectionMode && (
+          {selectionMode ? (
             <button
               type="button"
               onClick={handleBulkDelete}
@@ -107,6 +120,8 @@ export function ColorGrid({
             >
               {isPending ? "Suppression..." : `Supprimer (${selected.size})`}
             </button>
+          ) : (
+            addSlot
           )}
         </div>
       )}
@@ -115,13 +130,10 @@ export function ColorGrid({
         <p className="text-sm text-err-600 bg-err-100 border border-err-600/15 rounded-field px-3.5 py-2.5 mb-4">{error}</p>
       )}
 
+      {assets.length === 0 ? (
+        <p className="text-sm text-ink-400">Aucune couleur pour l&apos;instant.</p>
+      ) : (
       <div className="flex flex-col gap-6">
-        {addSlot && (
-          <div key="add-slot" className="grid grid-cols-4 gap-4">
-            {addSlot}
-          </div>
-        )}
-
         {categoryOrder.map((category) => {
           const items = assets.filter((asset) => categoryOf(asset) === category);
           if (items.length === 0) return null;
@@ -145,6 +157,16 @@ export function ColorGrid({
           );
         })}
       </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmBulkOpen}
+        title={`Supprimer ${selected.size} couleur${selected.size > 1 ? "s" : ""} ?`}
+        message="Récupérable depuis la Corbeille en cas d'erreur."
+        pending={isPending}
+        onConfirm={runBulkDelete}
+        onCancel={() => setConfirmBulkOpen(false)}
+      />
     </div>
   );
 }

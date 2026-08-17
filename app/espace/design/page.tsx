@@ -7,7 +7,7 @@ const ESSENTIEL: { key: AssetType; label: string; icon: string }[] = [
   { key: "logo", label: "Logos", icon: "🖼️" },
   { key: "couleur", label: "Couleurs", icon: "🎨" },
   { key: "typographie", label: "Typographies", icon: "Aa" },
-  { key: "moodboard", label: "Visuels & Moodboard", icon: "📷" },
+  { key: "guide", label: "Guide d'utilisation", icon: "📘" },
 ];
 
 export default async function DesignPage() {
@@ -62,7 +62,7 @@ export default async function DesignPage() {
       <DesignGrid
         essentiel={essentielCards}
         complements={complementCards}
-        sectionHref={(key) => `/espace/design/${key}`}
+        sectionHrefTemplate="/espace/design/{key}"
       />
     </div>
   );

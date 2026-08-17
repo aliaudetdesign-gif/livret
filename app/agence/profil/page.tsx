@@ -3,6 +3,7 @@ import { ProfileForm } from "@/components/ProfileForm";
 import { ProfessionalLinkForm } from "@/components/ProfessionalLinkForm";
 import { NotificationPreferencesForm } from "@/components/NotificationPreferencesForm";
 import { PasswordSecurityForm } from "@/components/PasswordSecurityForm";
+import { enterDemoMode } from "@/app/profil/actions";
 
 export default async function AgenceProfilPage() {
   const supabase = await createClient();
@@ -61,6 +62,32 @@ export default async function AgenceProfilPage() {
             <PasswordSecurityForm />
           </div>
         </section>
+
+        {profile && !profile.is_demo_account && (
+          <section>
+            <h2 className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">
+              Démo
+            </h2>
+            <div className="glass rounded-card p-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium mb-1">Modifier la démo</p>
+                <p className="text-xs text-ink-500">
+                  Bascule sur une interface indépendante, avec ses propres projets, où tu
+                  peux tout modifier sans toucher à tes vrais projets clients. C&apos;est
+                  cette version que consultent les recruteurs.
+                </p>
+              </div>
+              <form action={enterDemoMode}>
+                <button
+                  type="submit"
+                  className="shrink-0 btn-clay text-sm font-semibold px-4 py-2.5 whitespace-nowrap"
+                >
+                  Entrer en mode démo
+                </button>
+              </form>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

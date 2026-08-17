@@ -5,6 +5,8 @@ import {
   deleteProjectDocument,
   deleteProjectDocuments,
 } from "@/app/agence/projets/[id]/actions";
+import { DocumentCard } from "@/components/DocumentCard";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { DocumentCategory, ProjectDocument } from "@/lib/types";
 import type { ReactNode } from "react";
 
@@ -15,41 +17,6 @@ const categoryHeadings: Record<DocumentCategory, string> = {
   facture: "Factures",
   brief: "Brief",
 };
-
-// Déclenche un vrai téléchargement (et non une ouverture d'onglet) même pour
-// un fichier cross-origin (storage Supabase) : l'attribut download seul est
-// ignoré par les navigateurs sur ce type d'URL.
-async function downloadFile(url: string, filename: string) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  const blobUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = blobUrl;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(blobUrl);
-}
-
-function PdfIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="w-8 h-8 text-clay-600 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <path
-        d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M14 2v5h5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 // Grille des documents administratifs, groupée par catégorie. En mode agence
 // (projectId fourni) : suppression individuelle au survol + sélection multiple
@@ -69,18 +36,13 @@ export function DocumentGrid({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<
+    { type: "single"; doc: ProjectDocument } | { type: "bulk" } | null
+  >(null);
 
-  async function handleClientDownload(doc: ProjectDocument) {
-    setError(null);
-    setDownloadingId(doc.id);
-    try {
-      await downloadFile(doc.file_url, doc.label.toLowerCase().endsWith(".pdf") ? doc.label : `${doc.label}.pdf`);
-    } catch {
-      setError("Le téléchargement a échoué, réessaie.");
-    } finally {
-      setDownloadingId(null);
-    }
+  function handleSelectFromMenu(doc: ProjectDocument) {
+    setSelectionMode(true);
+    setSelected(new Set([doc.id]));
   }
 
   function toggleSelect(id: string) {
@@ -99,41 +61,35 @@ export function DocumentGrid({
 
   function handleDelete(doc: ProjectDocument) {
     if (!projectId) return;
-    const confirmed = window.confirm(
-      `Supprimer "${doc.label}" ? Cette action est irréversible.`
-    );
-    if (!confirmed) return;
-
-    setError(null);
-    startTransition(async () => {
-      try {
-        const result = await deleteProjectDocument(doc.id, projectId);
-        if (result.error) setError(result.error);
-      } catch {
-        setError("Une erreur est survenue, réessaie.");
-      }
-    });
+    setConfirmDelete({ type: "single", doc });
   }
 
   function handleBulkDelete() {
     if (!projectId || selected.size === 0) return;
-    const confirmed = window.confirm(
-      `Supprimer ${selected.size} document${selected.size > 1 ? "s" : ""} ? Cette action est irréversible.`
-    );
-    if (!confirmed) return;
+    setConfirmDelete({ type: "bulk" });
+  }
+
+  function runConfirmedDelete() {
+    if (!projectId || !confirmDelete) return;
 
     setError(null);
     startTransition(async () => {
       try {
-        const result = await deleteProjectDocuments(Array.from(selected), projectId);
-        if (result.error) {
-          setError(result.error);
-          return;
+        if (confirmDelete.type === "single") {
+          const result = await deleteProjectDocument(confirmDelete.doc.id, projectId);
+          if (result.error) setError(result.error);
+        } else {
+          const result = await deleteProjectDocuments(Array.from(selected), projectId);
+          if (result.error) {
+            setError(result.error);
+          } else {
+            exitSelectionMode();
+          }
         }
-        exitSelectionMode();
       } catch {
         setError("Une erreur est survenue, réessaie.");
       }
+      setConfirmDelete(null);
     });
   }
 
@@ -187,71 +143,40 @@ export function DocumentGrid({
             <div key={category}>
               <p className="text-sm font-medium mb-3">{categoryHeadings[category]}</p>
               <ul className="grid grid-cols-3 gap-4">
-                {items.map((doc) =>
-                  editable && selectionMode ? (
-                    <li key={doc.id}>
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => toggleSelect(doc.id)}
-                        className="flex items-center gap-3 glass rounded-card p-4 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected.has(doc.id)}
-                          onChange={() => toggleSelect(doc.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="w-4 h-4 accent-clay-500 shrink-0"
-                        />
-                        <PdfIcon />
-                        <span className="text-sm font-medium truncate">{doc.label}</span>
-                      </div>
-                    </li>
-                  ) : (
-                    <li key={doc.id} className="group relative">
-                      {editable && (
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(doc)}
-                          disabled={isPending}
-                          className="absolute top-3 right-3 z-10 hidden group-hover:flex w-7 h-7 items-center justify-center rounded-chip bg-white/85 border border-white/60 text-ink-500 hover:text-err-600 transition-colors disabled:opacity-50"
-                          title="Supprimer"
-                        >
-                          ✕
-                        </button>
-                      )}
-                      {editable ? (
-                        <a
-                          href={doc.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 glass rounded-card p-4 hover-lift"
-                        >
-                          <PdfIcon />
-                          <span className="text-sm font-medium truncate">{doc.label}</span>
-                        </a>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleClientDownload(doc)}
-                          disabled={downloadingId === doc.id}
-                          className="w-full flex items-center gap-3 glass rounded-card p-4 hover-lift text-left disabled:opacity-60 disabled:cursor-wait"
-                        >
-                          <PdfIcon />
-                          <span className="text-sm font-medium truncate">{doc.label}</span>
-                          <span className="ml-auto text-xs text-ink-400 shrink-0">
-                            {downloadingId === doc.id ? "..." : "↓"}
-                          </span>
-                        </button>
-                      )}
-                    </li>
-                  )
-                )}
+                {items.map((doc) => (
+                  <li key={doc.id}>
+                    <DocumentCard
+                      doc={doc}
+                      projectId={projectId}
+                      selectionMode={editable && selectionMode}
+                      selected={selected.has(doc.id)}
+                      onToggleSelect={() => toggleSelect(doc.id)}
+                      onSelectFromMenu={handleSelectFromMenu}
+                      onDelete={handleDelete}
+                      isDeleting={isPending}
+                    />
+                  </li>
+                ))}
               </ul>
             </div>
           );
         })}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title={
+          confirmDelete?.type === "bulk"
+            ? `Supprimer ${selected.size} document${selected.size > 1 ? "s" : ""} ?`
+            : confirmDelete?.type === "single"
+              ? `Supprimer "${confirmDelete.doc.label}" ?`
+              : ""
+        }
+        message="Récupérable depuis la Corbeille en cas d'erreur."
+        pending={isPending}
+        onConfirm={runConfirmedDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

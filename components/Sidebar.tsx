@@ -62,7 +62,19 @@ export function Sidebar({
   ];
 
   return (
-    <aside className="glass w-[246px] shrink-0 self-start sticky top-7 rounded-panel px-3.5 pt-6 pb-3.5 flex flex-col min-h-[calc(100vh-4.5rem)]">
+    <>
+      {/* Espaceur : occupe la largeur de la sidebar dans le flux flex
+          (celle-ci passe en position fixed juste après, donc sans cet
+          espaceur le contenu principal, en flex-1, recouvrirait sa place). */}
+      <div className="w-[246px] shrink-0" aria-hidden />
+      {/* Le fixed est porté par ce wrapper neutre, pas directement par
+          l'aside : `.glass` force `position: relative` (nécessaire pour son
+          ::after et le z-index de son contenu), ce qui écraserait sinon le
+          `fixed` de Tailwind (règle non "layered" de globals.css vs. utilitaire
+          Tailwind — le fixed perdait silencieusement, la sidebar restait dans
+          le flux et défilait avec la page). */}
+      <div className="fixed w-[246px] top-7 left-[22px] bottom-7">
+      <aside className="glass w-full h-full rounded-panel px-3.5 pt-6 pb-3.5 flex flex-col overflow-y-auto">
       <div className="px-2.5 pb-6 text-[21px] font-semibold tracking-[-0.02em]">
         livret<span className="text-gradient-terracotta">.</span>
       </div>
@@ -138,6 +150,8 @@ export function Sidebar({
           <div className={shell}>{content}</div>
         );
       })()}
-    </aside>
+      </aside>
+      </div>
+    </>
   );
 }

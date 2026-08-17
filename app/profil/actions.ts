@@ -1,9 +1,58 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE_COOKIE } from "@/lib/demoMode";
 
 export type ProfileActionState = { error: string | null };
+
+export async function signOut() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/connexion");
+}
+
+// Bascule le compte agence réel sur le jeu de données démo (widget "Modifier
+// la démo" du profil). Réservé au compte agence réel : le compte recruteur
+// (is_demo_account) est déjà scopé démo en permanence par la RLS et n'a pas
+// besoin de ce cookie.
+export async function enterDemoMode() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/connexion");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, is_demo_account")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "agence" || profile.is_demo_account) {
+    redirect("/agence/profil");
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(DEMO_MODE_COOKIE, "1", {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+  });
+
+  redirect("/agence/dashboard");
+}
+
+export async function exitDemoMode() {
+  const cookieStore = await cookies();
+  cookieStore.delete(DEMO_MODE_COOKIE);
+  redirect("/agence/profil");
+}
 
 export async function updateProfile(
   _prevState: ProfileActionState,

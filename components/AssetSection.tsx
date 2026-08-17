@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getClientProject } from "@/lib/getClientProject";
+import { DownloadableAssetImage } from "@/components/DownloadableAssetImage";
 import type { AssetType } from "@/lib/types";
 
 export async function AssetSection({
@@ -47,14 +48,7 @@ export async function AssetSection({
               className="glass rounded-card p-4"
             >
               {type === "logo" || type === "moodboard" ? (
-                <div className="aspect-square w-full mb-2 rounded-field overflow-hidden bg-white/55">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={asset.value}
-                    alt={asset.label}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+                <DownloadableAssetImage src={asset.value} alt={asset.label} />
               ) : null}
               <div className="font-medium text-sm">{asset.label}</div>
               {type !== "logo" && type !== "moodboard" && (

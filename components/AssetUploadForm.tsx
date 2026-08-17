@@ -4,6 +4,8 @@ import { startTransition, useActionState, useEffect, useRef, useState, type Form
 import { addBrandAsset, type AssetActionState } from "@/app/agence/projets/[id]/actions";
 import { ExtraFormatFields } from "@/components/ExtraFormatFields";
 import { InfoPopover } from "@/components/InfoPopover";
+import { FontFilesField, type PendingFontFile } from "@/components/FontFilesField";
+import { generatePdfPreview } from "@/lib/pdfPreview";
 import {
   COLOR_FORMAT_DESCRIPTIONS,
   LOGO_FORMAT_DESCRIPTIONS,
@@ -27,6 +29,7 @@ const labels: Record<AssetType, { title: string; namePlaceholder: string }> = {
   moodboard: { title: "Ajouter une image", namePlaceholder: "ex: Ambiance été" },
   typographie: { title: "Ajouter une typographie", namePlaceholder: "ex: Cormorant Infant" },
   couleur: { title: "Ajouter une couleur", namePlaceholder: "ex: Terracotta" },
+  guide: { title: "Ajouter un PDF", namePlaceholder: "ex: Guide de la charte graphique" },
 };
 
 const typographyCategories: { value: TypographyCategory; label: string }[] = [
@@ -52,35 +55,6 @@ const colorFormats: { value: ColorInputFormat; label: string }[] = [
   { value: "cmyk", label: "CMJN" },
 ];
 
-// Génère un aperçu PNG de la première page d'un PDF, entièrement côté
-// navigateur (canvas), pour les logos déposés uniquement en PDF. Best effort :
-// une erreur ici ne doit jamais empêcher l'ajout du logo.
-async function generatePdfPreview(file: File): Promise<Blob | null> {
-  try {
-    const pdfjsLib = await import("pdfjs-dist");
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 2 });
-
-    const canvas = document.createElement("canvas");
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    const context = canvas.getContext("2d");
-    if (!context) return null;
-
-    await page.render({ canvasContext: context, viewport }).promise;
-
-    return await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), "image/png");
-    });
-  } catch {
-    return null;
-  }
-}
-
 export function AssetUploadForm({
   projectId,
   type,
@@ -94,15 +68,28 @@ export function AssetUploadForm({
   const formRef = useRef<HTMLFormElement>(null);
   const wasPending = useRef(false);
   const [colorFormat, setColorFormat] = useState<ColorInputFormat>("hex");
+  const [fontFiles, setFontFiles] = useState<PendingFontFile[]>([]);
+  const weightsInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (wasPending.current && !pending && !state.error) {
       formRef.current?.reset();
       setColorFormat("hex");
+      setFontFiles([]);
       onSuccess?.();
     }
     wasPending.current = pending;
   }, [pending, state, onSuccess]);
+
+  // Pré-remplit "Graisses disponibles" avec les graisses détectées dans les
+  // fichiers joints, tout en laissant le champ modifiable à la main ensuite.
+  useEffect(() => {
+    if (fontFiles.length === 0 || !weightsInputRef.current) return;
+    const detected = fontFiles.filter((f) => !f.detecting).map((f) => f.weight);
+    if (detected.length > 0) {
+      weightsInputRef.current.value = detected.join(", ");
+    }
+  }, [fontFiles]);
 
   const isFile = FILE_TYPES.includes(type);
   const isTypography = type === "typographie";
@@ -113,6 +100,45 @@ export function AssetUploadForm({
   // formulaire, afin que la carte logo puisse afficher une image plutôt
   // qu'une icône PDF générique.
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    if (type === "typographie") {
+      if (fontFiles.length === 0) return; // rien à ajouter, soumission normale
+
+      e.preventDefault();
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+      fontFiles.forEach((entry, i) => {
+        formData.append(`font_file_${i}`, entry.file);
+        formData.append(`font_weight_${i}`, entry.weight || "Regular");
+      });
+
+      startTransition(() => {
+        formAction(formData);
+      });
+      return;
+    }
+
+    if (type === "guide") {
+      // Le guide est toujours un PDF : on génère systématiquement un aperçu
+      // de sa première page côté navigateur, comme pour un logo déposé
+      // uniquement en PDF.
+      const form = e.currentTarget;
+      const file = (form.elements.namedItem("file") as HTMLInputElement | null)?.files?.[0];
+      if (!file) return;
+
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      const previewBlob = await generatePdfPreview(file);
+      if (previewBlob) {
+        formData.append("pdf_preview_file", previewBlob, "preview.png");
+      }
+
+      startTransition(() => {
+        formAction(formData);
+      });
+      return;
+    }
+
     if (type !== "logo") return;
 
     const form = e.currentTarget;
@@ -228,23 +254,17 @@ export function AssetUploadForm({
             <input
               id="typographie-weights"
               name="weights"
+              ref={weightsInputRef}
               className={inputClass}
               placeholder="ex: Regular, SemiBold, Bold, Italic"
             />
           </div>
 
-          <div>
-            <label htmlFor="typographie-file" className={labelClass}>
-              Fichier de police (optionnel)
-            </label>
-            <input
-              id="typographie-file"
-              name="file"
-              type="file"
-              accept=".woff,.woff2,.ttf,.otf"
-              className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded-chip file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
-            />
-          </div>
+          <FontFilesField
+            entries={fontFiles}
+            onChange={setFontFiles}
+            idPrefix="typographie-add"
+          />
         </>
       ) : type === "logo" ? (
         <>
@@ -493,6 +513,20 @@ export function AssetUploadForm({
             </div>
           )}
         </>
+      ) : type === "guide" ? (
+        <div>
+          <label htmlFor="guide-file" className={labelClass}>
+            Fichier PDF *
+          </label>
+          <input
+            id="guide-file"
+            name="file"
+            type="file"
+            accept="application/pdf"
+            required
+            className={`${inputClass} file:mr-3 file:py-1 file:px-2 file:rounded-chip file:border-0 file:text-xs file:bg-white/65 file:text-ink-700`}
+          />
+        </div>
       ) : isFile ? (
         <div>
           <label htmlFor={`${type}-file`} className={labelClass}>

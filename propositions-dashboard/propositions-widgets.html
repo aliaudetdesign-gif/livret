@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Propositions dashboard — livret.</title>
+<style>
+  :root {
+    --shell: #f4f0ea;
+    --shell-deep: #ebe5dc;
+    --paper: #fbf9f6;
+    --line: #e4dfd7;
+
+    --ink-900: #17161a;
+    --ink-700: #3a3841;
+    --ink-500: #625e69;
+    --ink-400: #6e6975;
+
+    --clay-700: #9c4529;
+    --clay-600: #a64b2e;
+    --clay-500: #ba5636;
+    --clay-400: #da8664;
+    --clay-100: #f7dfd4;
+    --clay-glow: rgba(186, 86, 54, 0.3);
+
+    --sage: #5f6e52;
+    --sand: #d9b08c;
+    --bark: #8a6247;
+
+    --ok-600: #4e5c42;
+    --ok-100: #e6ebe0;
+    --err-600: #9e1c2f;
+    --err-100: #f9e1e3;
+    --warn-600: #8a5a12;
+    --warn-100: #f7e9cf;
+
+    --grad-clay: linear-gradient(135deg, var(--clay-500), var(--clay-600));
+
+    --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.4));
+    --glass-edge: rgba(255, 255, 255, 0.6);
+    --glass-blur: blur(34px) saturate(185%);
+    --glass-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.28),
+      0 20px 44px -20px rgba(52, 36, 26, 0.3),
+      0 3px 10px -3px rgba(52, 36, 26, 0.14);
+
+    --r-xl: 34px;
+    --r-lg: 28px;
+    --r-md: 20px;
+    --r-sm: 14px;
+    --r-xs: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    color: var(--ink-900);
+    background: var(--shell);
+    min-height: 100vh;
+  }
+
+  .mesh { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .mesh span { position: absolute; border-radius: 50%; filter: blur(120px); display: block; }
+  .mesh .b1 { width: 640px; height: 640px; background: var(--clay-400); top: -180px; left: -120px; opacity: .42; }
+  .mesh .b2 { width: 520px; height: 520px; background: var(--sand); top: 38%; right: -140px; opacity: .5; }
+  .mesh .b3 { width: 560px; height: 560px; background: var(--sage); bottom: -220px; left: 26%; opacity: .28; }
+
+  .glass {
+    position: relative;
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--r-md);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .page { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  .intro { margin-bottom: 20px; }
+  .intro h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 4px; }
+  .intro p { font-size: 13px; color: var(--ink-500); margin: 0; max-width: 560px; line-height: 1.5; }
+
+  .switcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .switcher button {
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-500);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .switcher button:hover { color: var(--ink-900); }
+  .switcher button.active {
+    background-image: var(--grad-clay);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 12px 26px -14px var(--clay-glow);
+  }
+
+  .model { display: none; }
+  .model.active { display: block; }
+
+  .model-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--clay-600); margin-bottom: 6px; }
+  .model-title { font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+  .model-desc { font-size: 12.5px; color: var(--ink-500); margin: 0 0 18px; max-width: 640px; line-height: 1.5; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+  .stat { padding: 19px; }
+  .stat-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+  .stat-label { font-size: 12.5px; font-weight: 500; color: var(--ink-700); max-width: 110px; line-height: 1.35; }
+  .stat-arrow { width: 28px; height: 28px; border-radius: 999px; background: rgba(23,22,26,.9); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; }
+  .stat-value { font-size: 34px; font-weight: 600; letter-spacing: -0.04em; line-height: 1; margin-bottom: 11px; }
+  .stat-trend { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--ok-600); background: var(--ok-100); border-radius: 999px; padding: 3.5px 10px; }
+
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .grid3 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .col-span-2 { grid-column: span 2; }
+
+  .card { padding: 19px; }
+  .card h2 { font-size: 12.5px; font-weight: 600; margin: 0 0 14px; }
+
+  /* --- Mini calendrier compact --- */
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cal-head strong { font-size: 12.5px; font-weight: 600; }
+  .cal-nav { display: flex; gap: 4px; }
+  .cal-nav button { width: 21px; height: 21px; border-radius: 999px; border: 1px solid var(--glass-edge); background: rgba(255,255,255,.6); color: var(--ink-500); font-size: 11px; cursor: default; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-grid .dow { text-align: center; font-size: 8.5px; font-weight: 600; text-transform: uppercase; color: var(--ink-400); padding-bottom: 4px; }
+  .cal-grid .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; border-radius: 8px; color: var(--ink-700); }
+  .cal-grid .day.today { background-image: var(--grad-clay); color: #fff; font-weight: 600; }
+  .cal-grid .day.empty { opacity: 0; }
+
+  /* --- Dernières activités --- */
+  .activity-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .activity-list li { display: flex; align-items: flex-start; gap: 10px; }
+  .activity-icon { width: 29px; height: 29px; border-radius: var(--r-xs); background: rgba(255,255,255,.65); border: 1px solid var(--glass-edge); color: var(--ink-500); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 600; margin-top: 2px; }
+  .activity-text { font-size: 12px; color: var(--ink-700); line-height: 1.4; }
+  .activity-meta { font-size: 10px; color: rgba(110,105,117,.8); margin-top: 2px; }
+  .activity-sub { font-size: 11px; color: var(--ink-400); }
+
+  /* --- Donut statut --- */
+  .donut-wrap { display: flex; align-items: center; gap: 18px; }
+  .donut { width: 92px; height: 92px; border-radius: 50%; flex-shrink: 0;
+    background: conic-gradient(var(--clay-500) 0% 55%, var(--warn-600) 55% 78%, var(--ok-600) 78% 100%); }
+  .donut-inner { width: 92px; height: 92px; border-radius: 50%; position: relative; }
+  .donut-hole { position: absolute; inset: 16px; border-radius: 50%; background: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; }
+  .legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--ink-700); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+
+  /* --- Bar chart activité --- */
+  .bars { display: flex; align-items: flex-end; gap: 7px; height: 90px; margin-bottom: 8px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 5px; }
+  .bar { width: 100%; border-radius: 6px 6px 3px 3px; background: linear-gradient(180deg, var(--clay-400), var(--clay-600)); }
+  .bar-day { font-size: 8.5px; color: var(--ink-400); text-transform: uppercase; }
+
+  /* --- Timeline échéances --- */
+  .timeline { position: relative; padding-left: 18px; display: flex; flex-direction: column; gap: 18px; }
+  .timeline::before { content: ""; position: absolute; left: 4px; top: 4px; bottom: 4px; width: 1.5px; background: var(--line); }
+  .timeline-item { position: relative; }
+  .timeline-item::before { content: ""; position: absolute; left: -18px; top: 3px; width: 9px; height: 9px; border-radius: 999px; background-image: var(--grad-clay); border: 2px solid var(--paper); }
+  .timeline-date { font-size: 10.5px; font-weight: 600; color: var(--clay-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  .timeline-name { font-size: 13px; font-weight: 600; }
+  .timeline-sub { font-size: 11px; color: var(--ink-500); }
+
+  /* --- Liste validation --- */
+  .validate-list { display: flex; flex-direction: column; gap: 10px; }
+  .validate-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm); background: rgba(255,255,255,.5); border: 1px solid var(--glass-edge); }
+  .validate-name { font-size: 12px; font-weight: 600; }
+  .validate-client { font-size: 10.5px; color: var(--ink-500); }
+  .badge-warn { font-size: 10px; font-weight: 600; color: var(--warn-600); background: var(--warn-100); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+
+  /* --- Kanban statuts --- */
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .kanban-col h3 { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-500); margin: 0 0 10px; display: flex; align-items: center; gap: 6px; }
+  .kanban-dot { width: 7px; height: 7px; border-radius: 999px; }
+  .kanban-card { background: rgba(255,255,255,.55); border: 1px solid var(--glass-edge); border-radius: var(--r-sm); padding: 10px 11px; font-size: 11.5px; font-weight: 600; margin-bottom: 8px; }
+  .kanban-card span { display: block; font-size: 10px; font-weight: 400; color: var(--ink-500); margin-top: 2px; }
+
+  /* --- Top clients --- */
+  .client-list { display: flex; flex-direction: column; gap: 12px; }
+  .client-item { display: flex; align-items: center; gap: 10px; }
+  .client-avatar { width: 30px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .client-name { font-size: 12px; font-weight: 600; }
+  .client-sub { font-size: 10.5px; color: var(--ink-500); }
+  .client-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--ink-500); }
+
+  .foot-note { font-size: 11.5px; color: var(--ink-400); margin-top: 4px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="mesh"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+
+<div class="page">
+
+  <div class="intro">
+    <h1>livret. — propositions de widgets dashboard</h1>
+    <p>Trois pistes, chacune ajoute un ou deux widgets différents autour de la même base (stats + calendrier compact + dernières activités). Prototype visuel non branché aux vraies données.</p>
+  </div>
+
+  <div class="switcher">
+    <button class="active" data-target="model-a">A — Data (statuts + activité)</button>
+    <button data-target="model-b">B — Échéances & validations</button>
+    <button data-target="model-c">C — Clients & suivi</button>
+  </div>
+
+  <!-- Stats communes -->
+  <div class="stats">
+    <div class="glass stat">
+      <div class="stat-top"><div class="stat-label">Projets actifs</div><div class="stat-arrow">↗</div></div>
+      <div class="stat-value">7</div>
+      <span class="stat-trend">↑ 2</span>
+    </div>
+    <div class="glass stat">
+      <div class="stat-top"><div class="stat-label">Clients totaux</div><div class="stat-arrow">↗</div></div>
+      <div class="stat-value">12</div>
+      <span class="stat-trend">↑ 1</span>
+    </div>
+    <div class="glass stat">
+      <div class="stat-top"><div class="stat-label">Projets totaux</div><div class="stat-arrow">↗</div></div>
+      <div class="stat-value">19</div>
+      <span class="stat-trend">↑ 3</span>
+    </div>
+    <div class="glass stat">
+      <div class="stat-top"><div class="stat-label">Nouveaux clients (30j)</div><div class="stat-arrow">↗</div></div>
+      <div class="stat-value">4</div>
+    </div>
+  </div>
+
+  <!-- ============ MODÈLE A ============ -->
+  <section id="model-a" class="model active">
+    <div class="model-label">Modèle A</div>
+    <h2 class="model-title">Orienté données</h2>
+    <p class="model-desc">Remplace une partie de l'espace par de la data-visualisation légère : répartition des projets par statut, et rythme d'activité de la semaine. Utile pour avoir un pouls du studio en un coup d'œil.</p>
+
+    <div class="grid4">
+      <div class="glass card">
+        <h2>Calendrier</h2>
+        <div class="cal-head"><strong>Août 2026</strong><div class="cal-nav"><button>‹</button><button>›</button></div></div>
+        <div class="cal-grid">
+          <div class="dow">L</div><div class="dow">M</div><div class="dow">M</div><div class="dow">J</div><div class="dow">V</div><div class="dow">S</div><div class="dow">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div>
+          <div class="day">1</div><div class="day">2</div><div class="day">3</div>
+          <div class="day today">4</div><div class="day">5</div><div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div>
+          <div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div>
+        </div>
+      </div>
+
+      <div class="glass card">
+        <h2>Répartition par statut</h2>
+        <div class="donut-wrap">
+          <div class="donut donut-inner"><div class="donut-hole">19</div></div>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--clay-500)"></span>En cours (55%)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--warn-600)"></span>À valider (23%)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--ok-600)"></span>Livrés (22%)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass card">
+        <h2>Dernières activités</h2>
+        <ul class="activity-list">
+          <li><div class="activity-icon">Aa</div><div><div class="activity-text">Téléchargement de Inter Variable</div><div class="activity-sub">chez Maison Verre</div><div class="activity-meta">Il y a 2h</div></div></li>
+          <li><div class="activity-icon">🎨</div><div><div class="activity-text">Téléchargement de Palette principale</div><div class="activity-sub">chez Studio Nord</div><div class="activity-meta">Hier</div></div></li>
+          <li><div class="activity-icon">🖼️</div><div><div class="activity-text">Téléchargement de Logo horizontal</div><div class="activity-sub">chez Maison Verre</div><div class="activity-meta">Il y a 2 jours</div></div></li>
+        </ul>
+      </div>
+
+      <div class="glass card">
+        <h2>Activité — 7 derniers jours</h2>
+        <div class="bars">
+          <div class="bar-col"><div class="bar" style="height:30%"></div></div>
+          <div class="bar-col"><div class="bar" style="height:55%"></div></div>
+          <div class="bar-col"><div class="bar" style="height:20%"></div></div>
+          <div class="bar-col"><div class="bar" style="height:75%"></div></div>
+          <div class="bar-col"><div class="bar" style="height:45%"></div></div>
+          <div class="bar-col"><div class="bar" style="height:90%"></div></div>
+          <div class="bar-col"><div class="bar" style="height:60%"></div></div>
+        </div>
+        <div class="bars" style="height:auto">
+          <div class="bar-col"><span class="bar-day">L</span></div>
+          <div class="bar-col"><span class="bar-day">M</span></div>
+          <div class="bar-col"><span class="bar-day">M</span></div>
+          <div class="bar-col"><span class="bar-day">J</span></div>
+          <div class="bar-col"><span class="bar-day">V</span></div>
+          <div class="bar-col"><span class="bar-day">S</span></div>
+          <div class="bar-col"><span class="bar-day">D</span></div>
+        </div>
+        <p class="foot-note">Nombre d'assets + messages ajoutés par jour.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODÈLE B ============ -->
+  <section id="model-b" class="model">
+    <div class="model-label">Modèle B</div>
+    <h2 class="model-title">Orienté échéances & validations</h2>
+    <p class="model-desc">Remplace la carte "Échéances proches" par une vraie timeline, et ajoute un widget "En attente de validation" pour voir d'un coup d'œil ce qui bloque côté client — un statut déjà existant dans l'app mais pas encore mis en avant sur le dashboard.</p>
+
+    <div class="grid3">
+      <div class="glass card">
+        <h2>Échéances à venir</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">12 août</div>
+            <div class="timeline-name">Maison Verre</div>
+            <div class="timeline-sub">Fin de projet</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">21 août</div>
+            <div class="timeline-name">Studio Nord</div>
+            <div class="timeline-sub">Fin de projet</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2 septembre</div>
+            <div class="timeline-name">Atelier Lin</div>
+            <div class="timeline-sub">Fin de projet</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass card">
+        <h2>En attente de validation</h2>
+        <div class="validate-list">
+          <div class="validate-item">
+            <div><div class="validate-name">Studio Nord</div><div class="validate-client">Palette + typo</div></div>
+            <span class="badge-warn">À valider</span>
+          </div>
+          <div class="validate-item">
+            <div><div class="validate-name">Atelier Lin</div><div class="validate-client">Logo v2</div></div>
+            <span class="badge-warn">À valider</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid4">
+      <div class="glass card">
+        <h2>Calendrier</h2>
+        <div class="cal-head"><strong>Août 2026</strong><div class="cal-nav"><button>‹</button><button>›</button></div></div>
+        <div class="cal-grid">
+          <div class="dow">L</div><div class="dow">M</div><div class="dow">M</div><div class="dow">J</div><div class="dow">V</div><div class="dow">S</div><div class="dow">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div>
+          <div class="day">1</div><div class="day">2</div><div class="day">3</div>
+          <div class="day today">4</div><div class="day">5</div><div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div>
+          <div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div>
+        </div>
+      </div>
+
+      <div class="glass card col-span-2">
+        <h2>Dernières activités</h2>
+        <ul class="activity-list">
+          <li><div class="activity-icon">Aa</div><div><div class="activity-text">Téléchargement de Inter Variable</div><div class="activity-sub">chez Maison Verre</div><div class="activity-meta">Il y a 2h</div></div></li>
+          <li><div class="activity-icon">🎨</div><div><div class="activity-text">Téléchargement de Palette principale</div><div class="activity-sub">chez Studio Nord</div><div class="activity-meta">Hier</div></div></li>
+          <li><div class="activity-icon">🖼️</div><div><div class="activity-text">Téléchargement de Logo horizontal</div><div class="activity-sub">chez Maison Verre</div><div class="activity-meta">Il y a 2 jours</div></div></li>
+        </ul>
+      </div>
+
+      <div class="glass card">
+        <h2>Messagerie</h2>
+        <div class="client-list">
+          <div class="client-item">
+            <div class="client-avatar" style="background:var(--clay-500)">SN</div>
+            <div><div class="client-name">Studio Nord</div><div class="client-sub">On valide la palette !</div></div>
+          </div>
+          <div class="client-item">
+            <div class="client-avatar" style="background:var(--sage)">AL</div>
+            <div><div class="client-name">Atelier Lin</div><div class="client-sub">Petite question sur le logo</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODÈLE C ============ -->
+  <section id="model-c" class="model">
+    <div class="model-label">Modèle C</div>
+    <h2 class="model-title">Orienté clients & suivi</h2>
+    <p class="model-desc">Ajoute un board "Projets par statut" en 3 colonnes (vue d'ensemble façon kanban) et un widget "Clients les plus actifs" — utile pour repérer qui avance vite et qui est silencieux depuis un moment.</p>
+
+    <div class="glass card" style="margin-bottom: 14px;">
+      <h2>Projets par statut</h2>
+      <div class="kanban">
+        <div class="kanban-col">
+          <h3><span class="kanban-dot" style="background:var(--clay-500)"></span>En cours (4)</h3>
+          <div class="kanban-card">Maison Verre<span>Branding complet</span></div>
+          <div class="kanban-card">Café Basalte<span>Identité + packaging</span></div>
+        </div>
+        <div class="kanban-col">
+          <h3><span class="kanban-dot" style="background:var(--warn-600)"></span>À valider (2)</h3>
+          <div class="kanban-card">Studio Nord<span>Palette + typo</span></div>
+          <div class="kanban-card">Atelier Lin<span>Logo v2</span></div>
+        </div>
+        <div class="kanban-col">
+          <h3><span class="kanban-dot" style="background:var(--ok-600)"></span>Livrés (1)</h3>
+          <div class="kanban-card">Papier Ocre<span>Logo + charte</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid4">
+      <div class="glass card">
+        <h2>Calendrier</h2>
+        <div class="cal-head"><strong>Août 2026</strong><div class="cal-nav"><button>‹</button><button>›</button></div></div>
+        <div class="cal-grid">
+          <div class="dow">L</div><div class="dow">M</div><div class="dow">M</div><div class="dow">J</div><div class="dow">V</div><div class="dow">S</div><div class="dow">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div>
+          <div class="day">1</div><div class="day">2</div><div class="day">3</div>
+          <div class="day today">4</div><div class="day">5</div><div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div>
+          <div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div>
+        </div>
+      </div>
+
+      <div class="glass card">
+        <h2>Clients les plus actifs</h2>
+        <div class="client-list">
+          <div class="client-item">
+            <div class="client-avatar" style="background:var(--clay-500)">MV</div>
+            <div><div class="client-name">Maison Verre</div><div class="client-sub">Dernière visite hier</div></div>
+            <div class="client-count">3 proj.</div>
+          </div>
+          <div class="client-item">
+            <div class="client-avatar" style="background:var(--sage)">SN</div>
+            <div><div class="client-name">Studio Nord</div><div class="client-sub">Dernière visite il y a 3j</div></div>
+            <div class="client-count">2 proj.</div>
+          </div>
+          <div class="client-item">
+            <div class="client-avatar" style="background:var(--bark)">CB</div>
+            <div><div class="client-name">Café Basalte</div><div class="client-sub">Dernière visite il y a 6j</div></div>
+            <div class="client-count">1 proj.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass card">
+        <h2>Dernières activités</h2>
+        <ul class="activity-list">
+          <li><div class="activity-icon">Aa</div><div><div class="activity-text">Téléchargement de Inter Variable</div><div class="activity-sub">chez Maison Verre</div><div class="activity-meta">Il y a 2h</div></div></li>
+          <li><div class="activity-icon">🎨</div><div><div class="activity-text">Téléchargement de Palette principale</div><div class="activity-sub">chez Studio Nord</div><div class="activity-meta">Hier</div></div></li>
+        </ul>
+      </div>
+
+      <div class="glass card">
+        <h2>Messagerie</h2>
+        <div class="client-list">
+          <div class="client-item">
+            <div class="client-avatar" style="background:var(--clay-500)">SN</div>
+            <div><div class="client-name">Studio Nord</div><div class="client-sub">On valide la palette !</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  document.querySelectorAll(".switcher button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".switcher button").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".model").forEach((m) => m.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.target).classList.add("active");
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ import {
 } from "@/app/agence/projets/[id]/actions";
 import { COLOR_FORMAT_DESCRIPTIONS, type BrandAsset, type ColorCategory, type ColorInputFormat, type ColorMetadata } from "@/lib/types";
 import { InfoPopover } from "@/components/InfoPopover";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 const initialState: AssetActionState = { error: null };
 
@@ -55,6 +56,7 @@ export function ColorCard({
 
   const [isDeleting, startTransition] = useTransition();
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (wasPending.current && !pending && !state.error) {
@@ -71,11 +73,11 @@ export function ColorCard({
 
   function handleDelete() {
     if (!projectId) return;
-    const confirmed = window.confirm(
-      `Supprimer "${asset.label}" ? Cette action est irréversible.`
-    );
-    if (!confirmed) return;
+    setConfirmOpen(true);
+  }
 
+  function runDelete() {
+    if (!projectId) return;
     setDeleteError(null);
     startTransition(async () => {
       try {
@@ -84,6 +86,7 @@ export function ColorCard({
       } catch {
         setDeleteError("Une erreur est survenue, réessaie.");
       }
+      setConfirmOpen(false);
     });
   }
 
@@ -282,17 +285,17 @@ export function ColorCard({
         ) : (
           <>
             <div className="font-semibold text-[13.5px]">{asset.label}</div>
-            <div className="text-xs text-ink-500 mt-1 flex items-center">
+            <div className="text-xs text-ink-500 mt-1 flex items-center flex-wrap gap-y-1">
               {copied ? "Copié !" : asset.value}
               {!copied && <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.hex} />}
             </div>
             {metadata && (
               <div className="text-[11px] text-ink-400 mt-1 leading-relaxed">
-                <div className="flex items-center">
+                <div className="flex items-center flex-wrap gap-y-1">
                   RGB {metadata.rgb.r}, {metadata.rgb.g}, {metadata.rgb.b}
                   <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.rgb} />
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center flex-wrap gap-y-1">
                   CMJN {metadata.cmyk.c}, {metadata.cmyk.m}, {metadata.cmyk.y}, {metadata.cmyk.k}
                   <InfoPopover text={COLOR_FORMAT_DESCRIPTIONS.cmyk} />
                 </div>
@@ -303,6 +306,15 @@ export function ColorCard({
 
         {deleteError && <p className="text-xs text-err-600 mt-2">{deleteError}</p>}
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Supprimer "${asset.label}" ?`}
+        message="Récupérable depuis la Corbeille en cas d'erreur."
+        pending={isDeleting}
+        onConfirm={runDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>livret. — Templates de section (exploration)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   EXPLORATION — TEMPLATES DE SECTION "COMPLÉMENTS"
+   Objectif : montrer à quoi pourraient ressembler des sections
+   spécialisées (vidéos, écrans Figma, mockups...) au lieu de la
+   grille générique de fichiers actuelle. Repose sur les tokens
+   réels de app/globals.css (charte liquid glass, proposition A).
+   Fichier statique, aucune donnée réelle, à parcourir dans un
+   navigateur pour choisir une direction avant implémentation.
+   ============================================================ */
+
+:root{
+  --shell:      #F4F0EA;
+  --shell-deep: #EBE5DC;
+  --paper:      #FBF9F6;
+  --line:       #E4DFD7;
+  --ink-900:    #17161A;
+  --ink-700:    #3A3841;
+  --ink-500:    #625E69;
+  --ink-400:    #6E6975;
+
+  --clay-700:   #9C4529;
+  --clay-600:   #A64B2E;
+  --clay-500:   #BA5636;
+  --clay-400:   #DA8664;
+  --clay-100:   #F7DFD4;
+  --clay-glow:  rgba(186, 86, 54, .30);
+
+  --sage:       #5F6E52;
+  --sand:       #D9B08C;
+  --bark:       #8A6247;
+
+  --ok-600:     #4E5C42;
+  --ok-100:     #E6EBE0;
+
+  --grad-clay:  linear-gradient(135deg, var(--clay-500), var(--clay-600));
+
+  --glass-fill:   linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.40));
+  --glass-edge:   rgba(255,255,255,.60);
+  --glass-blur:   blur(34px) saturate(185%);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255,255,255,.85),
+    inset 0 -1px 0 rgba(255,255,255,.28),
+    0 20px 44px -20px rgba(52,36,26,.30),
+    0 3px 10px -3px rgba(52,36,26,.14);
+
+  --r-xl: 34px;
+  --r-lg: 28px;
+  --r-md: 20px;
+  --r-sm: 14px;
+  --r-xs: 10px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--ink-900);
+  background:var(--shell);
+  -webkit-font-smoothing:antialiased;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.mesh{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.mesh span{position:absolute;border-radius:50%;filter:blur(120px);display:block}
+.mesh .b1{width:640px;height:640px;background:var(--clay-400);top:-180px;left:-120px;opacity:.42}
+.mesh .b2{width:520px;height:520px;background:var(--sand);top:38%;right:-140px;opacity:.50}
+.mesh .b3{width:560px;height:560px;background:var(--sage);bottom:-220px;left:26%;opacity:.28}
+.mesh .b4{width:400px;height:400px;background:var(--clay-500);bottom:12%;right:22%;opacity:.20}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.32;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}
+
+.glass{
+  position:relative;
+  background:var(--glass-fill);
+  -webkit-backdrop-filter:var(--glass-blur);
+  backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-edge);
+  border-radius:var(--r-md);
+  box-shadow:var(--glass-shadow);
+}
+.glass::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.50) 0%,rgba(255,255,255,0) 42%);
+}
+.glass>*{position:relative;z-index:1}
+
+.wrap{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:56px 24px 120px}
+
+/* --- Intro --- */
+.intro{margin-bottom:56px}
+.intro .kicker{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.13em;color:var(--clay-600);margin-bottom:10px}
+.intro h1{font-size:30px;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+.intro p{color:var(--ink-500);max-width:640px;margin-bottom:22px}
+.toc{display:flex;flex-wrap:wrap;gap:8px}
+.toc a{
+  font-size:12.5px;font-weight:500;color:var(--ink-700);text-decoration:none;
+  padding:8px 14px;border-radius:999px;border:1px solid var(--glass-edge);
+  background:rgba(255,255,255,.4);transition:.2s ease;
+}
+.toc a:hover{background:var(--grad-clay);color:#fff;border-color:transparent}
+
+/* --- Bloc "section" (reprend le pattern réel : icône + titre + badge + pill) --- */
+.tpl{margin-bottom:64px;scroll-margin-top:24px}
+.tpl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.tpl-head-left{display:flex;align-items:center;gap:10px}
+.tpl-icon{
+  width:34px;height:34px;border-radius:var(--r-xs);display:flex;align-items:center;justify-content:center;
+  font-size:16px;background:var(--glass-fill);border:1px solid var(--glass-edge);
+}
+.tpl-title{font-size:15px;font-weight:600}
+.tpl-badge{
+  font-size:11px;font-weight:600;color:var(--ink-500);background:var(--paper);
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px;margin-left:6px;
+}
+.tpl-note{font-size:12.5px;color:var(--ink-400);margin-top:2px}
+.pill{
+  font-size:12.5px;font-weight:600;color:#fff;background-image:var(--grad-clay);
+  border:0;border-radius:999px;padding:9px 16px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.32), 0 12px 26px -14px var(--clay-glow);
+}
+
+.hover-lift{transition:transform .2s ease, box-shadow .2s ease}
+.hover-lift:hover{transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.85), 0 26px 52px -22px rgba(52,36,26,.34), 0 4px 12px -4px var(--clay-glow)}
+
+/* ============================================================
+   1. VIDÉOS
+   ============================================================ */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.video-card{padding:12px}
+.video-thumb{
+  position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.video-thumb.v1{background:linear-gradient(135deg,var(--clay-400),var(--clay-600))}
+.video-thumb.v2{background:linear-gradient(135deg,var(--sage),#3f4a37)}
+.video-thumb.v3{background:linear-gradient(135deg,var(--sand),var(--bark))}
+.play-btn{
+  width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -8px rgba(0,0,0,.4);
+}
+.play-btn::after{content:'';border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent var(--ink-900);margin-left:3px}
+.video-duration{
+  position:absolute;bottom:8px;right:8px;font:600 11px/1 'Geist Mono',monospace;color:#fff;
+  background:rgba(0,0,0,.55);padding:3px 6px;border-radius:6px;
+}
+.video-title{font-size:13px;font-weight:600}
+.video-sub{font-size:11.5px;color:var(--ink-400);margin-top:2px}
+
+/* ============================================================
+   2. EXTRAITS D'INTERFACES FIGMA
+   ============================================================ */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.figma-card{padding:0;overflow:hidden}
+.figma-chrome{
+  display:flex;align-items:center;gap:5px;padding:9px 11px;
+  background:rgba(255,255,255,.5);border-bottom:1px solid var(--glass-edge);
+}
+.figma-chrome span{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.figma-body{aspect-ratio:9/13;background:var(--paper);padding:10px;display:flex;flex-direction:column;gap:6px}
+.figma-nav{height:14px;border-radius:5px;background:var(--clay-100);width:60%}
+.figma-hero{height:34%;border-radius:8px;background:linear-gradient(135deg,var(--clay-400),var(--sand))}
+.figma-row{display:flex;gap:6px;flex:1}
+.figma-row div{flex:1;border-radius:6px;background:var(--shell-deep)}
+.figma-label{padding:10px 12px 12px}
+.figma-name{font-size:12.5px;font-weight:600}
+.figma-tag{font-size:10.5px;color:var(--ink-400);margin-top:1px}
+
+/* ============================================================
+   3. MOCKUPS PRODUIT
+   ============================================================ */
+.grid-mockups{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:end}
+.mock-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:22px 16px}
+.device-phone{
+  width:100px;height:200px;border-radius:22px;background:var(--ink-900);padding:7px;box-shadow:0 20px 40px -18px rgba(23,22,26,.4);
+}
+.device-phone .screen{width:100%;height:100%;border-radius:16px;background:linear-gradient(160deg,var(--clay-400),var(--clay-600));position:relative;overflow:hidden}
+.device-phone .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:36px;height:14px;background:var(--ink-900);border-radius:0 0 10px 10px}
+.device-laptop{width:220px}
+.device-laptop .lid{
+  background:var(--ink-900);border-radius:10px 10px 0 0;padding:8px 8px 0;
+}
+.device-laptop .lid-chrome{display:flex;gap:4px;padding-bottom:6px}
+.device-laptop .lid-chrome span{width:5px;height:5px;border-radius:50%;background:#5a5860}
+.device-laptop .lid .screen{aspect-ratio:16/10;border-radius:4px 4px 0 0;background:linear-gradient(150deg,var(--sage),#3a4433)}
+.device-laptop .base{height:9px;background:#2a2930;border-radius:0 0 6px 6px;position:relative}
+.device-laptop .base::after{content:'';position:absolute;left:50%;top:0;transform:translateX(-50%);width:44px;height:9px;background:#3a3841;border-radius:0 0 4px 4px}
+.device-tablet{width:130px;height:174px;border-radius:16px;background:var(--ink-900);padding:8px}
+.device-tablet .screen{width:100%;height:100%;border-radius:9px;background:linear-gradient(150deg,var(--sand),var(--bark))}
+.mock-label{font-size:12.5px;font-weight:600;text-align:center}
+
+/* ============================================================
+   4. AVANT / APRÈS
+   ============================================================ */
+.compare-card{padding:0;overflow:hidden}
+.compare-strip{display:flex;height:220px}
+.compare-half{flex:1;position:relative;display:flex;align-items:flex-end;padding:16px}
+.compare-half.before{background:linear-gradient(160deg,#c9c2b6,#a9a196)}
+.compare-half.after{background:linear-gradient(160deg,var(--clay-400),var(--clay-700))}
+.compare-tag{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fff;
+  background:rgba(0,0,0,.28);padding:4px 10px;border-radius:999px;
+}
+.compare-handle{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:36px;height:36px;border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-700);
+  box-shadow:0 8px 20px -8px rgba(0,0,0,.35);
+}
+
+/* ============================================================
+   5. ÉTAPES DU PROCESS
+   ============================================================ */
+.timeline-card{padding:32px 28px}
+.timeline{display:flex;align-items:flex-start;justify-content:space-between;position:relative}
+.timeline::before{
+  content:'';position:absolute;top:17px;left:34px;right:34px;height:2px;background:var(--line);
+}
+.tl-step{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;width:100px}
+.tl-dot{
+  width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font:600 12px/1 'Geist',sans-serif;background:var(--paper);border:2px solid var(--line);color:var(--ink-400);
+  position:relative;z-index:1;
+}
+.tl-step.done .tl-dot{background-image:var(--grad-clay);border-color:transparent;color:#fff}
+.tl-step.current .tl-dot{border-color:var(--clay-500);color:var(--clay-600);background:#fff}
+.tl-label{font-size:12px;font-weight:600;text-align:center}
+.tl-date{font-size:10.5px;color:var(--ink-400)}
+
+@media (max-width: 860px){
+  .grid-3,.grid-4,.grid-mockups{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="mesh"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span></div>
+<div class="grain"></div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <div class="kicker">livret. — exploration</div>
+    <h1>Templates de section « Compléments »</h1>
+    <p>
+      Cinq exemples de mise en forme pour des sections spécialisées, à la place
+      de la grille de fichiers générique actuelle. Aucune donnée réelle : c'est
+      un support pour choisir une direction avant de coder quoi que ce soit.
+    </p>
+    <div class="toc">
+      <a href="#videos">Vidéos</a>
+      <a href="#figma">Extraits Figma</a>
+      <a href="#mockups">Mockups produit</a>
+      <a href="#compare">Avant / Après</a>
+      <a href="#timeline">Étapes du process</a>
+    </div>
+  </div>
+
+  <!-- 1. VIDÉOS -->
+  <div class="tpl" id="videos">
+    <div class="tpl-head">
+      <div class="tpl-head-left">
+        <div class="tpl-icon">🎬</div>
+        <div>
+          <div class="tpl-title">Vidéos <span class="tpl-badge">3</span></div>
+          <div class="tpl-note">Miniature 16:9, lecture au clic, durée affichée</div>
+        </div>
+      </div>
+      <button class="pill">+ Ajouter une vidéo</button>
+    </div>
+    <div class="grid-3">
+      <div class="glass video-card hover-lift">
+        <div class="video-thumb v1"><div class="play-btn"></div><span class="video-duration">1:24</span></div>
+        <div class="video-title">Teaser de marque</div>
+        <div class="video-sub">Ajoutée le 12 juin</div>
+      </div>
+      <div class="glass video-card hover-lift">
+        <div class="video-thumb v2"><div class="play-btn"></div><span class="video-duration">0:45</span></div>
+        <div class="video-title">Motion du logo</div>
+        <div class="video-sub">Ajoutée le 14 juin</div>
+      </div>
+      <div class="glass video-card hover-lift">
+        <div class="video-thumb v3"><div class="play-btn"></div><span class="video-duration">2:10</span></div>
+        <div class="video-title">Making-of tournage</div>
+        <div class="video-sub">Ajoutée le 20 juin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. EXTRAITS D'INTERFACES FIGMA -->
+  <div class="tpl" id="figma">
+    <div class="tpl-head">
+      <div class="tpl-head-left">
+        <div class="tpl-icon">🖥️</div>
+        <div>
+          <div class="tpl-title">Interfaces Figma <span class="tpl-badge">4</span></div>
+          <div class="tpl-note">Écran présenté dans un cadre navigateur, nom + statut</div>
+        </div>
+      </div>
+      <button class="pill">+ Ajouter un écran</button>
+    </div>
+    <div class="grid-4">
+      <div class="glass figma-card hover-lift">
+        <div class="figma-chrome"><span></span><span></span><span></span></div>
+        <div class="figma-body"><div class="figma-nav"></div><div class="figma-hero"></div><div class="figma-row"><div></div><div></div><div></div></div></div>
+        <div class="figma-label"><div class="figma-name">Écran d'accueil</div><div class="figma-tag">Version 3</div></div>
+      </div>
+      <div class="glass figma-card hover-lift">
+        <div class="figma-chrome"><span></span><span></span><span></span></div>
+        <div class="figma-body"><div class="figma-nav"></div><div class="figma-hero" style="background:linear-gradient(135deg,var(--sage),var(--sand))"></div><div class="figma-row"><div></div><div></div></div></div>
+        <div class="figma-label"><div class="figma-name">Fiche produit</div><div class="figma-tag">Version 2</div></div>
+      </div>
+      <div class="glass figma-card hover-lift">
+        <div class="figma-chrome"><span></span><span></span><span></span></div>
+        <div class="figma-body"><div class="figma-nav"></div><div class="figma-hero" style="background:linear-gradient(135deg,var(--bark),var(--clay-600))"></div><div class="figma-row"><div></div><div></div><div></div></div></div>
+        <div class="figma-label"><div class="figma-name">Panier</div><div class="figma-tag">Version 1</div></div>
+      </div>
+      <div class="glass figma-card hover-lift">
+        <div class="figma-chrome"><span></span><span></span><span></span></div>
+        <div class="figma-body"><div class="figma-nav"></div><div class="figma-hero" style="background:linear-gradient(135deg,var(--clay-400),var(--bark))"></div><div class="figma-row"><div></div></div></div>
+        <div class="figma-label"><div class="figma-name">Confirmation</div><div class="figma-tag">Version 1</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MOCKUPS PRODUIT -->
+  <div class="tpl" id="mockups">
+    <div class="tpl-head">
+      <div class="tpl-head-left">
+        <div class="tpl-icon">📱</div>
+        <div>
+          <div class="tpl-title">Mockups produit <span class="tpl-badge">3</span></div>
+          <div class="tpl-note">Le design présenté dans un cadre d'appareil plutôt qu'à plat</div>
+        </div>
+      </div>
+      <button class="pill">+ Ajouter un mockup</button>
+    </div>
+    <div class="glass grid-mockups">
+      <div class="mock-card">
+        <div class="device-phone"><div class="screen"><div class="notch"></div></div></div>
+        <div class="mock-label">Application mobile</div>
+      </div>
+      <div class="mock-card">
+        <div class="device-laptop">
+          <div class="lid"><div class="lid-chrome"><span></span><span></span><span></span></div><div class="screen"></div></div>
+          <div class="base"></div>
+        </div>
+        <div class="mock-label">Site vitrine</div>
+      </div>
+      <div class="mock-card">
+        <div class="device-tablet"><div class="screen"></div></div>
+        <div class="mock-label">Présentation client</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. AVANT / APRÈS -->
+  <div class="tpl" id="compare">
+    <div class="tpl-head">
+      <div class="tpl-head-left">
+        <div class="tpl-icon">↔️</div>
+        <div>
+          <div class="tpl-title">Avant / Après</div>
+          <div class="tpl-note">Utile pour un rebranding : ancienne identité vs nouvelle</div>
+        </div>
+      </div>
+      <button class="pill">+ Ajouter une comparaison</button>
+    </div>
+    <div class="glass compare-card hover-lift">
+      <div class="compare-strip">
+        <div class="compare-half before"><span class="compare-tag">Avant</span></div>
+        <div class="compare-half after"><span class="compare-tag">Après</span></div>
+        <div class="compare-handle">⟷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ÉTAPES DU PROCESS -->
+  <div class="tpl" id="timeline">
+    <div class="tpl-head">
+      <div class="tpl-head-left">
+        <div class="tpl-icon">🧭</div>
+        <div>
+          <div class="tpl-title">Étapes du process</div>
+          <div class="tpl-note">Frise chronologique des grandes phases du projet, avec repères visuels</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass timeline-card">
+      <div class="timeline">
+        <div class="tl-step done"><div class="tl-dot">✓</div><div class="tl-label">Recherche</div><div class="tl-date">3 juin</div></div>
+        <div class="tl-step done"><div class="tl-dot">✓</div><div class="tl-label">Moodboard</div><div class="tl-date">10 juin</div></div>
+        <div class="tl-step current"><div class="tl-dot">3</div><div class="tl-label">Direction<br>artistique</div><div class="tl-date">en cours</div></div>
+        <div class="tl-step"><div class="tl-dot">4</div><div class="tl-label">Maquettes</div><div class="tl-date">à venir</div></div>
+        <div class="tl-step"><div class="tl-dot">5</div><div class="tl-label">Livraison</div><div class="tl-date">à venir</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ import {
   removeProjectClientInvite,
   type ProjectClientInviteActionState,
 } from "@/app/agence/projets/[id]/actions";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { ProjectClientInvite } from "@/lib/types";
 import { formatShortDate } from "@/lib/format";
 
@@ -34,11 +35,13 @@ function InviteRow({
 }) {
   const [isDeleting, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   function handleRemove() {
-    const confirmed = window.confirm(`Retirer l'invitation de ${invite.email} ?`);
-    if (!confirmed) return;
+    setConfirmOpen(true);
+  }
 
+  function runRemove() {
     setError(null);
     startTransition(async () => {
       try {
@@ -47,6 +50,7 @@ function InviteRow({
       } catch {
         setError("Une erreur est survenue, réessaie.");
       }
+      setConfirmOpen(false);
     });
   }
 
@@ -74,6 +78,15 @@ function InviteRow({
           ✕
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Retirer l'invitation de ${invite.email} ?`}
+        message="Cette action est irréversible."
+        pending={isDeleting}
+        onConfirm={runRemove}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

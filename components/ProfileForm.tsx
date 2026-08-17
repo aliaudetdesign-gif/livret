@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
-import { updateProfile, uploadAvatar, type ProfileActionState } from "@/app/profil/actions";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { signOut, updateProfile, uploadAvatar, type ProfileActionState } from "@/app/profil/actions";
 
 const initialState: ProfileActionState = { error: null };
 
@@ -22,9 +22,16 @@ export function ProfileForm({
 }) {
   const [profileState, profileAction, profilePending] = useActionState(updateProfile, initialState);
   const [avatarState, avatarAction, avatarPending] = useActionState(uploadAvatar, initialState);
+  const [isSigningOut, startSignOutTransition] = useTransition();
 
   const wasPending = useRef(false);
   const [saved, setSaved] = useState(false);
+
+  function handleSignOut() {
+    startSignOutTransition(async () => {
+      await signOut();
+    });
+  }
 
   const avatarFormRef = useRef<HTMLFormElement>(null);
   const [preview, setPreview] = useState<string | null>(avatarUrl);
@@ -58,6 +65,12 @@ export function ProfileForm({
       canvas.height = height;
       const ctx = canvas.getContext("2d");
       if (!ctx) return file;
+
+      // Fond blanc par défaut : si la source a un fond transparent (PNG),
+      // on l'aplati sur du blanc plutôt que de laisser la transparence
+      // (qui donnerait un damier ou du noir selon l'affichage).
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
 
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
@@ -155,6 +168,17 @@ export function ProfileForm({
           {saved && <span className="text-sm text-ok-600">Enregistré.</span>}
         </div>
       </form>
+
+      <div className="pt-6 border-t border-white/50">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+          className="text-sm font-medium text-err-600 hover:underline disabled:opacity-60 disabled:cursor-wait"
+        >
+          {isSigningOut ? "Déconnexion..." : "Se déconnecter"}
+        </button>
+      </div>
     </div>
   );
 }

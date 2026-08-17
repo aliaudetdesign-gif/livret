@@ -3,6 +3,7 @@ import type { Project, Message } from "@/lib/types";
 import { MessagerieSearch } from "@/components/MessagerieSearch";
 import { NewDiscussionButton } from "@/components/NewDiscussionButton";
 import { DiscussionRow } from "@/components/DiscussionRow";
+import { getDemoScope } from "@/lib/demoMode";
 
 type Discussion = {
   project: Project;
@@ -17,14 +18,20 @@ export default async function MessagerieAgencePage({
 }) {
   const { q = "" } = await searchParams;
   const supabase = await createClient();
+  const scope = await getDemoScope();
 
   const [{ data: projects }, { data: messages }] = await Promise.all([
     supabase
       .from("projects")
       .select("*")
       .is("deleted_at", null)
+      .eq("is_demo", scope)
       .order("created_at", { ascending: false }),
-    supabase.from("messages").select("*").order("created_at", { ascending: true }),
+    supabase
+      .from("messages")
+      .select("*, projects!inner(is_demo)")
+      .eq("projects.is_demo", scope)
+      .order("created_at", { ascending: true }),
   ]);
 
   const allProjects = (projects ?? []) as Project[];

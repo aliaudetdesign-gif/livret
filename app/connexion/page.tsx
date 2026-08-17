@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { login, type LoginActionState } from "./actions";
+import { login, loginAsDemo, type LoginActionState } from "./actions";
 
 const initialState: LoginActionState = { error: null };
 
@@ -57,6 +57,15 @@ export default function ConnexionPage() {
             className="btn-clay mt-2 py-2.5 text-sm font-semibold disabled:opacity-60"
           >
             {pending ? "Connexion..." : "Se connecter"}
+          </button>
+        </form>
+
+        <form action={loginAsDemo}>
+          <button
+            type="submit"
+            className="w-full mt-2.5 py-2.5 text-sm font-medium text-ink-700 rounded-field border border-white/60 bg-white/40 hover:bg-white/70 transition-colors"
+          >
+            Voir la démo
           </button>
         </form>
       </div>

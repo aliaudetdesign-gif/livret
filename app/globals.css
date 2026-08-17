@@ -244,9 +244,17 @@ body {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 42%);
 }
 
-.glass > * {
-  position: relative;
-  z-index: 1;
+/* Dans une couche Tailwind (@layer base) : sans ça, cette règle non-layée
+   l'emporterait toujours sur les utilitaires Tailwind (.absolute, .fixed...)
+   quelle que soit la spécificité, à cause de l'ordre des cascade layers. Bug
+   réel constaté : les icônes crayon/croix (position absolute, enfants directs
+   de .glass) se retrouvaient forcées en position:relative et s'affichaient
+   donc en haut à gauche du bloc, quelle que soit la classe right-3 posée. */
+@layer base {
+  .glass > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .glass-soft {
@@ -346,6 +354,46 @@ body {
   .btn-clay:hover,
   .hover-lift:hover {
     transform: none;
+  }
+}
+
+/* Animations d'entrée pour les menus/popovers/modales à rendu conditionnel
+   ({open && (...)}). Le montage du noeud déclenche l'animation CSS : pas
+   besoin d'état de sortie, on accepte juste une disparition instantanée à la
+   fermeture (l'apparition est ce qui compte pour la fluidité perçue). */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.16s ease-out;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-pop-in {
+    animation: none;
   }
 }
 

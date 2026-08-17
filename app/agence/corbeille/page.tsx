@@ -1,8 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { TrashList, type TrashEntry } from "@/components/TrashList";
+import { purgeExpiredTrash } from "./actions";
+import { TRASH_RETENTION_DAYS } from "@/lib/trash";
+import { getDemoScope } from "@/lib/demoMode";
 
 export default async function CorbeillePage() {
+  // Nettoyage paresseux : purge tout élément au-delà du délai de rétention
+  // avant de lire la corbeille, faute de tâche planifiée côté serveur.
+  await purgeExpiredTrash();
+
   const supabase = await createClient();
+  const scope = await getDemoScope();
 
   const [
     { data: brandAssets },
@@ -13,21 +21,29 @@ export default async function CorbeillePage() {
   ] = await Promise.all([
     supabase
       .from("brand_assets")
-      .select("*, projects(id, name)")
-      .not("deleted_at", "is", null),
+      .select("*, projects!inner(id, name)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope),
     supabase
       .from("project_documents")
-      .select("*, projects(id, name)")
-      .not("deleted_at", "is", null),
+      .select("*, projects!inner(id, name)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope),
     supabase
       .from("project_sections")
-      .select("*, section_types(label), projects(id, name)")
-      .not("deleted_at", "is", null),
+      .select("*, section_types(label), projects!inner(id, name)")
+      .not("deleted_at", "is", null)
+      .eq("projects.is_demo", scope),
     supabase
       .from("section_assets")
-      .select("*, project_sections(deleted_at, projects(id, name))")
-      .not("deleted_at", "is", null),
-    supabase.from("projects").select("id, name, deleted_at").not("deleted_at", "is", null),
+      .select("*, project_sections!inner(deleted_at, projects!inner(id, name))")
+      .not("deleted_at", "is", null)
+      .eq("project_sections.projects.is_demo", scope),
+    supabase
+      .from("projects")
+      .select("id, name, deleted_at")
+      .not("deleted_at", "is", null)
+      .eq("is_demo", scope),
   ]);
 
   const entries: TrashEntry[] = [
@@ -89,7 +105,8 @@ export default async function CorbeillePage() {
     <div>
       <h1 className="text-[27px] font-semibold tracking-[-0.028em] mb-1">Corbeille</h1>
       <p className="text-sm text-ink-500 mb-8">
-        Les éléments supprimés restent ici, récupérables jusqu&apos;à suppression définitive.
+        Les éléments supprimés restent ici {TRASH_RETENTION_DAYS} jours, récupérables jusqu&apos;à
+        leur suppression définitive automatique.
       </p>
       <TrashList entries={entries} />
     </div>

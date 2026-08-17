@@ -35,3 +35,25 @@ export async function login(
 
   redirect(profile?.role === "agence" ? "/agence/dashboard" : "/espace/dashboard");
 }
+
+export async function loginAsDemo(): Promise<void> {
+  const email = process.env.DEMO_ACCOUNT_EMAIL;
+  const password = process.env.DEMO_ACCOUNT_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error("Compte démo non configuré.");
+  }
+
+  const supabase = await createClient();
+
+  const { data, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (signInError || !data.user) {
+    throw new Error("Connexion démo impossible.");
+  }
+
+  redirect("/agence/dashboard");
+}
