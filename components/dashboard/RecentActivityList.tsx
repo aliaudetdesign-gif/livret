@@ -4,7 +4,7 @@ import { formatRelativeDate } from "@/lib/format";
 import type { AssetType } from "@/lib/types";
 import type { DashboardActivity } from "./types";
 
-const ASSET_ICONS: Record<AssetType, string> = {
+export const ASSET_ICONS: Record<AssetType, string> = {
   logo: "🖼️",
   couleur: "🎨",
   typographie: "Aa",

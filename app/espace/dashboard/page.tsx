@@ -2,6 +2,30 @@ import { createClient } from "@/lib/supabase/server";
 import { getClientProject } from "@/lib/getClientProject";
 import { getBadges } from "@/components/ProjectCard";
 import { ProgressBar } from "@/components/ProjectProgressControls";
+import { ASSET_ICONS } from "@/components/dashboard/RecentActivityList";
+import {
+  ClientRecentActivity,
+  type ClientActivityItem,
+} from "@/components/dashboard/client/ClientRecentActivity";
+import { ClientDeadlineCard } from "@/components/dashboard/client/ClientDeadlineCard";
+import {
+  ClientMessagingPreview,
+  type ClientMessagePreviewItem,
+} from "@/components/dashboard/client/ClientMessagingPreview";
+import { ClientUpcomingRendezVous } from "@/components/dashboard/client/ClientUpcomingRendezVous";
+import {
+  ClientRecentDocuments,
+  type ClientDocumentItem,
+} from "@/components/dashboard/client/ClientRecentDocuments";
+import type { AssetType } from "@/lib/types";
+
+const ASSET_TYPE_LABELS: Record<AssetType, string> = {
+  logo: "Logos",
+  couleur: "Couleurs",
+  typographie: "Typographies",
+  moodboard: "Visuels & Moodboard",
+  guide: "Guide d'utilisation",
+};
 
 export default async function EspaceDashboardPage() {
   const project = await getClientProject();
@@ -15,14 +39,107 @@ export default async function EspaceDashboardPage() {
   }
 
   const supabase = await createClient();
-  const { data: assets } = await supabase
-    .from("brand_assets")
-    .select("type")
-    .eq("project_id", project.id)
-    .is("deleted_at", null);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [
+    { data: assets },
+    { data: recentBrandAssets },
+    { data: recentSectionAssets },
+    { data: recentMessages },
+    { count: unreadCount },
+    { data: lastRendezvous },
+    { data: recentDocuments },
+  ] = await Promise.all([
+    supabase.from("brand_assets").select("type").eq("project_id", project.id).is("deleted_at", null),
+    supabase
+      .from("brand_assets")
+      .select("id, type, label, created_at")
+      .eq("project_id", project.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(6),
+    supabase
+      .from("section_assets")
+      .select("id, label, created_at, project_sections!inner(project_id, section_types(label))")
+      .eq("project_sections.project_id", project.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(6),
+    supabase
+      .from("messages")
+      .select("id, content, type, sender_profile_id, created_at")
+      .eq("project_id", project.id)
+      .order("created_at", { ascending: false })
+      .limit(3),
+    supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", project.id)
+      .eq("read", false)
+      .neq("sender_profile_id", user?.id ?? ""),
+    supabase
+      .from("messages")
+      .select("id, metadata, sender_profile_id, created_at")
+      .eq("project_id", project.id)
+      .eq("type", "rendezvous")
+      .order("created_at", { ascending: false })
+      .limit(1),
+    supabase
+      .from("project_documents")
+      .select("id, category, label, created_at")
+      .eq("project_id", project.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(3),
+  ]);
 
   const count = (type: string) =>
     (assets ?? []).filter((a) => a.type === type).length;
+
+  const brandItems: ClientActivityItem[] = (recentBrandAssets ?? []).map((a) => ({
+    id: `asset-${a.id}`,
+    icon: ASSET_ICONS[a.type as AssetType],
+    label: a.label,
+    sublabel: ASSET_TYPE_LABELS[a.type as AssetType],
+    createdAt: a.created_at,
+  }));
+
+  const sectionItems: ClientActivityItem[] = (
+    (recentSectionAssets ?? []) as unknown as {
+      id: string;
+      label: string;
+      created_at: string;
+      project_sections: { section_types: { label: string } };
+    }[]
+  ).map((a) => ({
+    id: `section-asset-${a.id}`,
+    icon: "📄",
+    label: a.label,
+    sublabel: a.project_sections.section_types.label,
+    createdAt: a.created_at,
+  }));
+
+  const activityItems = [...brandItems, ...sectionItems]
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+    .slice(0, 6);
+
+  const messagePreview: ClientMessagePreviewItem[] = (recentMessages ?? []).map((m) => ({
+    id: m.id,
+    content: m.type === "rendezvous" ? "📅 Proposition de rendez-vous" : m.content,
+    isMine: m.sender_profile_id === user?.id,
+    createdAt: m.created_at,
+  }));
+
+  const rendezvous = (lastRendezvous ?? [])[0] ?? null;
+
+  const documents: ClientDocumentItem[] = (recentDocuments ?? []).map((d) => ({
+    id: d.id,
+    category: d.category,
+    label: d.label,
+    createdAt: d.created_at,
+  }));
 
   return (
     <div>
@@ -72,11 +189,32 @@ export default async function EspaceDashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-4 gap-3.5 mb-3.5">
         <StatCard label="Logos" value={count("logo")} />
         <StatCard label="Couleurs" value={count("couleur")} />
         <StatCard label="Typographies" value={count("typographie")} />
         <StatCard label="Visuels & Moodboard" value={count("moodboard")} />
+      </div>
+
+      <div className="grid grid-cols-3 grid-rows-2 gap-3.5">
+        <div className="col-start-1 row-start-1 row-span-2">
+          <ClientRecentActivity items={activityItems} />
+        </div>
+        <div className="col-start-2 row-start-1">
+          <ClientMessagingPreview messages={messagePreview} unreadCount={unreadCount ?? 0} />
+        </div>
+        <div className="col-start-3 row-start-1">
+          <ClientDeadlineCard endDate={project.end_date} />
+        </div>
+        <div className="col-start-2 row-start-2">
+          <ClientUpcomingRendezVous
+            metadata={rendezvous?.metadata ?? null}
+            isMine={rendezvous?.sender_profile_id === user?.id}
+          />
+        </div>
+        <div className="col-start-3 row-start-2">
+          <ClientRecentDocuments documents={documents} />
+        </div>
       </div>
     </div>
   );

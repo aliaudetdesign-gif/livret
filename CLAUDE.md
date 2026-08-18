@@ -101,6 +101,7 @@ Routes : `dashboard`, `logos`, `couleurs`, `typographies`, `moodboard`, `design`
 - Proposition de rendez-vous dans la messagerie (18 août 2026) : agence et client peuvent proposer un rendez-vous (date/heure/lieu optionnel) directement dans le fil de discussion, sur le principe de la négociation d'offre Vinted (proposer → accepter/refuser/recontre-proposer). Détails dans la section dédiée ci-dessous.
 - Template de section "Réseaux sociaux" (18 août 2026) : template pré-enregistré supplémentaire dans le picker de `AddSectionForm`, accepte images/PDF/vidéos comme toutes les sections. Détails dans la section dédiée ci-dessous.
 - Thème global Clair/Sombre/Automatique (18 août 2026) : réglage utilisateur (agence et client), persisté par profil et appliqué sans flash au chargement. Détails dans la section dédiée ci-dessous.
+- Widgets du dashboard client (18 août 2026) : 5 nouveaux blocs sur `/espace/dashboard` (nouveautés récentes, échéance, messagerie, rendez-vous, documents). Détails dans la section dédiée ci-dessous.
 
 ## Mode démo agence
 
@@ -159,6 +160,21 @@ Architecture (migration `031_theme_preference.sql`) :
 - Palette sombre : entièrement dans `app/globals.css`, bloc `.dark { }` après `:root { }`. Redéfinit uniquement les tokens qui changent (fonds, encre, terre cuite, secondaires, états, matière verre) — tout le reste (alias historiques, mappings `@theme inline`, `--grad-clay`, nappes `.mesh`) hérite automatiquement via la cascade CSS.
 - `updateThemePreference(value)` dans `app/profil/actions.ts` : met à jour `profiles.theme_preference` + le cookie miroir. Appelée directement avec la valeur choisie (pas de `FormData`), même convention que `updateProjectStatus`.
 - `components/ThemeToggle.tsx` : contrôle segmenté à 3 boutons (Clair/Sombre/Automatique), `useTransition` + `router.refresh()` après l'action — nécessaire ici car le thème vit dans le layout serveur (`<html>`), pas dans un état local du composant. Intégré dans `app/agence/parametres/page.tsx` (onglet Réglages côté agence) et `app/espace/profil/page.tsx` (Mon profil côté client — pas d'onglet Réglages équivalent côté client, choix assumé de laisser le toggle dans le profil).
+
+## Widgets du dashboard client
+
+Objectif : le dashboard client (`app/espace/dashboard/page.tsx`) était limité à un hero + 4 stat cards. Ajout de 5 widgets pour donner une vraie visibilité d'ensemble sur le projet, sur le modèle du dashboard agence mais adaptés au contexte mono-projet du client.
+
+Choix d'architecture : les widgets agence existants (`MessagingPreview`, `RecentActivityList`, `DeadlinesTimeline` dans `components/dashboard/`) sont codés en dur pour des routes `/agence/*` et des données multi-projets (chaque item porte un `projectName`/`projectId`, pensé pour un sélecteur de projet). Inadaptés au client qui n'a qu'un seul projet. Plutôt que d'y ajouter des branches conditionnelles, 5 composants dédiés ont été créés dans `components/dashboard/client/`, qui réutilisent les classes visuelles (`.glass rounded-card p-[19px]`) et, quand c'est pertinent, une constante partagée (`ASSET_ICONS`, exportée depuis `RecentActivityList.tsx` pour l'occasion).
+
+Les 5 widgets (grille `grid-cols-3 grid-rows-2`, activité en colonne 1 sur toute la hauteur) :
+- `ClientRecentActivity` — fusionne les derniers `brand_assets` (Essentiel) et `section_assets` (Compléments) du projet en un seul flux "Nouveautés récentes", triés par date, limité à 6.
+- `ClientDeadlineCard` — échéance du projet (`project.end_date`) avec badge "Dans X jours".
+- `ClientMessagingPreview` — aperçu des 3 derniers messages de la conversation unique du client, badge de messages non lus (`messages.read = false`, hors messages envoyés par le client lui-même).
+- `ClientUpcomingRendezVous` — dernier message `type: 'rendezvous'` du fil (une recontre-proposition crée un nouveau message, donc le plus récent fait foi), masqué si refusé.
+- `ClientRecentDocuments` — 3 derniers `project_documents` (devis/facture/brief).
+
+Toutes les requêtes suivent les conventions existantes : `.is("deleted_at", null)` sur les tables soft-deletables, jointure `section_assets!inner` → `project_sections!inner(project_id, section_types(label))` pour filtrer par projet (même motif que `brand_assets!inner`/`projects!inner` côté agence), et `{ count: "exact", head: true }` pour le compteur de messages non lus sans charger les lignes.
 
 ### Convention technique établie
 - RLS Supabase via la fonction `is_agence()` (security definer).
