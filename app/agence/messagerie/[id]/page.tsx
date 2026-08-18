@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProjectColor } from "@/lib/projectColor";
 import { formatTime } from "@/lib/format";
 import { MessageForm } from "@/components/MessageForm";
+import { RendezVousCard } from "@/components/RendezVousCard";
 
 export default async function ConversationPage({
   params,
@@ -78,6 +79,18 @@ export default async function ConversationPage({
           ) : (
             allMessages.map((message) => {
               const isMine = message.sender_profile_id === user?.id;
+
+              if (message.type === "rendezvous") {
+                return (
+                  <RendezVousCard
+                    key={message.id}
+                    message={message}
+                    projectId={project.id}
+                    isMine={isMine}
+                  />
+                );
+              }
+
               return (
                 <div
                   key={message.id}

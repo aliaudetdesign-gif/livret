@@ -3,6 +3,7 @@ import { getClientProject } from "@/lib/getClientProject";
 import { getProjectColor } from "@/lib/projectColor";
 import { formatTime } from "@/lib/format";
 import { MessageForm } from "@/components/MessageForm";
+import { RendezVousCard } from "@/components/RendezVousCard";
 
 // Même rendu de conversation que côté agence (app/agence/messagerie/[id]/page.tsx) :
 // seule la liste des discussions (propre à l'agence, qui gère plusieurs
@@ -73,6 +74,18 @@ export default async function MessagerieClientPage() {
           ) : (
             allMessages.map((message) => {
               const isMine = message.sender_profile_id === user?.id;
+
+              if (message.type === "rendezvous") {
+                return (
+                  <RendezVousCard
+                    key={message.id}
+                    message={message}
+                    projectId={project.id}
+                    isMine={isMine}
+                  />
+                );
+              }
+
               return (
                 <div
                   key={message.id}

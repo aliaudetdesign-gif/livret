@@ -199,12 +199,25 @@ export interface SectionAsset {
   created_at: string;
 }
 
+export type MessageType = "text" | "rendezvous";
+
+export type RendezVousStatus = "pending" | "accepted" | "declined";
+
+export interface RendezVousMetadata {
+  date: string; // format ISO (yyyy-mm-dd)
+  heure: string; // format HH:mm
+  lieu: string | null;
+  status: RendezVousStatus;
+}
+
 export interface Message {
   id: string;
   project_id: string;
   sender_profile_id: string;
   content: string;
   read: boolean;
+  type: MessageType;
+  metadata: RendezVousMetadata | null;
   created_at: string;
 }
 

@@ -94,6 +94,7 @@ Routes : `dashboard`, `logos`, `couleurs`, `typographies`, `moodboard`, `design`
 - Invitations client par email (suivi manuel en base, `project_client_invites` — pas de création automatique de compte Supabase Auth, ça demanderait une clé service-role).
 - Duplication des assets de marque et documents administratifs quand on crée un nouveau projet pour un client existant.
 - Mode démo côté agence (17 août 2026) : interface agence complète dupliquée en scope `is_demo`, isolée par RLS, pour montrer le produit à des recruteurs sans exposer les vraies données. Détails dans la section dédiée ci-dessous.
+- Proposition de rendez-vous dans la messagerie (18 août 2026) : agence et client peuvent proposer un rendez-vous (date/heure/lieu optionnel) directement dans le fil de discussion, sur le principe de la négociation d'offre Vinted (proposer → accepter/refuser/recontre-proposer). Détails dans la section dédiée ci-dessous.
 
 ## Mode démo agence
 
@@ -114,6 +115,23 @@ Architecture (migration `028_demo_mode.sql`) :
 4. Se connecter avec le compte agence réel, aller sur `/agence/profil`, cliquer "Entrer en mode démo", créer au moins un projet pour peupler la démo (il sera automatiquement `is_demo = true`).
 5. Communiquer les identifiants du compte recruteur aux personnes concernées — elles se connectent normalement via `/connexion`.
 
+## Rendez-vous dans la messagerie
+
+Objectif : permettre à l'agence et au client de proposer un rendez-vous directement dans une conversation, sans sortir du fil de discussion — analogue à la négociation d'offre Vinted (proposer, accepter, refuser, ou recontre-proposer).
+
+Architecture (migration `029_messages_rendezvous.sql`) :
+- `messages.type text` (`'text'` par défaut ou `'rendezvous'`) et `messages.metadata jsonb` (nul pour un message texte). Pour un rendez-vous : `{ date, heure, lieu, status }`, `status` dans `pending` / `accepted` / `declined`.
+- Aucune policy RLS supplémentaire : les policies d'update existantes sur `messages` (migrations 004 et 028) sont scopées par projet, pas par expéditeur — un client peut donc accepter/refuser un message envoyé par l'agence, et inversement.
+- Chaque proposition est un message indépendant : une recontre-proposition crée un nouveau message `type: 'rendezvous'`, l'ancien reste visible dans l'historique du fil mais n'affiche plus de boutons d'action.
+
+Code :
+- `app/agence/messagerie/actions.ts` : `proposeRendezVous` (insertion, réutilisée par le bouton calendrier de `MessageForm` et par le formulaire de recontre-proposition dans `RendezVousCard`) et `respondToRendezVous` (accepte/refuse, met à jour `metadata.status`).
+- `components/RendezVousCard.tsx` : carte affichée dans le fil à la place de la bulle classique quand `message.type === 'rendezvous'`. Boutons Accepter/Refuser/Proposer un autre horaire visibles uniquement si `status === 'pending'` et que ce n'est pas l'auteur qui consulte.
+- `components/MessageForm.tsx` : bouton calendrier à côté de l'envoi, ouvre un popover (date/heure/lieu) pour lancer une première proposition.
+- `lib/types.ts` : `MessageType`, `RendezVousStatus`, `RendezVousMetadata` ajoutés, `Message` étendu avec `type` et `metadata`.
+
+**Statut d'exécution de la migration 029 : non confirmé** — à exécuter manuellement dans Supabase Dashboard > SQL Editor avant que la fonctionnalité soit utilisable en prod/dev (le code applicatif la suppose déjà exécutée, comme pour la 020 et la 028).
+
 ### Convention technique établie
 - RLS Supabase via la fonction `is_agence()` (security definer).
 - Pattern corbeille : `TrashItemType` union + `TABLE_BY_TYPE` + helpers génériques `restoreItem`/`permanentlyDeleteItem`/`emptyTrash` dans `app/agence/corbeille/actions.ts`.
@@ -126,11 +144,13 @@ Architecture (migration `028_demo_mode.sql`) :
 
 Fichiers dans `supabase/migrations/`, numérotés, à exécuter manuellement dans Supabase Dashboard > SQL Editor (pas de clé service-role disponible pour automatiser).
 
-Présents : 002 à 018, puis 020 à 028. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
+Présents : 002 à 018, puis 020 à 029. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
 
 `020_projects_soft_delete.sql` (ajoute `deleted_at` sur `projects` + policy delete définitive agence) : créée récemment, **statut d'exécution non confirmé** — à vérifier en priorité avec l'utilisateur avant de considérer le soft-delete des projets comme fonctionnel en prod/dev.
 
 `028_demo_mode.sql` (colonnes `is_demo` / `is_demo_account` + RLS mode démo agence) : écrite le 17 août 2026, **statut d'exécution non confirmé** — voir section "Mode démo agence" ci-dessus pour les étapes manuelles restantes. Le code applicatif suppose déjà cette migration exécutée.
+
+`029_messages_rendezvous.sql` (colonnes `type` / `metadata` sur `messages`, propositions de rendez-vous) : écrite le 18 août 2026, **statut d'exécution non confirmé** — voir section "Rendez-vous dans la messagerie" ci-dessus.
 
 ## Prochaines étapes probables
 
