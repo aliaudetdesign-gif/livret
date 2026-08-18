@@ -46,6 +46,10 @@ Typographie : Geist et Geist Mono chargées via `next/font/google` dans `app/lay
 
 Le titre du produit s'écrit `livret.` en minuscules, avec le point (voir `metadata` dans `app/layout.tsx`).
 
+### Thème sombre (18 août 2026)
+
+Palette sombre complète ajoutée dans `app/globals.css`, appliquée via une classe `.dark` sur `<html>` (voir section "Thème global" plus bas). Charbon chaud (`#1b1815`) plutôt que noir pur, terre cuite éclaircie pour rester lisible sur fond sombre — reste dans l'identité liquid glass plutôt que de basculer vers un dark mode générique. Tous les alias historiques et les mappings `@theme inline` héritent automatiquement des valeurs sombres via la cascade CSS (résolution des `var()` à l'usage), aucun composant n'a eu besoin d'être modifié.
+
 ### Chantier en cours : peaufinage de la fluidité
 
 Le style visuel (couleurs/tokens) est appliqué de façon cohérente partout. Le chantier ouvert le 3 août 2026 porte sur les détails d'interaction qui cassent encore la fluidité attendue d'une interface "liquid glass" : ouverture/fermeture de menus et popovers sans transition (apparition/disparition brutale via rendu conditionnel `{open && (...)}`), à vérifier notamment dans `StatusToggle` et `ProgressBar` (`ProjectProgressControls.tsx`), `ProjectCardMenu`, `InfoPopover`, `Modal`, `NewDiscussionButton`. Rien n'est encore corrigé à ce stade, c'est un audit à démarrer.
@@ -95,6 +99,8 @@ Routes : `dashboard`, `logos`, `couleurs`, `typographies`, `moodboard`, `design`
 - Duplication des assets de marque et documents administratifs quand on crée un nouveau projet pour un client existant.
 - Mode démo côté agence (17 août 2026) : interface agence complète dupliquée en scope `is_demo`, isolée par RLS, pour montrer le produit à des recruteurs sans exposer les vraies données. Détails dans la section dédiée ci-dessous.
 - Proposition de rendez-vous dans la messagerie (18 août 2026) : agence et client peuvent proposer un rendez-vous (date/heure/lieu optionnel) directement dans le fil de discussion, sur le principe de la négociation d'offre Vinted (proposer → accepter/refuser/recontre-proposer). Détails dans la section dédiée ci-dessous.
+- Template de section "Réseaux sociaux" (18 août 2026) : template pré-enregistré supplémentaire dans le picker de `AddSectionForm`, accepte images/PDF/vidéos comme toutes les sections. Détails dans la section dédiée ci-dessous.
+- Thème global Clair/Sombre/Automatique (18 août 2026) : réglage utilisateur (agence et client), persisté par profil et appliqué sans flash au chargement. Détails dans la section dédiée ci-dessous.
 
 ## Mode démo agence
 
@@ -132,6 +138,28 @@ Code :
 
 **Statut d'exécution de la migration 029 : non confirmé** — à exécuter manuellement dans Supabase Dashboard > SQL Editor avant que la fonctionnalité soit utilisable en prod/dev (le code applicatif la suppose déjà exécutée, comme pour la 020 et la 028).
 
+## Template de section "Réseaux sociaux"
+
+Objectif : proposer un template pré-enregistré "Réseaux sociaux" dans l'onglet "Voir les templates" de `AddSectionForm`, qui accepte tous les formats déjà supportés (images, PDF, vidéos).
+
+Contexte : ce template existait déjà de façon ad hoc sous le nom "Linkedin" (créé sans template pré-enregistré, juste une section custom) — renommé en "Réseaux sociaux" directement en base par Alexandre (édition manuelle via le menu ⋮ de la section, `section_types` étant une bibliothèque partagée entre projets), puis complété par la vraie entrée template ci-dessous.
+
+Architecture (migration `030_section_template_social.sql`) :
+- Un `template` sur `section_types` ne sert qu'à faire apparaître la ligne dans le picker de templates — il ne déclenche aucun rendu spécial. Seul `"figma"` a une branche de rendu dédiée dans `SectionAssetGrid.tsx` ; tous les autres templates (`mockup`, `moodboard`, `illustrations`, `packaging`, `social`) retombent sur la grille générique.
+- L'acceptation de formats (images/PDF/vidéos) est une règle fixe côté upload (`SectionAssetUploadForm.tsx` + validation MIME serveur dans `addSectionAsset`, `app/agence/projets/[id]/actions.ts`), indépendante du template. Donc zéro changement de logique d'upload ou de rendu pour ce nouveau template : juste une ligne `section_types` en plus + `"social"` ajouté à `SectionTemplate` (`lib/types.ts`).
+
+## Thème global (Clair / Sombre / Automatique)
+
+Objectif : un réglage de thème utilisateur, accessible en page profil (agence et client), persisté par profil pour suivre l'utilisateur d'un appareil à l'autre, appliqué côté serveur sans flash visuel au chargement.
+
+Architecture (migration `031_theme_preference.sql`) :
+- `profiles.theme_preference text` (`'light'` / `'dark'` / `'auto'`, défaut `'auto'`). Type `ThemePreference` dans `lib/types.ts`.
+- Cookie miroir `livret_theme` (httpOnly, jamais lu côté client), même principe que `livret_demo_mode` : `lib/themeMode.ts` expose `getThemeCookie()`, lu dans `app/layout.tsx` (Server Component) pour poser la classe `.dark` sur `<html>` avant le premier rendu.
+- Cas `"auto"` (préférence système, pas connue côté serveur) : un petit script inline (`AUTO_THEME_SCRIPT` dans `app/layout.tsx`) interroge `prefers-color-scheme` et ajoute la classe `.dark` avant peinture, seulement quand le cookie vaut `"auto"`. `suppressHydrationWarning` sur `<html>` pour éviter le warning de mismatch React dans ce cas précis.
+- Palette sombre : entièrement dans `app/globals.css`, bloc `.dark { }` après `:root { }`. Redéfinit uniquement les tokens qui changent (fonds, encre, terre cuite, secondaires, états, matière verre) — tout le reste (alias historiques, mappings `@theme inline`, `--grad-clay`, nappes `.mesh`) hérite automatiquement via la cascade CSS.
+- `updateThemePreference(value)` dans `app/profil/actions.ts` : met à jour `profiles.theme_preference` + le cookie miroir. Appelée directement avec la valeur choisie (pas de `FormData`), même convention que `updateProjectStatus`.
+- `components/ThemeToggle.tsx` : contrôle segmenté à 3 boutons (Clair/Sombre/Automatique), `useTransition` + `router.refresh()` après l'action — nécessaire ici car le thème vit dans le layout serveur (`<html>`), pas dans un état local du composant. Intégré dans `app/agence/profil/page.tsx` et `app/espace/profil/page.tsx`.
+
 ### Convention technique établie
 - RLS Supabase via la fonction `is_agence()` (security definer).
 - Pattern corbeille : `TrashItemType` union + `TABLE_BY_TYPE` + helpers génériques `restoreItem`/`permanentlyDeleteItem`/`emptyTrash` dans `app/agence/corbeille/actions.ts`.
@@ -144,13 +172,15 @@ Code :
 
 Fichiers dans `supabase/migrations/`, numérotés, à exécuter manuellement dans Supabase Dashboard > SQL Editor (pas de clé service-role disponible pour automatiser).
 
-Présents : 002 à 018, puis 020 à 029. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
+Présents : 002 à 018, puis 020 à 031. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
 
 `020_projects_soft_delete.sql` (ajoute `deleted_at` sur `projects` + policy delete définitive agence) : créée récemment, **statut d'exécution non confirmé** — à vérifier en priorité avec l'utilisateur avant de considérer le soft-delete des projets comme fonctionnel en prod/dev.
 
 `028_demo_mode.sql` (colonnes `is_demo` / `is_demo_account` + RLS mode démo agence) : écrite le 17 août 2026, **statut d'exécution non confirmé** — voir section "Mode démo agence" ci-dessus pour les étapes manuelles restantes. Le code applicatif suppose déjà cette migration exécutée.
 
 `029_messages_rendezvous.sql` (colonnes `type` / `metadata` sur `messages`, propositions de rendez-vous) : écrite le 18 août 2026, **statut d'exécution non confirmé** — voir section "Rendez-vous dans la messagerie" ci-dessus.
+
+`030_section_template_social.sql` (nouvelle entrée `section_types` "Réseaux sociaux") et `031_theme_preference.sql` (colonne `profiles.theme_preference`) : écrites le 18 août 2026, **statut d'exécution non confirmé** — le code applicatif suppose déjà les deux exécutées (le sélecteur de thème et le picker de templates y font référence directement).
 
 ## Prochaines étapes probables
 

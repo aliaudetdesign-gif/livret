@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { getThemeCookie } from "@/lib/themeMode";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,17 +18,31 @@ export const metadata: Metadata = {
   description: "Livrets de marque pour agences et clients",
 };
 
-export default function RootLayout({
+// Script exécuté avant le premier rendu peint, uniquement quand la
+// préférence est "auto" : "light"/"dark" sont déjà résolus côté serveur
+// ci-dessous via le cookie miroir (voir lib/themeMode.ts), donc inutile de
+// le réévaluer côté client dans ces deux cas. Ici on interroge directement
+// prefers-color-scheme (pas besoin de relire le cookie, qui est httpOnly).
+const AUTO_THEME_SCRIPT = `(function(){try{if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themePreference = await getThemeCookie();
+  const isDarkServer = themePreference === "dark";
+
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${isDarkServer ? " dark" : ""}`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
+        {themePreference === "auto" && (
+          <script dangerouslySetInnerHTML={{ __html: AUTO_THEME_SCRIPT }} />
+        )}
         {/* Nappes de couleur floutées : c'est ce que le verre réfracte.
             Sans elles, l'effet retombe à plat. */}
         <div className="mesh" aria-hidden>

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "@/components/ProfileForm";
 import { NotificationPreferencesForm } from "@/components/NotificationPreferencesForm";
 import { PasswordSecurityForm } from "@/components/PasswordSecurityForm";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function EspaceProfilPage() {
   const supabase = await createClient();
@@ -40,6 +41,15 @@ export default async function EspaceProfilPage() {
               notifyNewMessage={profile?.notify_new_message ?? true}
               notifyNewDocument={profile?.notify_new_document ?? true}
             />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">
+            Thème
+          </h2>
+          <div className="glass rounded-card p-5">
+            <ThemeToggle current={profile?.theme_preference ?? "auto"} />
           </div>
         </section>
 

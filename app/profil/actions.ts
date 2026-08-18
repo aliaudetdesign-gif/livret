@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { DEMO_MODE_COOKIE } from "@/lib/demoMode";
+import { THEME_COOKIE } from "@/lib/themeMode";
+import type { ThemePreference } from "@/lib/types";
 
 export type ProfileActionState = { error: string | null };
 
@@ -153,6 +155,51 @@ export async function updateNotificationPreferences(
 
   revalidatePath("/agence/profil");
   revalidatePath("/espace/profil");
+
+  return { error: null };
+}
+
+// Met à jour la préférence de thème (Clair/Sombre/Automatique), persistée en
+// base pour suivre l'utilisateur d'un appareil à l'autre, et son cookie
+// miroir pour un rendu SSR sans flash (voir lib/themeMode.ts). Appelée
+// directement avec la valeur choisie (pas de FormData) : c'est un contrôle
+// segmenté à 3 boutons, même principe que updateProjectStatus.
+export async function updateThemePreference(
+  value: ThemePreference
+): Promise<ProfileActionState> {
+  if (value !== "light" && value !== "dark" && value !== "auto") {
+    return { error: "Préférence de thème invalide." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Session expirée, reconnecte-toi." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ theme_preference: value })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(THEME_COOKIE, value, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+
+  revalidatePath("/agence/profil");
+  revalidatePath("/espace/profil");
+  revalidatePath("/", "layout");
 
   return { error: null };
 }

@@ -4,6 +4,16 @@ export type Role = "agence" | "client";
 
 export type ProjectStatus = "en_cours" | "attente_validation" | "livre";
 
+// Préférence de thème d'affichage, éditable depuis la page profil (agence et
+// client). "auto" suit le réglage système de l'appareil (voir lib/themeMode.ts).
+export type ThemePreference = "light" | "dark" | "auto";
+
+export const THEME_LABELS: Record<ThemePreference, string> = {
+  light: "Clair",
+  dark: "Sombre",
+  auto: "Automatique",
+};
+
 // Étape du projet dans son avancement global, indépendante du statut.
 // 0 = orientation, 1 = idéation, 2 = création, 3 = déploiement, 4 = fin de projet.
 export const PROGRESS_STEPS = [
@@ -25,6 +35,7 @@ export interface Profile {
   notify_new_document: boolean;
   professional_link: string | null; // LinkedIn / site / portfolio, agence uniquement
   is_demo_account: boolean; // compte recruteur dédié, scopé is_demo=true par la RLS
+  theme_preference: ThemePreference;
   created_at: string;
 }
 
@@ -151,7 +162,14 @@ export interface ProjectDocument {
   created_at: string;
 }
 
-export type SectionTemplate = "video" | "figma" | "mockup" | "moodboard" | "illustrations" | "packaging";
+export type SectionTemplate =
+  | "video"
+  | "figma"
+  | "mockup"
+  | "moodboard"
+  | "illustrations"
+  | "packaging"
+  | "social";
 
 export interface SectionType {
   id: string;
