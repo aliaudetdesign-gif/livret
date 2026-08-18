@@ -3,7 +3,6 @@ import { ProfileForm } from "@/components/ProfileForm";
 import { ProfessionalLinkForm } from "@/components/ProfessionalLinkForm";
 import { NotificationPreferencesForm } from "@/components/NotificationPreferencesForm";
 import { PasswordSecurityForm } from "@/components/PasswordSecurityForm";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { enterDemoMode } from "@/app/profil/actions";
 
 export default async function AgenceProfilPage() {
@@ -52,15 +51,6 @@ export default async function AgenceProfilPage() {
               notifyNewMessage={profile?.notify_new_message ?? true}
               notifyNewDocument={profile?.notify_new_document ?? true}
             />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink-400 mb-3">
-            Thème
-          </h2>
-          <div className="glass rounded-card p-5">
-            <ThemeToggle current={profile?.theme_preference ?? "auto"} />
           </div>
         </section>
 

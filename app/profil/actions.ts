@@ -197,7 +197,7 @@ export async function updateThemePreference(
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  revalidatePath("/agence/profil");
+  revalidatePath("/agence/parametres");
   revalidatePath("/espace/profil");
   revalidatePath("/", "layout");
 
