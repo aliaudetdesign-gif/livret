@@ -7,7 +7,10 @@ import {
   ClientRecentActivity,
   type ClientActivityItem,
 } from "@/components/dashboard/client/ClientRecentActivity";
-import { ClientDeadlineCard } from "@/components/dashboard/client/ClientDeadlineCard";
+import {
+  ClientDashboardCalendar,
+  type CalendarEvent,
+} from "@/components/dashboard/client/ClientDashboardCalendar";
 import {
   ClientMessagingPreview,
   type ClientMessagePreviewItem,
@@ -134,6 +137,14 @@ export default async function EspaceDashboardPage() {
 
   const rendezvous = (lastRendezvous ?? [])[0] ?? null;
 
+  const events: CalendarEvent[] = [];
+  if (project.end_date) {
+    events.push({ date: project.end_date, label: "Échéance du projet" });
+  }
+  if (rendezvous?.metadata && rendezvous.metadata.status !== "declined") {
+    events.push({ date: rendezvous.metadata.date, label: "Rendez-vous" });
+  }
+
   const documents: ClientDocumentItem[] = (recentDocuments ?? []).map((d) => ({
     id: d.id,
     category: d.category,
@@ -143,30 +154,34 @@ export default async function EspaceDashboardPage() {
 
   return (
     <div>
-      <div className="relative overflow-hidden bg-ink-900 text-white rounded-panel p-9 mb-3.5 shadow-[0_28px_60px_-28px_rgba(23,22,26,0.55)]">
+      <div className="relative overflow-hidden bg-ink-900 text-white rounded-panel p-5 mb-3.5 shadow-[0_28px_60px_-28px_rgba(23,22,26,0.55)]">
         <div
           className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-clay-500 opacity-40 blur-[90px] pointer-events-none"
           aria-hidden
         />
-        <div className="relative">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.13em] text-clay-400 mb-2.5">
-            Identité de marque
-          </div>
-          <h1 className="text-[34px] font-semibold tracking-[-0.035em] leading-none mb-3">
-            {project.name}
-          </h1>
-          <div className="flex gap-10 text-sm text-white/75 border-t border-white/10 pt-4 mt-5">
+        <div className="relative flex items-start justify-between gap-6">
           <div>
-            <div className="text-white/45 text-[11px] uppercase tracking-[0.09em] font-semibold mb-1">
-              Secteur
+            <div className="text-[10px] font-semibold uppercase tracking-[0.13em] text-clay-400 mb-1.5">
+              Identité de marque
             </div>
-            {project.sector}
+            <h1 className="text-[22px] font-semibold tracking-[-0.03em] leading-none mb-3.5">
+              {project.name}
+            </h1>
+            <ProgressBar
+              projectId={project.id}
+              progressStep={project.progress_step}
+              variant="dark"
+            />
           </div>
-          <div>
-            <div className="text-white/45 text-[11px] uppercase tracking-[0.09em] font-semibold mb-1">
-              Statut
+
+          <div className="flex flex-col items-end gap-2.5 shrink-0 text-right">
+            <div>
+              <div className="text-white/45 text-[10px] uppercase tracking-[0.09em] font-semibold mb-1">
+                Secteur
+              </div>
+              <div className="text-sm text-white/75">{project.sector}</div>
             </div>
-            <div className="flex gap-1 flex-wrap">
+            <div className="flex gap-1 flex-wrap justify-end">
               {getBadges(project.status).map((badge) => (
                 <span
                   key={badge.label}
@@ -176,15 +191,6 @@ export default async function EspaceDashboardPage() {
                 </span>
               ))}
             </div>
-          </div>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-white/10">
-            <ProgressBar
-              projectId={project.id}
-              progressStep={project.progress_step}
-              variant="dark"
-            />
           </div>
         </div>
       </div>
@@ -204,7 +210,7 @@ export default async function EspaceDashboardPage() {
           <ClientMessagingPreview messages={messagePreview} unreadCount={unreadCount ?? 0} />
         </div>
         <div className="col-start-3 row-start-1">
-          <ClientDeadlineCard endDate={project.end_date} />
+          <ClientDashboardCalendar projectId={project.id} events={events} />
         </div>
         <div className="col-start-2 row-start-2">
           <ClientUpcomingRendezVous

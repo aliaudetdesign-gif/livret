@@ -174,10 +174,19 @@ Choix d'architecture : les widgets agence existants (`MessagingPreview`, `Recent
 
 Les 5 widgets (grille `grid-cols-3 grid-rows-2`, activité en colonne 1 sur toute la hauteur) :
 - `ClientRecentActivity` — fusionne les derniers `brand_assets` (Essentiel) et `section_assets` (Compléments) du projet en un seul flux "Nouveautés récentes", triés par date, limité à 6.
-- `ClientDeadlineCard` — échéance du projet (`project.end_date`) avec badge "Dans X jours".
+- `ClientDashboardCalendar` — calendrier mensuel (**remplace `ClientDeadlineCard`, archivé le 19 août 2026**, voir section dédiée ci-dessous).
 - `ClientMessagingPreview` — aperçu des 3 derniers messages de la conversation unique du client, badge de messages non lus (`messages.read = false`, hors messages envoyés par le client lui-même).
 - `ClientUpcomingRendezVous` — dernier message `type: 'rendezvous'` du fil (une recontre-proposition crée un nouveau message, donc le plus récent fait foi), masqué si refusé.
 - `ClientRecentDocuments` — 3 derniers `project_documents` (devis/facture/brief).
+
+### Calendrier du dashboard client (19 août 2026)
+
+`ClientDeadlineCard` (badge "Dans X jours") remplacé par `ClientDashboardCalendar`, sur demande d'Alexandre (maquette manuscrite "Goodlands") : calendrier mensuel dans le même style/structure que `DashboardCalendar` côté agence (grille 7 colonnes, navigation mois précédent/suivant, jour du jour surligné en dégradé terracotta), avec en plus un point de couleur sous les jours portant un événement (échéance projet, rendez-vous).
+
+- Couleur du point = `getProjectColor(project.id).text`, la même fonction de hash déjà utilisée pour les carrés d'initiales (`ProjectCard`, messagerie...) — pas de nouveau champ couleur en base, un seul projet côté client donc pas besoin de distinguer plusieurs couleurs.
+- `events: CalendarEvent[]` construit côté page (`app/espace/dashboard/page.tsx`) à partir de `project.end_date` ("Échéance du projet") et du dernier message `type: 'rendezvous'` non refusé ("Rendez-vous", `metadata.date`).
+- `components/dashboard/client/ClientDeadlineCard.tsx` déplacé dans `_Archive/components/dashboard/client/` (pattern "ne jamais supprimer"), plus aucune référence active dans le code.
+- Bandeau/hero du dashboard client compacté à la même occasion : titre réduit, secteur/statut passés en colonne à droite (au lieu d'une ligne pleine largeur sous le titre), barre de progression sans bordure englobante — pour que les 5 widgets tiennent dans une seule frame sans scroll, comme demandé.
 
 Toutes les requêtes suivent les conventions existantes : `.is("deleted_at", null)` sur les tables soft-deletables, jointure `section_assets!inner` → `project_sections!inner(project_id, section_types(label))` pour filtrer par projet (même motif que `brand_assets!inner`/`projects!inner` côté agence), et `{ count: "exact", head: true }` pour le compteur de messages non lus sans charger les lignes.
 

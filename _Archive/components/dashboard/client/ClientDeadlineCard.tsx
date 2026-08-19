@@ -4,6 +4,11 @@ import { formatWeekdayDate } from "@/lib/format";
 // tant que la date n'est pas dépassée. Volontairement compact : un seul
 // projet côté client, pas besoin de la timeline multi-projets de l'agence
 // (DeadlinesTimeline).
+//
+// Archivé le 19 août 2026 : remplacé par ClientDashboardCalendar
+// (components/dashboard/client/ClientDashboardCalendar.tsx) sur le dashboard
+// client, à la demande d'Alexandre (maquette "Goodlands"). Conservé ici au
+// cas où, non supprimé.
 export function ClientDeadlineCard({ endDate }: { endDate: string | null }) {
   const daysRemaining = endDate ? computeDaysRemaining(endDate) : null;
 
