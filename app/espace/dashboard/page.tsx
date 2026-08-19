@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getClientProject } from "@/lib/getClientProject";
 import { getBadges } from "@/components/ProjectCard";
@@ -195,10 +197,10 @@ export default async function EspaceDashboardPage() {
       </div>
 
       <div className="grid grid-cols-4 gap-3.5 mb-3.5">
-        <StatCard label="Logos" value={count("logo")} />
-        <StatCard label="Couleurs" value={count("couleur")} />
-        <StatCard label="Typographies" value={count("typographie")} />
-        <StatCard label="Visuels & Moodboard" value={count("moodboard")} />
+        <StatCard label="Logos" value={count("logo")} href="/espace/logos" />
+        <StatCard label="Couleurs" value={count("couleur")} href="/espace/couleurs" />
+        <StatCard label="Typographies" value={count("typographie")} href="/espace/typographies" />
+        <StatCard label="Visuels & Moodboard" value={count("moodboard")} href="/espace/moodboard" />
       </div>
 
       <div className="grid grid-cols-3 grid-rows-2 gap-3.5">
@@ -225,11 +227,16 @@ export default async function EspaceDashboardPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({ label, value, href }: { label: string; value: number; href: string }) {
   return (
-    <div className="glass rounded-card p-[19px]">
-      <div className="text-[12.5px] font-medium text-ink-700 mb-2.5">{label}</div>
+    <Link href={href} className="glass hover-lift rounded-card p-[19px] block">
+      <div className="flex items-start justify-between mb-2.5">
+        <div className="text-[12.5px] font-medium text-ink-700">{label}</div>
+        <div className="w-6 h-6 rounded-full bg-ink-900/90 text-white flex items-center justify-center shrink-0">
+          <ArrowUpRight className="w-3 h-3" strokeWidth={2} />
+        </div>
+      </div>
       <div className="text-[28px] font-semibold tracking-[-0.04em] leading-none">{value}</div>
-    </div>
+    </Link>
   );
 }
