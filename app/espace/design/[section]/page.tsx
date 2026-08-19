@@ -7,19 +7,15 @@ import { TypographyCard } from "@/components/TypographyCard";
 import { LogoGrid } from "@/components/LogoGrid";
 import { DownloadableAssetImage } from "@/components/DownloadableAssetImage";
 import { DownloadableGuidePreview } from "@/components/DownloadableGuidePreview";
+import { ESSENTIEL_SECTIONS } from "@/lib/designEssentiel";
 import type { AssetType, GuideMetadata } from "@/lib/types";
 
 const FILE_TYPES: AssetType[] = ["logo", "moodboard"];
-// "moodboard" reste une valeur AssetType valide (les lignes brand_assets
-// existantes ne sont pas supprimées, voir migration 024) mais n'est plus une
-// section Essentiel accessible : elle a basculé en section Compléments.
-const ESSENTIEL_LABELS: Record<Exclude<AssetType, "moodboard">, string> = {
-  logo: "Logos",
-  couleur: "Couleurs",
-  typographie: "Typographies",
-  guide: "Guide d'utilisation",
-};
-const ESSENTIEL_KEYS = Object.keys(ESSENTIEL_LABELS);
+// Labels/clés dérivés de la source unique ESSENTIEL_SECTIONS (lib/designEssentiel.ts).
+const ESSENTIEL_LABELS: Record<Exclude<AssetType, "moodboard">, string> = Object.fromEntries(
+  ESSENTIEL_SECTIONS.map((s) => [s.key, s.label])
+) as Record<Exclude<AssetType, "moodboard">, string>;
+const ESSENTIEL_KEYS: string[] = ESSENTIEL_SECTIONS.map((s) => s.key);
 
 export default async function DesignSectionPage({
   params,

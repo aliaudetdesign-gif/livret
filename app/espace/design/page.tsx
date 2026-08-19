@@ -1,14 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { getClientProject } from "@/lib/getClientProject";
 import { DesignGrid, type DesignCardData } from "@/components/DesignGrid";
-import type { AssetType, ProjectSection } from "@/lib/types";
-
-const ESSENTIEL: { key: AssetType; label: string; icon: string }[] = [
-  { key: "logo", label: "Logos", icon: "🖼️" },
-  { key: "couleur", label: "Couleurs", icon: "🎨" },
-  { key: "typographie", label: "Typographies", icon: "Aa" },
-  { key: "guide", label: "Guide d'utilisation", icon: "📘" },
-];
+import { ESSENTIEL_SECTIONS } from "@/lib/designEssentiel";
+import type { ProjectSection } from "@/lib/types";
 
 export default async function DesignPage() {
   const project = await getClientProject();
@@ -35,7 +29,7 @@ export default async function DesignPage() {
     .eq("project_id", project.id)
     .is("deleted_at", null);
 
-  const essentielCards: DesignCardData[] = ESSENTIEL.map((e) => ({
+  const essentielCards: DesignCardData[] = ESSENTIEL_SECTIONS.map((e) => ({
     key: e.key,
     label: e.label,
     icon: e.icon,

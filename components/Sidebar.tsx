@@ -31,6 +31,10 @@ export interface NavItem {
   label: string;
   href: string;
   icon?: NavIcon;
+  // Icône libre (emoji ou glyphe court, ex. "Aa") pour les items qui ne
+  // correspondent pas à une icône Lucide fixe — sections de design
+  // notamment, dont l'icône est choisie par l'agence. Prioritaire sur `icon`.
+  emoji?: string;
 }
 
 export interface NavGroup {
@@ -42,6 +46,12 @@ export function Sidebar({
   sectionLabel,
   navItems,
   navGroups,
+  // Groupes additionnels affichés uniquement quand `extraGroupsPathPrefix`
+  // matche le début du pathname courant (ex. sections de design côté client,
+  // visibles seulement une fois entré dans une section précise, pas sur
+  // l'index /espace/design). Évite de les afficher partout dans l'app.
+  extraGroups,
+  extraGroupsPathPrefix,
   accountLabel,
   accountSubLabel,
   accountHref,
@@ -50,6 +60,8 @@ export function Sidebar({
   sectionLabel?: string;
   navItems?: NavItem[];
   navGroups?: NavGroup[];
+  extraGroups?: NavGroup[];
+  extraGroupsPathPrefix?: string;
   accountLabel: string;
   accountSubLabel: string;
   accountHref?: string;
@@ -57,9 +69,12 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
 
-  const groups: NavGroup[] = navGroups ?? [
+  const baseGroups: NavGroup[] = navGroups ?? [
     { label: sectionLabel ?? "", items: navItems ?? [] },
   ];
+  const showExtraGroups =
+    !!extraGroups && !!extraGroupsPathPrefix && pathname.startsWith(extraGroupsPathPrefix);
+  const groups: NavGroup[] = showExtraGroups ? [...baseGroups, ...extraGroups] : baseGroups;
 
   return (
     <>
@@ -101,15 +116,24 @@ export function Sidebar({
                       : "text-ink-700 hover:bg-white/55 hover:text-ink-900"
                   }`}
                 >
-                  {Icon && (
-                    <Icon
-                      size={15}
-                      strokeWidth={1.7}
+                  {item.emoji ? (
+                    <span
+                      className="w-[15px] text-center text-[12.5px] leading-none shrink-0"
                       aria-hidden
-                      className={
-                        active ? "text-clay-500 shrink-0" : "opacity-60 shrink-0"
-                      }
-                    />
+                    >
+                      {item.emoji}
+                    </span>
+                  ) : (
+                    Icon && (
+                      <Icon
+                        size={15}
+                        strokeWidth={1.7}
+                        aria-hidden
+                        className={
+                          active ? "text-clay-500 shrink-0" : "opacity-60 shrink-0"
+                        }
+                      />
+                    )
                   )}
                   {item.label}
                 </Link>
