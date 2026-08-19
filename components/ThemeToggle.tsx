@@ -7,6 +7,11 @@ import { THEME_LABELS, type ThemePreference } from "@/lib/types";
 
 const OPTIONS: ThemePreference[] = ["light", "dark", "auto"];
 
+// Sombre et automatique désactivés temporairement (soucis de contraste à
+// régler, voir CLAUDE.md) : seul Clair est sélectionnable. Les deux autres
+// options restent visibles mais grisées, en attendant leur réactivation.
+const ENABLED_OPTIONS: ThemePreference[] = ["light"];
+
 // Contrôle segmenté à 3 options (Clair/Sombre/Automatique), page profil
 // agence et client. router.refresh() après l'action : la classe .dark vit
 // sur <html> dans app/layout.tsx (Server Component), donc le nouveau thème
@@ -17,7 +22,7 @@ export function ThemeToggle({ current }: { current: ThemePreference }) {
   const [isPending, startTransition] = useTransition();
 
   function handleSelect(next: ThemePreference) {
-    if (next === current || isPending) return;
+    if (!ENABLED_OPTIONS.includes(next) || next === current || isPending) return;
     startTransition(async () => {
       const result = await updateThemePreference(next);
       if (!result.error) {
@@ -33,19 +38,24 @@ export function ThemeToggle({ current }: { current: ThemePreference }) {
       className="inline-flex items-center gap-1 rounded-chip bg-shell-deep p-1 border border-line"
     >
       {OPTIONS.map((option) => {
-        const isActive = option === current;
+        const isEnabled = ENABLED_OPTIONS.includes(option);
+        const isActive = isEnabled && option === current;
         return (
           <button
             key={option}
             type="button"
             role="radio"
             aria-checked={isActive}
-            disabled={isPending}
+            aria-disabled={!isEnabled}
+            disabled={isPending || !isEnabled}
+            title={isEnabled ? undefined : "Bientôt disponible"}
             onClick={() => handleSelect(option)}
-            className={`px-3.5 py-1.5 text-sm font-medium rounded-full transition-colors disabled:cursor-wait ${
-              isActive
-                ? "btn-clay"
-                : "text-ink-500 hover:text-ink-900 cursor-pointer"
+            className={`px-3.5 py-1.5 text-sm font-medium rounded-full transition-colors ${
+              !isEnabled
+                ? "text-ink-400/50 cursor-not-allowed"
+                : isActive
+                  ? "btn-clay"
+                  : "text-ink-500 hover:text-ink-900 cursor-pointer disabled:cursor-wait"
             }`}
           >
             {THEME_LABELS[option]}

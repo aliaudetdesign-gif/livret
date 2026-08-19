@@ -161,6 +161,11 @@ Architecture (migration `031_theme_preference.sql`) :
 - `updateThemePreference(value)` dans `app/profil/actions.ts` : met à jour `profiles.theme_preference` + le cookie miroir. Appelée directement avec la valeur choisie (pas de `FormData`), même convention que `updateProjectStatus`.
 - `components/ThemeToggle.tsx` : contrôle segmenté à 3 boutons (Clair/Sombre/Automatique), `useTransition` + `router.refresh()` après l'action — nécessaire ici car le thème vit dans le layout serveur (`<html>`), pas dans un état local du composant. Intégré dans `app/agence/parametres/page.tsx` (onglet Réglages côté agence) et `app/espace/profil/page.tsx` (Mon profil côté client — pas d'onglet Réglages équivalent côté client, choix assumé de laisser le toggle dans le profil).
 
+**Sombre/Automatique désactivés temporairement (19 août 2026)** : soucis de contraste identifiés sur la palette sombre, pas prioritaire pour le moment. Seul Clair est actif :
+- `ThemeToggle.tsx` : `ENABLED_OPTIONS = ["light"]`, les boutons Sombre/Automatique restent visibles (grisés, `title="Bientôt disponible"`) mais `disabled` et sans effet au clic.
+- `app/layout.tsx` : ne lit plus le cookie `livret_theme` ni la préférence en base — rend toujours le thème clair, y compris pour les comptes qui ont déjà `dark`/`auto` enregistré (dont celui d'Alexandre, à l'origine du problème constaté). Script `AUTO_THEME_SCRIPT` retiré.
+- Rien n'a été supprimé côté infra (migration `031_theme_preference.sql`, colonne `profiles.theme_preference`, cookie, palette `.dark` dans `globals.css`) : uniquement neutralisé, pour pouvoir réactiver facilement une fois le contraste corrigé.
+
 ## Widgets du dashboard client
 
 Objectif : le dashboard client (`app/espace/dashboard/page.tsx`) était limité à un hero + 4 stat cards. Ajout de 5 widgets pour donner une vraie visibilité d'ensemble sur le projet, sur le modèle du dashboard agence mais adaptés au contexte mono-projet du client.
