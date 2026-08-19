@@ -154,32 +154,25 @@ export default async function EspaceDashboardPage() {
 
   return (
     <div>
-      <div className="relative overflow-hidden bg-ink-900 text-white rounded-panel p-5 mb-3.5 shadow-[0_28px_60px_-28px_rgba(23,22,26,0.55)]">
+      <div className="relative overflow-hidden bg-ink-900 text-white rounded-panel p-7 mb-3.5 shadow-[0_28px_60px_-28px_rgba(23,22,26,0.55)]">
         <div
           className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-clay-500 opacity-40 blur-[90px] pointer-events-none"
           aria-hidden
         />
-        <div className="relative flex items-start justify-between gap-6">
+        <div className="relative flex items-start justify-between gap-6 mb-7">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.13em] text-clay-400 mb-1.5">
-              Identité de marque
-            </div>
-            <h1 className="text-[22px] font-semibold tracking-[-0.03em] leading-none mb-3.5">
+            <h1 className="text-[38px] font-bold tracking-[-0.03em] leading-none mb-3">
               {project.name}
             </h1>
-            <ProgressBar
-              projectId={project.id}
-              progressStep={project.progress_step}
-              variant="dark"
-            />
+            <div className="text-white/45 text-[10px] uppercase tracking-[0.09em] font-semibold mb-1">
+              Secteur
+            </div>
+            <div className="text-sm text-white/75">{project.sector}</div>
           </div>
 
-          <div className="flex flex-col items-end gap-2.5 shrink-0 text-right">
-            <div>
-              <div className="text-white/45 text-[10px] uppercase tracking-[0.09em] font-semibold mb-1">
-                Secteur
-              </div>
-              <div className="text-sm text-white/75">{project.sector}</div>
+          <div className="flex flex-col items-end gap-1.5 shrink-0 text-right">
+            <div className="text-white/45 text-[10px] uppercase tracking-[0.09em] font-semibold mb-1">
+              Statut
             </div>
             <div className="flex gap-1 flex-wrap justify-end">
               {getBadges(project.status).map((badge) => (
@@ -193,6 +186,12 @@ export default async function EspaceDashboardPage() {
             </div>
           </div>
         </div>
+
+        <ProgressBar
+          projectId={project.id}
+          progressStep={project.progress_step}
+          variant="dark"
+        />
       </div>
 
       <div className="grid grid-cols-4 gap-3.5 mb-3.5">

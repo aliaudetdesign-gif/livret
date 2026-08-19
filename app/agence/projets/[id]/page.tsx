@@ -155,9 +155,6 @@ export default async function ProjetDetailPage({
         {project ? (
           <div className="relative flex items-start justify-between gap-10">
             <div className="max-w-xl">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-clay-400 mb-2.5">
-                Identité de marque
-              </p>
               <h1 className="text-[34px] font-semibold tracking-[-0.035em] leading-none text-white mb-3.5">
                 {project.name}
               </h1>
