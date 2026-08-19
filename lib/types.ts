@@ -258,6 +258,9 @@ export interface AgencyInvite {
   full_name: string;
   status: InviteStatus;
   invited_by: string | null;
+  // Renseigné dès que le compte Supabase Auth est réellement créé (voir
+  // lib/supabase/admin.ts) — avant, la ligne restait "en_attente" indéfiniment.
+  profile_id: string | null;
   created_at: string;
 }
 
@@ -268,5 +271,6 @@ export interface ProjectClientInvite {
   full_name: string;
   status: InviteStatus;
   invited_by: string | null;
+  profile_id: string | null;
   created_at: string;
 }

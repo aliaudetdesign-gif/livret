@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { createProject, type ActionState } from "@/app/agence/projets/nouveau/actions";
+import { InviteLinkPanel } from "@/components/InviteLinkPanel";
 
 const initialState: ActionState = { error: null };
 
@@ -16,6 +18,21 @@ export function NouveauProjetForm({
 }) {
   const [state, formAction, pending] = useActionState(createProject, initialState);
   const [clientMode, setClientMode] = useState<"nouveau" | "existant">("nouveau");
+
+  if (state.inviteLink) {
+    return (
+      <div className="glass rounded-card p-6 max-w-xl flex flex-col gap-4">
+        <p className="text-sm font-medium text-ink-900">Projet créé.</p>
+        <InviteLinkPanel inviteLink={state.inviteLink} />
+        <Link
+          href="/agence/projets"
+          className="self-start btn-clay text-sm font-semibold px-4 py-2.5"
+        >
+          Voir les projets
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -93,7 +110,7 @@ export function NouveauProjetForm({
             </select>
           ) : (
             <p className="text-xs text-ink-400 leading-snug">
-              Le compte sera créé après la création du projet.
+              Le compte sera créé en même temps que le projet.
             </p>
           )}
         </div>

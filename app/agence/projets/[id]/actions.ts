@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createRealAccount } from "@/lib/accountCreation";
 import type {
   AssetType,
   ColorCategory,
@@ -1544,13 +1545,16 @@ export async function deleteProjectSections(
   return { error: null };
 }
 
-export type ProjectClientInviteActionState = { error: string | null };
+export type ProjectClientInviteActionState = { error: string | null; inviteLink?: string };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Suivi d'une personne côté client à inviter sur ce projet, en plus du client
-// principal. Pas de création de compte Supabase Auth automatique (nécessiterait
-// une clé service-role côté serveur) : le compte est créé manuellement ensuite.
+// principal. Un vrai compte Supabase Auth est créé tout de suite (voir
+// lib/accountCreation.ts) : reste à Alexandre de transmettre le lien à la
+// main. Accès au projet non branché pour ce contact secondaire pour l'instant
+// (seul client_profile_id sur projects donne accès côté client, voir
+// CLAUDE.md) : le compte existe mais ne voit rien tant que ce n'est pas fait.
 export async function inviteProjectClient(
   _prevState: ProjectClientInviteActionState,
   formData: FormData
@@ -1574,10 +1578,17 @@ export async function inviteProjectClient(
     data: { user },
   } = await supabase.auth.getUser();
 
+  const result = await createRealAccount(email, fullName, "client");
+  if (!result.ok) {
+    return { error: result.error };
+  }
+
   const { error } = await supabase.from("project_client_invites").insert({
     project_id: projectId,
     email,
     full_name: fullName,
+    status: "acceptee",
+    profile_id: result.userId,
     invited_by: user?.id ?? null,
   });
 
@@ -1587,7 +1598,7 @@ export async function inviteProjectClient(
 
   revalidatePath(`/agence/projets/${projectId}`);
 
-  return { error: null };
+  return { error: null, inviteLink: result.inviteLink };
 }
 
 export async function removeProjectClientInvite(

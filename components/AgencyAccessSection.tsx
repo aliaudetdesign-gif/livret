@@ -3,6 +3,7 @@
 import { useActionState, useState, useTransition } from "react";
 import { inviteAgencyMember, removeAgencyInvite, type InviteActionState } from "@/app/agence/parametres/actions";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { InviteLinkPanel } from "@/components/InviteLinkPanel";
 import type { AgencyInvite } from "@/lib/types";
 import { formatShortDate } from "@/lib/format";
 
@@ -19,7 +20,7 @@ const statusStyle: Record<AgencyInvite["status"], string> = {
 
 const statusLabel: Record<AgencyInvite["status"], string> = {
   en_attente: "En attente",
-  acceptee: "Acceptée",
+  acceptee: "Compte créé",
 };
 
 function InviteRow({ invite }: { invite: AgencyInvite }) {
@@ -77,9 +78,10 @@ function InviteRow({ invite }: { invite: AgencyInvite }) {
   );
 }
 
-// Suivi d'invitations pour l'accès à l'espace agence. Pas de création de compte
-// Supabase Auth réelle (nécessiterait une clé service-role côté serveur) : le
-// statut "En attente" / "Acceptée" reste pour l'instant un suivi manuel.
+// Suivi des comptes agence. Un vrai compte Supabase Auth est créé
+// immédiatement (voir lib/accountCreation.ts) : le statut "En attente" ne
+// devrait plus apparaître en pratique, conservé pour compat avec d'anciennes
+// lignes créées avant ce chantier.
 export function AgencyAccessSection({ invites }: { invites: AgencyInvite[] }) {
   const [state, formAction, pending] = useActionState(inviteAgencyMember, initialState);
 
@@ -117,6 +119,11 @@ export function AgencyAccessSection({ invites }: { invites: AgencyInvite[] }) {
         </button>
       </form>
       {state.error && <p className="text-sm text-err-600 mt-2">{state.error}</p>}
+      {state.inviteLink && (
+        <div className="mt-3">
+          <InviteLinkPanel inviteLink={state.inviteLink} />
+        </div>
+      )}
     </div>
   );
 }

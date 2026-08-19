@@ -73,8 +73,9 @@ Variables d'environnement dans `.env.local` (jamais versionné, modèle dans `.e
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (19 août 2026, voir section "Création de compte" plus bas) — requise pour que la création de compte réelle fonctionne (agence, client, invitations projet). Sans elle, ces actions échouent avec un message explicite plutôt qu'une erreur silencieuse.
 
-À récupérer dans Supabase : Project Settings > API. Pas de clé service-role disponible, ce qui explique plusieurs limitations documentées plus bas (migrations manuelles, invitations client non automatisées).
+À récupérer dans Supabase : Project Settings > API. Les migrations restent manuelles (pas de CLI Supabase configurée), ce qui explique la liste "statut d'exécution non confirmé" plus bas.
 
 ## État d'avancement réel
 
@@ -95,13 +96,28 @@ Routes : `dashboard`, `logos`, `couleurs`, `typographies`, `moodboard`, `design`
 - Authentification unique (agence + client) via `app/connexion/`.
 - Soft-delete généralisé (corbeille) sur projets, assets de marque, documents, sections, section assets — restauration ou suppression définitive depuis `app/agence/corbeille/`.
 - Statuts de projet (en cours / attente de validation / livré) et barre de progression à 5 checkpoints, éditables depuis le menu ⋮ sur chaque `ProjectCard` ou le header de la fiche projet.
-- Invitations client par email (suivi manuel en base, `project_client_invites` — pas de création automatique de compte Supabase Auth, ça demanderait une clé service-role).
+- Création de compte réelle (19 août 2026) : Alexandre crée un vrai compte Supabase Auth (agence, client principal, contact secondaire) directement depuis l'app, sans passer par le Dashboard Supabase. Détails dans la section dédiée ci-dessous.
 - Duplication des assets de marque et documents administratifs quand on crée un nouveau projet pour un client existant.
 - Mode démo côté agence (17 août 2026) : interface agence complète dupliquée en scope `is_demo`, isolée par RLS, pour montrer le produit à des recruteurs sans exposer les vraies données. Détails dans la section dédiée ci-dessous.
 - Proposition de rendez-vous dans la messagerie (18 août 2026) : agence et client peuvent proposer un rendez-vous (date/heure/lieu optionnel) directement dans le fil de discussion, sur le principe de la négociation d'offre Vinted (proposer → accepter/refuser/recontre-proposer). Détails dans la section dédiée ci-dessous.
 - Template de section "Réseaux sociaux" (18 août 2026) : template pré-enregistré supplémentaire dans le picker de `AddSectionForm`, accepte images/PDF/vidéos comme toutes les sections. Détails dans la section dédiée ci-dessous.
 - Thème global Clair/Sombre/Automatique (18 août 2026) : réglage utilisateur (agence et client), persisté par profil et appliqué sans flash au chargement. Détails dans la section dédiée ci-dessous.
 - Widgets du dashboard client (18 août 2026) : 5 nouveaux blocs sur `/espace/dashboard` (nouveautés récentes, échéance, messagerie, rendez-vous, documents). Détails dans la section dédiée ci-dessous.
+
+## Création de compte
+
+Objectif (phase 1, en place) : Alexandre crée lui-même un vrai compte Supabase Auth pour une personne (agence, client principal à la création d'un projet, contact secondaire sur un projet), directement depuis l'app — plus besoin du Dashboard Supabase. Aucun email n'est envoyé automatiquement : le lien d'activation est affiché à l'écran (bouton copier) et Alexandre le transmet à la main. Phase 2 (future, pas commencée) : inscription en autonomie, sans intervention d'Alexandre.
+
+Architecture (migration `032_account_creation.sql`) :
+- `lib/supabase/admin.ts` : `createAdminClient()`, client Supabase avec la clé service-role (`SUPABASE_SERVICE_ROLE_KEY`), qui contourne complètement la RLS. Utilisé uniquement côté serveur, jamais exposé au client. Comme la RLS ne s'applique plus, chaque Server Action qui l'utilise revérifie elle-même `profiles.role === 'agence'` pour l'appelant avant d'agir.
+- `lib/accountCreation.ts` : `createRealAccount(email, fullName, role)`, point d'entrée unique. Appelle `admin.auth.admin.generateLink({ type: 'invite', ... })` (crée le compte Auth sans envoyer d'email), insère la ligne `profiles` correspondante, puis construit le lien d'activation lui-même à partir de `properties.hashed_token` (pattern `token_hash` + `type=invite`, plus fiable que de dépendre du comportement de redirection hébergé de Supabase). Réutilisé aux 3 endroits où un compte se crée : agence elle-même (Réglages > Accès), nouveau client (création de projet), contact secondaire sur un projet existant.
+- `app/auth/confirm/route.ts` : Route Handler qui reçoit le clic sur le lien, appelle `verifyOtp({ type, token_hash })`, ouvre une session (cookie) et redirige vers `next` (par défaut `/connexion/definir-mot-de-passe`).
+- `app/connexion/definir-mot-de-passe/` : page + formulaire + action pour choisir un mot de passe une fois la session ouverte, puis redirection vers le bon dashboard selon `profiles.role`.
+- `agency_invites` et `project_client_invites` ont désormais une colonne `profile_id` (lien vers le compte réellement créé) ; leur statut passe directement à `acceptee` à la création (le compte existe déjà, ce n'est plus une invitation en attente d'action externe).
+
+Écarts assumés, à garder en tête :
+- Un contact secondaire invité sur un projet (`project_client_invites`) a un vrai compte et peut se connecter, mais ne voit encore aucune donnée : seul `projects.client_profile_id` donne accès côté RLS client, pas `project_client_invites`. Prochaine étape si ce cas devient prioritaire.
+- Retirer une invitation (bouton ✕) supprime la ligne de suivi mais pas le compte Supabase Auth sous-jacent (cohérent avec le principe "ne jamais supprimer") — nettoyage manuel dans le Dashboard Supabase si un compte a été créé par erreur.
 
 ## Mode démo agence
 
@@ -202,7 +218,7 @@ Toutes les requêtes suivent les conventions existantes : `.is("deleted_at", nul
 
 Fichiers dans `supabase/migrations/`, numérotés, à exécuter manuellement dans Supabase Dashboard > SQL Editor (pas de clé service-role disponible pour automatiser).
 
-Présents : 002 à 018, puis 020 à 031. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
+Présents : 002 à 018, puis 020 à 032. **001 et 019 sont absents** du dossier — à vérifier avec Alexandre si elles ont été appliquées autrement ou si elles manquent réellement.
 
 `020_projects_soft_delete.sql` (ajoute `deleted_at` sur `projects` + policy delete définitive agence) : créée récemment, **statut d'exécution non confirmé** — à vérifier en priorité avec l'utilisateur avant de considérer le soft-delete des projets comme fonctionnel en prod/dev.
 
@@ -211,6 +227,8 @@ Présents : 002 à 018, puis 020 à 031. **001 et 019 sont absents** du dossier 
 `029_messages_rendezvous.sql` (colonnes `type` / `metadata` sur `messages`, propositions de rendez-vous) : écrite le 18 août 2026, **statut d'exécution non confirmé** — voir section "Rendez-vous dans la messagerie" ci-dessus.
 
 `030_section_template_social.sql` (nouvelle entrée `section_types` "Réseaux sociaux") et `031_theme_preference.sql` (colonne `profiles.theme_preference`) : écrites le 18 août 2026, **statut d'exécution non confirmé** — le code applicatif suppose déjà les deux exécutées (le sélecteur de thème et le picker de templates y font référence directement).
+
+`032_account_creation.sql` (colonne `profile_id` sur `agency_invites` et `project_client_invites` + policies update agence) : écrite le 19 août 2026, **statut d'exécution non confirmé** — voir section "Création de compte" ci-dessus. Nécessite en plus `SUPABASE_SERVICE_ROLE_KEY` dans `.env.local` (voir section "Installation et lancement") pour que la création de compte fonctionne, indépendamment de l'exécution de la migration elle-même.
 
 ## Prochaines étapes probables
 

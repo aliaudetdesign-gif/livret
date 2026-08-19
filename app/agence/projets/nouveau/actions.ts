@@ -4,12 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getDemoScope } from "@/lib/demoMode";
+import { createRealAccount } from "@/lib/accountCreation";
 import {
   duplicateBrandAssetsForNewProject,
   duplicateDocumentsForNewProject,
 } from "@/lib/projectDuplication";
 
-export type ActionState = { error: string | null };
+export type ActionState = { error: string | null; inviteLink?: string };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -35,9 +36,12 @@ export async function createProject(
   const client_full_name_input = (formData.get("client_full_name") as string)?.trim() || null;
 
   // Email du client (optionnel) : saisi maintenant pour éviter de repasser par
-  // Réglages ensuite. Pour un nouveau client il faut aussi son nom (le compte
-  // n'existe pas encore). Pour un client existant, on récupère son nom déjà
-  // enregistré.
+  // Réglages ensuite. Pour un nouveau client il faut aussi son nom : un vrai
+  // compte Supabase Auth est créé tout de suite, avant même l'insertion du
+  // projet, pour pouvoir le lier directement en client_profile_id. Pour un
+  // client existant, l'email sert à inviter un contact secondaire sur ce
+  // projet précis (son propre compte, sans accès au projet pour l'instant,
+  // voir CLAUDE.md).
   let inviteFullName: string | null = null;
   if (client_email) {
     if (!EMAIL_PATTERN.test(client_email)) {
@@ -56,6 +60,19 @@ export async function createProject(
       }
       inviteFullName = client_full_name_input;
     }
+  }
+
+  // Nouveau client avec email : on crée le vrai compte maintenant, pour
+  // pouvoir lier le projet directement (plus de client_profile_id resté nul).
+  let newClientProfileId = client_profile_id;
+  let inviteLink: string | undefined;
+  if (client_email && inviteFullName && !client_profile_id) {
+    const result = await createRealAccount(client_email, inviteFullName, "client");
+    if (!result.ok) {
+      return { error: result.error };
+    }
+    newClientProfileId = result.userId;
+    inviteLink = result.inviteLink;
   }
 
   // Client existant : on récupère ses projets précédents avant de créer le
@@ -82,7 +99,7 @@ export async function createProject(
       status,
       start_date,
       end_date,
-      client_profile_id,
+      client_profile_id: newClientProfileId,
       is_demo: scope,
     })
     .select("id")
@@ -97,20 +114,39 @@ export async function createProject(
     await duplicateDocumentsForNewProject(supabase, priorProjectIds, newProject.id);
   }
 
-  if (client_email && inviteFullName && newProject) {
+  // Client existant + email : contact secondaire sur ce projet précis, avec
+  // son propre vrai compte (accès au projet non branché, voir CLAUDE.md).
+  if (client_email && inviteFullName && client_profile_id && newProject) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    await supabase.from("project_client_invites").insert({
+    const result = await createRealAccount(client_email, inviteFullName, "client");
+    if (!result.ok) {
+      return { error: result.error };
+    }
+    inviteLink = result.inviteLink;
+
+    const { error: inviteRowError } = await supabase.from("project_client_invites").insert({
       project_id: newProject.id,
       email: client_email,
       full_name: inviteFullName,
+      status: "acceptee",
+      profile_id: result.userId,
       invited_by: user?.id ?? null,
     });
+
+    if (inviteRowError) {
+      return { error: inviteRowError.message };
+    }
   }
 
   revalidatePath("/agence/projets");
   revalidatePath("/agence/dashboard");
+
+  if (inviteLink) {
+    return { error: null, inviteLink };
+  }
+
   redirect("/agence/projets");
 }

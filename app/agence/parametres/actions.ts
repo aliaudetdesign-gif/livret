@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createRealAccount } from "@/lib/accountCreation";
 
 export type AgencyProfileActionState = { error: string | null };
-export type InviteActionState = { error: string | null };
+export type InviteActionState = { error: string | null; inviteLink?: string };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -65,19 +66,39 @@ export async function inviteAgencyMember(
     return { error: "Session expirée, reconnecte-toi." };
   }
 
-  const { error } = await supabase.from("agency_invites").insert({
+  // Le client admin (clé service-role) contourne la RLS : on vérifie donc
+  // nous-mêmes que l'appelant est bien côté agence avant de créer un compte.
+  const { data: callerProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (callerProfile?.role !== "agence") {
+    return { error: "Action réservée à l'agence." };
+  }
+
+  const result = await createRealAccount(email, fullName, "agence");
+
+  if (!result.ok) {
+    return { error: result.error };
+  }
+
+  const { error: inviteRowError } = await supabase.from("agency_invites").insert({
     email,
     full_name: fullName,
+    status: "acceptee",
+    profile_id: result.userId,
     invited_by: user.id,
   });
 
-  if (error) {
-    return { error: error.message };
+  if (inviteRowError) {
+    return { error: inviteRowError.message };
   }
 
   revalidatePath("/agence/parametres");
 
-  return { error: null };
+  return { error: null, inviteLink: result.inviteLink };
 }
 
 export async function removeAgencyInvite(inviteId: string): Promise<{ error: string | null }> {

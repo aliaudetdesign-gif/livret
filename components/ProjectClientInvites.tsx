@@ -7,6 +7,7 @@ import {
   type ProjectClientInviteActionState,
 } from "@/app/agence/projets/[id]/actions";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { InviteLinkPanel } from "@/components/InviteLinkPanel";
 import type { ProjectClientInvite } from "@/lib/types";
 import { formatShortDate } from "@/lib/format";
 
@@ -23,7 +24,7 @@ const statusStyle: Record<ProjectClientInvite["status"], string> = {
 
 const statusLabel: Record<ProjectClientInvite["status"], string> = {
   en_attente: "En attente",
-  acceptee: "Acceptée",
+  acceptee: "Compte créé",
 };
 
 function InviteRow({
@@ -92,9 +93,11 @@ function InviteRow({
 }
 
 // Suivi des personnes côté client invitées à consulter ce projet, en plus du
-// client principal. Pas de création de compte Supabase Auth réelle (nécessiterait
-// une clé service-role côté serveur) : le statut "En attente" / "Acceptée"
-// reste pour l'instant un suivi manuel, le compte étant créé à la main ensuite.
+// client principal. Un vrai compte Supabase Auth est créé immédiatement (voir
+// lib/accountCreation.ts), mais son accès à ce projet précis n'est pas encore
+// branché côté RLS (seul client_profile_id sur projects donne accès côté
+// client) : le compte existe et peut se connecter, mais ne verra rien tant
+// que ce n'est pas fait. Voir CLAUDE.md.
 export function ProjectClientInvites({
   invites,
   projectId,
@@ -139,6 +142,11 @@ export function ProjectClientInvites({
         </button>
       </form>
       {state.error && <p className="text-sm text-err-600 mt-2">{state.error}</p>}
+      {state.inviteLink && (
+        <div className="mt-3">
+          <InviteLinkPanel inviteLink={state.inviteLink} />
+        </div>
+      )}
     </div>
   );
 }
